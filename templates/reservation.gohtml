@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Go Sessions Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body>
+    {{ template "navbar" }}
+    
+    {{if .Authenticated }}
+        <a href="/index">Welcome back! {{.Username}}</a>
+        <div class="container">
+            <form id="reservation" action="/createreservation" method="post">
+                <h3>Client Information</h3>
+                <div class="client-info">
+                    <div class="row justify-content-around">
+                        <div class="form-group col-3">
+                            <label for="firstname">Firstname</label>
+                            <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="lastname">Lastname</label>
+                            <input type="lastname" class="form-control" id="lastname" name="lastname" placeholder="Lastname">
+                        </div>
+                        <div class="form-group col-3"></div>
+                    </div>
+
+                    <div class="row justify-content-around">
+                        <div class="form-group col-3">
+                            <label for="email">Email</label>
+                            <input type="text" class="form-control" id="email" name="email" placeholder="Email">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="phone">Phone Number</label>
+                            <input type="phone" class="form-control" id="phone" name="phone" placeholder="Phone">
+                        </div>
+                        <div class="col-3"></div>
+                    </div>
+
+                    <div class="row justify-content-around">
+                        <div class="form-group col-3">
+                            <label for="streetaddress">Street Address</label>
+                            <input type="text" class="form-control" id="streetaddress" name="streetaddress" placeholder="Street Address">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="city">City</label>
+                            <input type="city" class="form-control" id="city" name="city" placeholder="City">
+                        </div>
+                        <div class="col-3"></div>
+                    </div>
+
+                    <div class="row justify-content-around">
+                        <div class="form-group col-3">
+                            <label for="provstate">Province/State</label>
+                            <input type="text" class="form-control" id="provstate" name="provstate" placeholder="Province/State">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="postalzip">Postal/Zip Code</label>
+                            <input type="postalzip" class="form-control" id="postalzip" name="postalzip" placeholder="Postal/Zip">
+                        </div>
+                        <div class="form-group col-3">
+                        
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-around">
+                        <div class="form-group col-3">
+                            <label for="country">Country</label>
+                            <input type="text" class="form-control" id="country" name="country" placeholder="Country">
+                        </div>
+                        <div class="col-3">
+                        
+                        </div>
+                        <div class="col-3">
+                        
+                        </div>
+                    </div>
+
+                    <p>Travel Agents Use Only</p>
+                    <div class="row justify-content-around">    
+                        <div class="form-group col-3">
+                            <label for="iata">Travel Agent IATA#</label>
+                            <input type="text" class="form-control" id="iata" name="iata" placeholder="IATA #">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="agentname">Agent Name</label>
+                            <input type="text" class="form-control" id="agentname" name="agentname" placeholder="Agent Name">
+                        </div>
+                        <div class="form-group col-3">
+                    </div>
+                    <div class="form-group col-3">
+                    </div>
+                    </div>
+                </div>
+                
+                <h3>Trip Information</h3>
+                <div class="trip-info">
+                    <div class="row justify-content-around">    
+                        <div class="form-group col-3">
+                            <label for="triptype">Trip Type</label>
+                            <select class="form-control" id="triptype" name="triptype" placeholder="Trip Type">
+                                <option value="oneway">One Way</option>
+                                <option value="roundtrip">Round Trip</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-3">
+                        </div>
+                        <div class="form-group col-3">
+                        </div>
+                        <div class="form-group col-3">
+                        </div>
+                    </div>
+                    <div class="row justify-content-around">    
+                        <div class="form-group col-3">
+                            <label for="departurecity">Departure City</label>
+                            <select class="form-control" id="departurecity" name="departurecity" placeholder="Departure City">
+                                <option value="test">Test City</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="departurevenue">Departure Venue</label>
+                            <select class="form-control" id="departurevenue" name="departurevenue" placeholder="Departure Venue">
+                                <option value="test">Test Venue</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="departuredate">Departure Date</label>
+                            <input type="date" class="form-control" id="departuredate" name="departuredate">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="departuretime">Departure Time</label>
+                            <select class="form-control" id="departuretime" name="departuretime" placeholder="Departure Time">
+                                <option value="test">Test Time</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row justify-content-around">    
+                        <div class="form-group col-3">
+                            <label for="destinationcity">Destination City</label>
+                            <select class="form-control" id="destinationcity" name="destinationcity" placeholder="Destination City">
+                                <option value="test">Test City</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="destinationvenue">Destination Venue</label>
+                            <select class="form-control" id="destinationvenue" name="destinationvenue" placeholder="Destination Venue">
+                                <option value="test">Test Venue</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="destinationdate">Destination Date</label>
+                            <input type="date" class="form-control" id="destinationdate" name="destinationdate">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="destinationtime">Destination Time</label>
+                            <select class="form-control" id="destinationtime" name="destinationtime" placeholder="Destination Time">
+                                <option value="test">Test Time</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p>Number of Passengers</p>  
+                    <div class="row justify-content-around">  
+                        <div class="form-group col-3">
+                            <label for="numadults">Adults</label>
+                            <input type="text" class="form-control" id="numadults" name="numadults">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="numseniors">Seniors (65+)</label>
+                            <input type="text" class="form-control" id="numseniors" name="numseniors">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="numstudents">Students</label>
+                            <input type="text" class="form-control" id="numstudents" name="numstudents">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="numchildren">Children (under 12)</label>
+                            <input type="text" class="form-control" id="numchildren" name="numchildren">
+                        </div>
+                    </div>
+
+                    <div id="return-info">
+                    <p>Return Trip Information</p>  
+                        <div class="row justify-content-around">    
+                            <div class="form-group col-3">
+                                <label for="returndeparturecity">Return Departure City</label>
+                                <select class="form-control" id="returndeparturecity" name="returndeparturecity" placeholder="Departure City">
+                                    <option value="test">Test City</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="returndeparturevenue">Return Departure Venue</label>
+                                <select class="form-control" id="returndeparturevenue" name="returndeparturevenue" placeholder="Departure Venue">
+                                    <option value="test">Test Venue</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="returndeparturedate">return Departure Date</label>
+                                <input type="date" class="form-control" id="returndeparturedate" name="returndeparturedate">
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="returndeparturetime">Return Departure Time</label>
+                                <select class="form-control" id="returndeparturetime" name="returndeparturetime" placeholder="Departure Time">
+                                    <option value="test">Test Time</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row justify-content-around">    
+                            <div class="form-group col-3">
+                                <label for="returndestinationcity">Return Destination City</label>
+                                <select class="form-control" id="returndestinationcity" name="returndestinationcity" placeholder="Destination City">
+                                    <option value="test">Test City</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="returndestinationvenue">Return Destination Venue</label>
+                                <select class="form-control" id="returndestinationvenue" name="returndestinationvenue" placeholder="Destination Venue">
+                                    <option value="test">Test Venue</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="returndestinationdate">Destination Date</label>
+                                <input type="date" class="form-control" id="returndestinationdate" name="returndestinationdate">
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="returndestinationtime">Return Destination Time</label>
+                                <select class="form-control" id="returndestinationtime" name="returndestinationtime" placeholder="Destination Time">
+                                    <option value="test">Test Time</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <p>Number of Return Passengers</p>  
+                        <div class="row justify-content-around">  
+                            <div class="form-group col-3">
+                                <label for="numadults">Adults</label>
+                                <input type="text" class="form-control" id="numadults" name="numadults">
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="numseniors">Seniors (65+)</label>
+                                <input type="text" class="form-control" id="numseniors" name="numseniors">
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="numstudents">Students</label>
+                                <input type="text" class="form-control" id="numstudents" name="numstudents">
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="numchildren">Children (under 12)</label>
+                                <input type="text" class="form-control" id="numchildren" name="numchildren">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="submit" type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        {{end}}
+        {{ if not .Authenticated }}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm">
+                    <h2 id="signin">Sign In</h2>
+                    <p>If you don't have an account please sign up <a href="/signup">here</a></p>
+                    <form id="signin" action="/signin" method="post">
+                        <div class="form-group col-4">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {{ end }}
+
+    {{ template "footer" }}
+
+    <script type="text/javascript" >
+    (function() {
+        document.getElementById("submit").onclick = function() { 
+            alert('Reservation Created!!'); 
+        };
+    })();
+
+    (function() {
+        document.getElementById("triptype").onchange = function() { 
+            if(document.getElementById('triptype').value == "roundtrip") {
+                document.getElementById('return-info').style.display = "inline-block";
+
+            }
+        };
+    })();
+</script>
+</body>
+</html>

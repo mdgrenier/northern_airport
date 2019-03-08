@@ -1,0 +1,15 @@
+# git ignore file
+
+# files
+*.lock
+*.dll
+*.suo
+
+# directories
+**/bin
+**/lib
+**/packages
+**/fonts
+**/obj
+**/.vs
+**/App_Data

@@ -1,0 +1,77 @@
+{{ define "navbar" }}
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Northern Airport Passenger Service</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+      
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/signup">Sign Up</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/reservation">Reservation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+{{ end }}
+
+{{ define "footer" }}
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row justify-content-between">
+                <div class="col-4">
+                    <p class="left">© Northern Airport Passenger Service 2019</p>
+                </div>
+                <div class="col-4">
+                    <p class="right">Created by: <a href="http://www.mgrenier.ca">Matthew Grenier Consulting</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+{{ end }}
+
+{{ define "authentication" }}
+    {{if .Authenticated }}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm">
+                    <h2 id="signin"><a href="/index">Welcome back! {{.Username}}</a></h2>
+                </div>
+            </div>
+        </div>
+        {{end}}
+        {{ if not .Authenticated }}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm">
+                    <h2 id="signin">Sign In</h2>
+                    <p>If you don't have an account please sign up <a href="/signup">here</a></p>
+                    <form id="signin" action="/signin" method="post">
+                        <div class="form-group col-4">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {{ end }}
+{{ end }}
