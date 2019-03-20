@@ -10,8 +10,137 @@
 </head>
 <body>
     {{ template "navbar" }}
+    
     <h1>Northern Airport Reservation System</h1>
-    {{ template "authentication" }}
+    
+    <div class="container">
+        <form id="register" action="/register" method="post">
+            <h3>Client Information</h3>
+            <div class="client-info">
+            <div class="row justify-content-around">
+                    <div class="form-group col-3">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                    </div>
+                    <div class="form-group col-3"></div>
+                </div>
+
+                <div class="row justify-content-around">
+                    <div class="form-group col-3">
+                        <label for="firstname">Firstname</label>
+                        <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname">
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="lastname">Lastname</label>
+                        <input type="lastname" class="form-control" id="lastname" name="lastname" placeholder="Lastname">
+                    </div>
+                    <div class="form-group col-3"></div>
+                </div>
+
+                <div class="row justify-content-around">
+                    <div class="form-group col-3">
+                        <label for="email">Email</label>
+                        <input type="text" class="form-control" id="email" name="email" placeholder="Email">
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="phone">Phone Number</label>
+                        <input type="phone" class="form-control" id="phone" name="phone" placeholder="Phone">
+                    </div>
+                    <div class="col-3"></div>
+                </div>
+
+                <div class="row justify-content-around">
+                    <div class="form-group col-3">
+                        <label for="streetaddress">Street Address</label>
+                        <input type="text" class="form-control" id="streetaddress" name="streetaddress" placeholder="Street Address">
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="city">City</label>
+                        <input type="city" class="form-control" id="city" name="city" placeholder="City">
+                    </div>
+                    <div class="col-3"></div>
+                </div>
+
+                <div class="row justify-content-around">
+                    <div class="form-group col-3">
+                        <label for="provstate">Province/State</label>
+                        <input type="text" class="form-control" id="provstate" name="provstate" placeholder="Province/State">
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="postalzip">Postal/Zip Code</label>
+                        <input type="postalzip" class="form-control" id="postalzip" name="postalzip" placeholder="Postal/Zip">
+                    </div>
+                    <div class="form-group col-3">
+                    
+                    </div>
+                </div>
+
+                <div class="row justify-content-around">
+                    <div class="form-group col-3">
+                        <label for="country">Country</label>
+                        <input type="text" class="form-control" id="country" name="country" placeholder="Country">
+                    </div>
+                    <div class="col-3">
+                    
+                    </div>
+                    <div class="col-3">
+                    
+                    </div>
+                </div>
+
+                <div class="row justify-content-around">
+                    <div class="form-group col-3">
+                        <label for="defaultdeparturevenue">Default Departure Venue</label>
+                        <select class="form-control" id="defaultdeparturevenue" name="defaultdeparturevenue" placeholder="Default Venue">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                    <div class="col-3">
+                    
+                    </div>
+                    <div class="col-3">
+                    
+                    </div>
+                </div>
+
+                <div class="row justify-content-around">
+                    <div class="form-group col-3">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                    <div class="col-3">
+                    
+                    </div>
+                    <div class="col-3">
+                    
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
     {{ template "footer" }}
+
+    <script>
+
+        var select=document.getElementById('defaultdeparturevenue');
+        index=0;
+        var langArray = ["1", "2", "3"];
+
+        for(element in langArray)
+        {
+            var opt = document.createElement("option");
+            opt.value= index;
+            opt.innerHTML = element; // whatever property it has
+
+            // then append it to the select element
+            select.appendChild(opt);
+            index++;
+        }
+
+    </script>
 </body>
 </html>

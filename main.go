@@ -52,11 +52,6 @@ func newRouter() *mux.Router {
 func main() {
 	r := newRouter()
 
-	//connString := "dbname=mydb user=mdgre_000 password=password port=5432 sslmode=disable"
-	//db, err := sql.Open("postgres", connString)
-	//local development connection
-	//connString := "root:test@tcp(127.0.0.1:3306)/northernairport"
-	//docker container connection
 	connString := "root:test@tcp(db:3306)/northernairport"
 	db, err := sql.Open("mysql", connString)
 

@@ -26,11 +26,96 @@ INSERT INTO `accountdetails` (`AccountDetailID`, `ClientID`, `Username`, `Passwo
 
 CREATE TABLE `airlines` (
   `AirlineID` int(11) NOT NULL,
-  `Name` varchar(25) NOT NULL,
+  `Name` varchar(50) NOT NULL,
   `Terminal` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `airlines`
+--
+
+INSERT INTO `airlines` (`airlineid`, `name`, `terminal`) VALUES
+(1, 'Lufthansa', 1),
+(2, 'Alitalia', 3),
+(3, 'WestJet', 3),
+(4, 'Sunwing Airlines', 3),
+(5, 'KLM', 3),
+(6, 'Air France', 3),
+(7, 'Air Transat', 3),
+(8, 'Delta', 3),
+(9, 'EVA Air', 1),
+(10, 'Etihad Airways', 3),
+(11, 'Hainan Airlines', 3),
+(12, 'CanJet', 3),
+(13, 'LOT Polish Airlines', 1),
+(14, 'All Nippon Airways', 1),
+(15, 'American Airlines', 3),
+(16, 'Air New Zealand', 1),
+(17, 'Alaska Airlines', 3),
+(18, 'Arkefly', 1),
+(19, 'Air China', 1),
+(20, 'Caribbean Airlines', 3),
+(21, 'Copa Airlines', 1),
+(22, 'Condor', 3),
+(23, 'All Nippon Air', 1),
+(24, 'EL AL', 3),
+(25, 'Emirates', 1),
+(26, 'Finnair', 3),
+(27, 'Japan Airlines', 3),
+(28, 'Air Canada', 1),
+(29, 'Asiana Airlines', 1),
+(30, 'Air Wisconsin', 1),
+(31, 'Ethiopian Airlines', 1),
+(32, 'Aeroflot', 3),
+(33, 'Austrian', 1),
+(34, 'Avianca', 1),
+(35, 'British Airways', 3),
+(36, 'Air Jamaica', 1),
+(37, 'Cathay Pacific', 3),
+(38, 'Cubana', 3),
+(39, 'Comar', 3),
+(40, 'Fly Jamaica', 3),
+(41, 'Ibena', 3),
+(42, 'Icelandair', 3),
+(43, 'Jet Airways', 1),
+(44, 'Air India', 1),
+(45, 'Korean Air', 3),
+(46, 'LAN Airlines', 3),
+(47, 'Aerosvit Ukranian Air', 3),
+(48, 'Miami Air International', 3),
+(49, 'Pakistan International', 3),
+(50, 'Phillippine Airlines', 3),
+(51, 'Qantas', 3),
+(52, 'SAS Scandinavian', 1),
+(53, 'SATA International', 3),
+(54, 'SAUDIA', 3),
+(55, 'Singapore Airlines', 1),
+(56, 'Swiss International Air Lines', 1),
+(57, 'TACA', 1),
+(58, 'Thai Airways International', 1),
+(59, 'Transaero Airlines', 3),
+(60, 'Turkish Airlines', 1),
+(61, 'Aeromexico', 3),
+(62, 'United', 1),
+(63, 'US Airways', 3),
+(64, 'Commuter', 3),
+(65, 'Continental air', 1),
+(66, 'Continental Express', 1),
+(67, 'Jet Airways', 3),
+(68, 'WOW Air', 3),
+(69, 'Egypt Air', 1),
+(70, 'Aer LIngus', 3),
+(71, 'China Eastern', 3),
+(72, 'China Eastern Airlines', 3),
+(73, 'Brazilian Airlines', 3),
+(74, 'American Eagle', 3),
+(75, 'Union Pearson Express', 1),
+(76, 'Brussels', 1),
+(77, 'A Terminal 1  Not flying,', 1),
+(78, 'A Terminal 3, Not flying', 3),
+(79, 'China South Airlines', 3),
+(80, 'TAP Portugal Air', 1),
+(81, 'Flair Airline', 3);
 
 --
 -- Table structure for table `cities`
@@ -45,8 +130,23 @@ CREATE TABLE `cities` (
 -- Dumping data for table `cities`
 --
 
-INSERT INTO `cities` (`CityID`, `Name`) VALUES
-(1, 'test');
+INSERT INTO `cities` (`cityid`, `name`) VALUES
+(1, 'North Bay'),
+(2, 'Toronto Pearson and Hotels'),
+(3, 'Bracebridge'),
+(4, 'Burks Falls'),
+(5, 'Callander'),
+(7, 'Emsdale'),
+(8, 'Gravenhurst'),
+(10, 'Huntsville'),
+(11, 'Katrine'),
+(14, 'Novar'),
+(15, 'Port Sydney'),
+(16, 'Powassan'),
+(17, 'South River'),
+(18, 'Sundridge'),
+(20, 'Trout Creek'),
+(9, 'Huntsville Deerhurst Resort');
 
 -- --------------------------------------------------------
 
@@ -58,7 +158,7 @@ CREATE TABLE `clients` (
   `ClientID` int(11) NOT NULL,
   `FirstName` varchar(50) NOT NULL,
   `LastName` varchar(50) NOT NULL,
-  `Phone` int(11) NOT NULL,
+  `Phone` bigint(20) NOT NULL,
   `Email` varchar(100) NOT NULL,
   `StreetAddress` varchar(100) NOT NULL,
   `City` varchar(50) NOT NULL,
@@ -66,7 +166,7 @@ CREATE TABLE `clients` (
   `PostalCode` char(6) NOT NULL,
   `Country` varchar(50) NOT NULL,
   `DefaultDepartureAddress` varchar(100) DEFAULT NULL,
-  `DefaultPartureCityID` int(11) NOT NULL,
+  `DefaultDepartureCityID` int(11) DEFAULT NULL,
   `TravelAgentID` int(11) DEFAULT NULL,
   `Notes` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -75,7 +175,7 @@ CREATE TABLE `clients` (
 -- Dumping data for table `clients`
 --
 
-INSERT INTO `clients` (`ClientID`, `FirstName`, `LastName`, `Phone`, `Email`, `StreetAddress`, `City`, `Province`, `PostalCode`, `Country`, `DefaultDepartureAddress`, `DefaultPartureCityID`, `TravelAgentID`, `Notes`) VALUES
+INSERT INTO `clients` (`ClientID`, `FirstName`, `LastName`, `Phone`, `Email`, `StreetAddress`, `City`, `Province`, `PostalCode`, `Country`, `DefaultDepartureAddress`, `DefaultDepartureCityID`, `TravelAgentID`, `Notes`) VALUES
 (3, 'test', 'test', 1234567890, 'test@test.com', 'test', 'test', 'ontario', 'p1b8p4', 'canada', NULL, 1, NULL, NULL);
 
 -- --------------------------------------------------------
@@ -89,7 +189,16 @@ CREATE TABLE `customertypes` (
   `Name` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `clients`
+--
+
+INSERT INTO `customertypes` (`CustomerTypeID`, `Name`) VALUES
+(1, 'Adult'),
+(2, 'Senior'),
+(3, 'Student'),
+(4, 'Child');
+
 
 --
 -- Table structure for table `customvenues`
@@ -142,7 +251,22 @@ CREATE TABLE `drivers` (
   `LastName` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `drivers`
+--
+
+INSERT INTO `drivers` (`driverid`, `firstname`, `lastname`) VALUES
+(1, 'Andy', 'Duggan'),
+(2, 'Joe', 'Palangio'),
+(3, 'Mike', 'Lok'),
+(4, 'Blake', 'Gennoe'),
+(5, 'Rob', 'Farris'),
+(6, 'Carole', 'Tran'),
+(7, 'Mike', 'Ianiro'),
+(8, 'Cosmo', 'Ianiro'),
+(9, 'Mike', 'Brideau'),
+(10, 'Brad', 'Openshaw'),
+(11, 'Jean Paul', 'Chartrand');
 
 --
 -- Table structure for table `prices`
@@ -157,7 +281,128 @@ CREATE TABLE `prices` (
   `DestinationCityID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `prices`
+--
+
+INSERT INTO `prices` (`priceid`, `departurecityid`, `destinationcityid`, `customertypeid`, `price`, `returnprice`) VALUES
+(23, 10, 2, 1, 94.00,0),
+(31, 1, 2, 1, 119.00,0),
+(32, 1, 2, 2, 111.00,0),
+(33, 1, 2, 3, 109.00,0),
+(35, 5, 2, 1, 119.00,0),
+(37, 5, 2, 3, 109.00,0),
+(36, 5, 2, 2, 111.00,0),
+(39, 16, 2, 1, 119.00,0),
+(40, 16, 2, 4, 59.50,0),
+(41, 16, 2, 3, 109.00,0),
+(29, 20, 2, 1, 99.00,0),
+(30, 20, 2, 4, 47.50,0),
+(45, 20, 2, 3, 95.00,169.00),
+(46, 20, 2, 2, 95.00,169.00),
+(47, 17, 2, 1, 99.00,0),
+(3, 17, 2, 4, 49.50,0),
+(49, 17, 2, 3, 95.00,169.00),
+(50, 17, 2, 2, 95.00,169.00),
+(51, 18, 2, 1, 99.00,0),
+(5, 18, 2, 4, 49.50,0),
+(53, 18, 2, 3, 95.00,169.00),
+(54, 18, 2, 2, 95.00,169.00),
+(55, 4, 2, 1, 99.00,0),
+(21, 4, 2, 2, 95.00,0),
+(57, 4, 2, 3, 95.00,0),
+(59, 11, 2, 1, 99.00,0),
+(17, 11, 2, 4, 49.50,0),
+(61, 11, 2, 3, 95.00,0),
+(62, 11, 2, 2, 95.00,0),
+(63, 7, 2, 1, 99.00,0),
+(65, 7, 2, 2, 95.00,0),
+(24, 7, 2, 3, 95.00,0),
+(67, 14, 2, 1, 99.00,0),
+(18, 14, 2, 4, 49.50,0),
+(69, 14, 2, 2, 95.00,0),
+(48, 10, 2, 2, 89.00,0),
+(22, 10, 2, 4, 47.00,0),
+(75, 3, 2, 1, 94.00,0),
+(6, 3, 2, 4, 47.00,0),
+(77, 3, 2, 2, 89.00,0),
+(79, 15, 2, 1, 94.00,0),
+(80, 15, 2, 4, 47.00,0),
+(81, 15, 2, 3, 89.00,159.00),
+(82, 15, 2, 2, 89.00,159.00),
+(85, 8, 2, 4, 47.00,0),
+(83, 8, 2, 1, 94.00,0),
+(84, 8, 2, 2, 89.00,0),
+(89, 2, 11, 4, 47.50,0),
+(88, 2, 11, 3, 95.00,0),
+(73, 2, 11, 2, 95.00,0),
+(92, 2, 1, 3, 109.00,0),
+(91, 2, 1, 2, 111.00,0),
+(90, 2, 1, 1, 119.00,0),
+(9, 2, 4, 1, 99.00,0),
+(8, 2, 4, 4, 49.50,0),
+(2, 2, 5, 2, 111.00,0),
+(1, 2, 5, 1, 119.00,0),
+(95, 2, 10, 4, 47.00,0),
+(56, 2, 11, 1, 99.00,0),
+(102, 2, 1, 4, 59.50,0),
+(10, 2, 4, 2, 95.00,0),
+(4, 2, 5, 4, 59.50,0),
+(71, 2, 7, 4, 49.50,0),
+(68, 2, 7, 3, 95.00,0),
+(64, 2, 7, 2, 95.00,0),
+(60, 2, 7, 1, 99.00,0),
+(103, 2, 8, 4, 47.00,0),
+(101, 2, 8, 3, 89.00,0),
+(100, 2, 8, 2, 89.00,0),
+(99, 2, 8, 1, 94.00,0),
+(107, 9, 2, 4, 47.00,0),
+(94, 2, 10, 3, 89.00,0),
+(93, 2, 10, 2, 89.00,0),
+(43, 2, 10, 1, 94.00,0),
+(98, 2, 3, 4, 47.00,0),
+(119, 2, 3, 3, 89.00,0),
+(44, 2, 3, 1, 94.00,0),
+(106, 9, 2, 3, 119.00,0),
+(105, 9, 2, 2, 119.00,0),
+(72, 2, 14, 1, 99.00,0),
+(74, 2, 14, 2, 95.00,0),
+(97, 2, 15, 4, 47.00,0),
+(132, 2, 15, 3, 89.00,159.00),
+(133, 2, 15, 2, 89.00,159.00),
+(96, 2, 15, 1, 94.00,0),
+(15, 2, 16, 4, 59.50,0),
+(13, 2, 16, 2, 111.00,0),
+(14, 2, 16, 3, 109.00,0),
+(12, 2, 16, 1, 119.00,0),
+(26, 2, 17, 3, 95.00,0),
+(25, 2, 17, 2, 95.00,0),
+(20, 2, 17, 1, 99.00,0),
+(121, 2, 18, 1, 99.00,0),
+(144, 2, 18, 2, 95.00,169.00),
+(145, 2, 18, 3, 95.00,169.00),
+(28, 2, 18, 4, 49.50,0),
+(104, 9, 2, 1, 124.00,0),
+(19, 2, 20, 4, 49.50,0),
+(150, 2, 20, 2, 95.00,169.00),
+(151, 2, 20, 3, 95.00,169.00),
+(16, 2, 20, 1, 99.00,0),
+(115, 2, 3, 2, 89.00,0),
+(87, 2, 14, 4, 49.50,0),
+(76, 2, 14, 3, 95.00,0),
+(27, 2, 17, 4, 49.50,0),
+(11, 2, 4, 3, 95.00,0),
+(7, 2, 5, 3, 109.00,0),
+(78, 3, 2, 3, 89.00,0),
+(58, 4, 2, 4, 49.50,0),
+(38, 5, 2, 4, 59.50,0),
+(66, 7, 2, 4, 49.50,0),
+(86, 8, 2, 3, 89.00,0),
+(52, 10, 2, 3, 89.00,0),
+(34, 1, 2, 4, 59.50,0),
+(70, 14, 2, 3, 95.00,0),
+(42, 16, 2, 2, 111.00,0);
+
 
 --
 -- Table structure for table `reservations`
@@ -217,8 +462,11 @@ CREATE TABLE `roles` (
 -- Dumping data for table `roles`
 --
 
-INSERT INTO `roles` (`RoleID`, `RoleName`) VALUES
-(1, 'test');
+INSERT INTO `roles` (`roleid`, `RoleName`) VALUES
+(1, 'test'),
+(2, 'client'),
+(3, 'staff'),
+(4, 'admin');
 
 -- --------------------------------------------------------
 
@@ -233,7 +481,13 @@ CREATE TABLE `taxes` (
   `Active` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `taxes` (`TaxID`, `Percentage`, `Name`, `Active`) VALUES
+(1, '13', 'HST', 1);
+
 
 --
 -- Table structure for table `transactions`
@@ -311,12 +565,20 @@ CREATE TABLE `triptypes` (
 
 CREATE TABLE `vehicles` (
   `VehicleID` int(11) NOT NULL,
-  `LicensePlate` varchar(7) NOT NULL,
+  `LicensePlate` varchar(25) NOT NULL,
   `NumSeats` int(11) NOT NULL,
   `Make` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `vehicles`
+--
+
+INSERT INTO `vehicles` (`vehicleid`, `licenseplate`, `make`, `numseats`) VALUES
+(2, '1109 lic. 8362BF', 'Mercedes', 10),
+(3, '1512 lic. 8697BH', 'Mercedes', 14),
+(1, '1110 lic. 7405BF', 'Mercedes', 10),
+(4, '1411 lic. 8691BH', 'Mercedes', 11);
 
 --
 -- Table structure for table `venues`
@@ -324,15 +586,63 @@ CREATE TABLE `vehicles` (
 
 CREATE TABLE `venues` (
   `VenueID` int(11) NOT NULL,
-  `Name` varchar(100) NOT NULL,
   `CityID` int(11) NOT NULL,
+  `Name` varchar(100) NOT NULL,
   `ExtraCost` float DEFAULT NULL,
   `Active` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Indexes for dumped tables
+-- Dumping data for table `venues`
 --
+
+INSERT INTO `venues` (`venueid`, `cityid`, `name`, `extracost`, `active`) VALUES
+(1, 8, 'McDonald''s Restaurant located at Bethune Dr. and Muskoka Rd', 0.00, 1),
+(2, 3, 'Tim Hortons coffee shop corner of Depot Rd. and Taylor Rd', 0.00, 1),
+(3, 4, 'Tim Horton''s located at 27 Commercial Dr', 0.00, 1),
+(4, 5, 'Wasi Petro Canada located at the corner of Wasi Rd and Callander Bay Dr', 0.00, 1),
+(5, 7, 'Tourist information centre located on Emsdale Rd. Exit #244', 0.00, 1),
+(6, 10, 'Holiday Inn Express located at Howland Dr', 0.00, 1),
+(7, 11, 'The Lucky Dollar on old Hwy 11', 0.00, 1),
+(8, 1, 'Country Style coffee shop located at 1401 Seymour St. and Hwy 11', 0.00, 1),
+(9, 14, 'Foodland', 0.00, 1),
+(10, 15, 'Smiths Resaurant located on highway 11', 0.00, 1),
+(11, 16, 'East Himsworth Cafe, previous Ethels', 0.00, 1),
+(12, 17, 'Shell gas station highway 124', 0.00, 1),
+(13, 18, 'Blue Roof restaurant', 0.00, 1),
+(14, 20, 'TJ''s Variety on highway 522', 0.00, 1),
+(99, 2, 'AIRPORT AIRLINES: CLICK HERE FOR AIRLINE LIST', 0.00, 1),
+(100, 1, 'Home Pickup or Dropoff', 15.00, 1),
+(15, 2, 'Nu Hotel-6465 Airport Rd.', 0.00, 1),
+(19, 2, 'UP Express train Pearson Terminal 1', 0.00, 1),
+(17, 2, 'YYZ No Flight TERMINAL 1,', 0.00, 0),
+(49, 10, 'Deerhurst Resort', 30.00, 1),
+(18, 2, 'YYZ No Flight  Terminal 3,', 0.00, 0),
+(48, 1, 'North Bay Office 191 Booth Rd #7', 0.00, 1),
+(16, 2, 'Quality Inn 2180 Islington', 0.00, 1),
+(25, 2, 'Sheraton Airport, 801 Dixon Rd', 0.00, 1),
+(26, 2, 'Comfort Inn, 6355 Airport Rd.', 0.00, 1),
+(27, 2, 'Carlingview, 221 Carlingview Dr.', 0.00, 1),
+(28, 2, 'Crown Plaza, 33 Carlson Crt.', 0.00, 1),
+(29, 2, 'Delta Hotels 655 Dixon Rd', 0.00, 1),
+(30, 2, 'Fairfield Inn, 3299 Caroga Dr.', 0.00, 1),
+(31, 2, 'Four Points Sheraton, 6257 Airport Rd.', 0.00, 1),
+(32, 2, 'Hampton Inn, 3279 Caroga Dr.', 0.00, 1),
+(33, 2, 'Hilton, 5875 Airport Rd', 0.00, 1),
+(34, 2, 'Holiday Inn , 970 Dixon Rd', 0.00, 1),
+(35, 2, 'Holiday Inn, 600 Dixon Rd.', 0.00, 1),
+(36, 2, 'Embassy Suites, 262 Carlingview Dr.', 0.00, 1),
+(37, 2, 'Hilton Garden Inn,  3311 Caroga Dr.', 0.00, 1),
+(38, 2, 'Radisson Suite, 640 Dixon Rd', 0.00, 1),
+(39, 2, 'Residence Inn Marriott, 17 Reading Crt.', 0.00, 1),
+(40, 2, 'Sheraton Gateway, PIA terminal 3', 0.00, 1),
+(41, 2, 'Marriott Toronto Airport, 901 Dixon Rd.', 0.00, 1),
+(42, 2, 'Double Tree,  925 Dixon Rd.', 0.00, 1),
+(43, 2, 'The Westin Toronto Airport, 950 Dixon Rd.', 0.00, 1),
+(44, 2, 'Best Western Premier, 135 Carlingview Dr.', 0.00, 1),
+(45, 2, 'Sandman Signature, 55 Reading Crt.', 0.00, 1),
+(46, 2, 'Alt Hotel,  6080 Viscount Rd.', 0.00, 1),
+(47, 2, 'Courtyard by Marriot-231 Carlingview', 0.00, 1);
 
 --
 -- Indexes for table `accountdetails`
@@ -361,7 +671,7 @@ ALTER TABLE `clients`
   ADD PRIMARY KEY (`ClientID`),
   ADD UNIQUE KEY `NONCLUSTERED` (`FirstName`),
   ADD KEY `FK_171` (`TravelAgentID`),
-  ADD KEY `FK_217` (`DefaultPartureCityID`);
+  ADD KEY `FK_217` (`DefaultDepartureCityID`);
 
 --
 -- Indexes for table `customertypes`
@@ -634,7 +944,7 @@ ALTER TABLE `accountdetails`
 --
 ALTER TABLE `clients`
   ADD CONSTRAINT `FK_171` FOREIGN KEY (`TravelAgentID`) REFERENCES `travelagents` (`TravelAgentID`),
-  ADD CONSTRAINT `FK_217` FOREIGN KEY (`DefaultPartureCityID`) REFERENCES `cities` (`CityID`);
+  ADD CONSTRAINT `FK_217` FOREIGN KEY (`DefaultDepartureCityID`) REFERENCES `cities` (`CityID`);
 
 --
 -- Constraints for table `customvenues`
