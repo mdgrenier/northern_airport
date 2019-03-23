@@ -10,13 +10,40 @@ import (
 
 	"github.com/gorilla/securecookie"
 
-	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/mux"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var cache redis.Conn
+// Client - data structure to hold client information and account details
+type Client struct {
+	Authenticated bool
+	Password      string `json:"password" db:"password"`
+	Username      string `json:"username" db:"username"`
+	Firstname     string `json:"firstname" db:"firstname"`
+	Lastname      string `json:"lastname" db:"lastname"`
+	Phone         string `json:"phone" db:"phone"`
+	Email         string `json:"email" db:"email"`
+	StreetAddress string `json:"streetaddress" db:"streetaddress"`
+	City          string `json:"city" db:"city"`
+	Province      string `json:"province" db:"province"`
+	PostalCode    string `json:"postalcode" db:"postalcode"`
+	Country       string `json:"country" db:"country"`
+}
+
+// Venues - stores venues
+type Venues struct {
+	VenueID   int    `json:"venueid" db:"venueid"`
+	VenueName string `json:"venuename" db:"venuename"`
+}
+
+// Cities stores venues
+type Cities struct {
+	CityID   int    `json:"cityid" db:"cityid"`
+	CityName string `json:"cityname" db:"cityname"`
+}
+
+var sessionStore *sessions.CookieStore
 
 // tpl holds all parsed templates
 var tpl *template.Template
@@ -86,7 +113,7 @@ func InitSession() {
 		HttpOnly: true,
 	}
 
-	gob.Register(User{})
+	gob.Register(Client{})
 
 	tpl = template.Must(template.ParseGlob("templates/*.gohtml"))
 }

@@ -10,10 +10,11 @@ import (
 
 //Store offers an interface for various db function to the rest of the application
 type Store interface {
-	CreateUser(clients *Clients) error
-	SignInUser(clients *Clients) error
-	GetVenues() error
-	GetClientInfo(clients *Clients, username string) error
+	CreateUser(client *Client) error
+	SignInUser(client *Client) error
+	GetVenues(venues *Venues) error
+	GetCities(cities *Cities) error
+	GetClientInfo(client *Client) error
 }
 
 // The `dbStore` struct will implement the `Store` interface
@@ -23,9 +24,11 @@ type dbStore struct {
 	db *sql.DB
 }
 
-func (store *dbStore) CreateUser(clients *Clients) error {
-	result, err := store.db.Exec("INSERT INTO clients(firstname, lastname, phone, email, streetaddress, city, province, postalcode, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-		clients.Firstname, clients.Lastname, clients.Phone, clients.Email, clients.StreetAddress, clients.City, clients.Province, clients.PostalCode, clients.Country)
+func (store *dbStore) CreateUser(client *Client) error {
+	result, err := store.db.Exec("INSERT INTO clients(firstname, lastname, phone, email, "+
+		"streetaddress, city, province, postalcode, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		client.Firstname, client.Lastname, client.Phone, client.Email, client.StreetAddress,
+		client.City, client.Province, client.PostalCode, client.Country)
 
 	if err != nil {
 		return err
@@ -35,8 +38,9 @@ func (store *dbStore) CreateUser(clients *Clients) error {
 
 	log.Printf("New Client ID: %d", id)
 
-	result, err = store.db.Exec("INSERT INTO accountdetails(clientid, password, roleid, username) VALUES (?, ?, 2, ?)",
-		id, clients.Password, clients.Username)
+	result, err = store.db.Exec("INSERT INTO accountdetails(clientid, password, roleid, username) "+
+		"VALUES (?, ?, 2, ?)",
+		id, client.Password, client.Username)
 
 	id, _ = result.LastInsertId()
 
@@ -45,12 +49,37 @@ func (store *dbStore) CreateUser(clients *Clients) error {
 	return err
 }
 
-func (store *dbStore) SignInUser(clients *Clients) error {
+func (store *dbStore) CreateReservation(client *Client) error {
+	result, err := store.db.Exec("INSERT INTO clients(firstname, lastname, phone, email, streetaddress, "+
+		"city, province, postalcode, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		client.Firstname, client.Lastname, client.Phone, client.Email,
+		client.StreetAddress, client.City, client.Province, client.PostalCode, client.Country)
+
+	if err != nil {
+		return err
+	}
+
+	id, _ := result.LastInsertId()
+
+	log.Printf("New Client ID: %d", id)
+
+	result, err = store.db.Exec("INSERT INTO accountdetails(clientid, password, roleid, username) "+
+		"VALUES (?, ?, 2, ?)",
+		id, client.Password, client.Username)
+
+	id, _ = result.LastInsertId()
+
+	log.Printf("Account Details: %d", id)
+
+	return err
+}
+
+func (store *dbStore) SignInUser(client *Client) error {
 	// Parse and decode the request body into a new `Credentials` instance
 
 	// Query the database for all birds, and return the result to the `rows` object
 	//rows, err := store.db.Query("SELECT username, password from users")
-	row, err := store.db.Query("select password from accountdetails where username=?", clients.Username)
+	row, err := store.db.Query("select password from accountdetails where username=?", client.Username)
 	// We return in case of an error, and defer the closing of the row structure
 	if err != nil {
 		return err
@@ -59,10 +88,10 @@ func (store *dbStore) SignInUser(clients *Clients) error {
 
 	// Create the data structure that is returned from the function.
 	// By default, this will be an empty array of birds
-	storedClients := &Clients{}
+	storedClient := &Client{}
 
 	row.Next()
-	err = row.Scan(&storedClients.Password)
+	err = row.Scan(&storedClient.Password)
 	if err != nil {
 		// If an entry with the username does not exist, send an "Unauthorized"(401) status
 		if err == sql.ErrNoRows {
@@ -76,7 +105,7 @@ func (store *dbStore) SignInUser(clients *Clients) error {
 	}
 
 	// Compare the stored hashed password, with the hashed version of the password that was received
-	if err = bcrypt.CompareHashAndPassword([]byte(storedClients.Password), []byte(clients.Password)); err != nil {
+	if err = bcrypt.CompareHashAndPassword([]byte(storedClient.Password), []byte(client.Password)); err != nil {
 		// If the two passwords don't match, return a 401 status
 		//w.WriteHeader(http.StatusUnauthorized)
 		log.Print("Incorrect Password")
@@ -85,7 +114,7 @@ func (store *dbStore) SignInUser(clients *Clients) error {
 	return err
 }
 
-func (store *dbStore) GetVenues() error {
+func (store *dbStore) GetVenues(venues *Venues) error {
 	row, err := store.db.Query("select venueid, name from venues")
 	// We return in case of an error, and defer the closing of the row structure
 	if err != nil {
@@ -93,20 +122,67 @@ func (store *dbStore) GetVenues() error {
 	}
 	defer row.Close()
 
+	var venueid int
+	var name string
+
+	row.Next()
+	err = row.Scan(
+		&venueid, &name,
+	)
+	if err != nil {
+		// If an entry with the username does not exist, send an "Unauthorized"(401) status
+		if err == sql.ErrNoRows {
+			log.Print("No client found")
+		} else {
+			log.Printf("Error saving client: %s", err.Error())
+		}
+	} else {
+		venues.VenueID = venueid
+		venues.VenueName = name
+	}
+
 	return err
 }
 
-//GetClientInfo takes a username and returns client info
-func (store *dbStore) GetClientInfo(clients *Clients, username string) error {
+func (store *dbStore) GetCities(cities *Cities) error {
+	row, err := store.db.Query("select cityid, name from cities")
+	// We return in case of an error, and defer the closing of the row structure
+	if err != nil {
+		return err
+	}
+	defer row.Close()
 
-	log.Printf("Username: %s", username)
+	var cityid int
+	var name string
+
+	row.Next()
+	err = row.Scan(
+		&cityid, &name,
+	)
+	if err != nil {
+		// If an entry with the username does not exist, send an "Unauthorized"(401) status
+		if err == sql.ErrNoRows {
+			log.Print("No client found")
+		} else {
+			log.Printf("Error saving client: %s", err.Error())
+		}
+	} else {
+		cities.CityID = cityid
+		cities.CityName = name
+	}
+
+	return err
+}
+
+//GetClientInfo takes a client and username
+func (store *dbStore) GetClientInfo(client *Client) error {
 
 	// Query the database for all birds, and return the result to the `rows` object
 	row, err := store.db.Query(
 		"select firstname, lastname, phone, email, streetaddress, "+
 			"city, province, postalcode, country from clients c inner join "+
 			"accountdetails a on c.clientid = a.clientid "+
-			"where a.username=?", username)
+			"where a.username=?", client.Username)
 	// We return in case of an error, and defer the closing of the row structure
 	if err != nil {
 		log.Printf("Error retrieving client: %s", err.Error())
@@ -139,15 +215,15 @@ func (store *dbStore) GetClientInfo(clients *Clients, username string) error {
 	} else {
 		//clients.Username =
 		//clients.Password = firstname
-		clients.Firstname = firstname
-		clients.Lastname = lastname
-		clients.Phone = phone
-		clients.Email = email
-		clients.StreetAddress = streetaddress
-		clients.City = city
-		clients.Province = province
-		clients.PostalCode = postalcode
-		clients.Country = country
+		client.Firstname = firstname
+		client.Lastname = lastname
+		client.Phone = phone
+		client.Email = email
+		client.StreetAddress = streetaddress
+		client.City = city
+		client.Province = province
+		client.PostalCode = postalcode
+		client.Country = country
 	}
 
 	return err

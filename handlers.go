@@ -4,52 +4,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Clients creates a struct that models the structure of a user, both in the request body, and in the DB
-type Clients struct {
-	Authenticated bool
-	Password      string `json:"password" db:"password"`
-	Username      string `json:"username" db:"username"`
-	Firstname     string `json:"firstname" db:"firstname"`
-	Lastname      string `json:"lastname" db:"lastname"`
-	Phone         string `json:"phone" db:"phone"`
-	Email         string `json:"email" db:"email"`
-	StreetAddress string `json:"streetaddress" db:"streetaddress"`
-	City          string `json:"city" db:"city"`
-	Province      string `json:"province" db:"province"`
-	PostalCode    string `json:"postalcode" db:"postalcode"`
-	Country       string `json:"country" db:"country"`
-}
-
-// User stores authentication information
-type User struct {
-	Username      string
-	Authenticated bool
-}
-
-// Venue stores venues
-type Venue struct {
-	VenueID   int
-	VenueName string
-}
-
-var sessionStore *sessions.CookieStore
-
-func getUser(s *sessions.Session) User {
-	val := s.Values["user"]
-	var user = User{}
-	user, ok := val.(User)
-	if !ok {
-		return User{Authenticated: false}
-	}
-	return user
-}
-
 func registerHandler(w http.ResponseWriter, r *http.Request) {
-	clients := &Clients{}
+	client := &Client{}
 
 	err := r.ParseForm()
 
@@ -59,21 +18,21 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clients.Username = r.Form.Get("username")
-	clients.Password = r.Form.Get("password")
-	clients.Firstname = r.Form.Get("firstname")
-	clients.Lastname = r.Form.Get("lastname")
-	clients.Phone = r.Form.Get("phone")
-	clients.Email = r.Form.Get("email")
-	clients.StreetAddress = r.Form.Get("streetaddress")
-	clients.City = r.Form.Get("city")
-	clients.Province = r.Form.Get("provstate")
-	clients.PostalCode = r.Form.Get("postalzip")
-	clients.Country = r.Form.Get("country")
+	client.Username = r.Form.Get("username")
+	client.Password = r.Form.Get("password")
+	client.Firstname = r.Form.Get("firstname")
+	client.Lastname = r.Form.Get("lastname")
+	client.Phone = r.Form.Get("phone")
+	client.Email = r.Form.Get("email")
+	client.StreetAddress = r.Form.Get("streetaddress")
+	client.City = r.Form.Get("city")
+	client.Province = r.Form.Get("provstate")
+	client.PostalCode = r.Form.Get("postalzip")
+	client.Country = r.Form.Get("country")
 
 	// Salt and hash the password using the bcrypt algorithm
 	// The second argument is the cost of hashing, which we arbitrarily set as 8 (this value can be more or less, depending on the computing power you wish to utilize)
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(clients.Password), 8)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(client.Password), 8)
 	if err != nil {
 		// If there is something wrong with the request body, return a 400 status
 		log.Fatal("Hashing Error: ", err)
@@ -81,9 +40,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clients.Password = string(hashedPassword)
+	client.Password = string(hashedPassword)
 
-	err = store.CreateUser(clients)
+	err = store.CreateUser(client)
 	if err != nil {
 		log.Fatal("Error Creating User: ", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -102,7 +61,7 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	creds := &Clients{}
+	client := &Client{}
 
 	err = r.ParseForm()
 
@@ -112,21 +71,18 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	creds.Username = r.Form.Get("username")
-	creds.Password = r.Form.Get("password")
+	client.Username = r.Form.Get("username")
+	client.Password = r.Form.Get("password")
 
-	err = store.SignInUser(creds)
+	err = store.SignInUser(client)
 	if err != nil {
 		log.Print("Error: ", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	user := &User{
-		Username:      creds.Username,
-		Authenticated: true,
-	}
+	client.Authenticated = true
 
-	session.Values["user"] = user
+	session.Values["client"] = client
 
 	err = session.Save(r, w)
 	if err != nil {
@@ -135,7 +91,7 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// We reach this point if the credentials we correctly stored in the database, and the default status of 200 is sent back
-	log.Printf("%s is signed in", session.Values["user"])
+	log.Printf("%s is signed in", session.Values["client"])
 
 	http.Redirect(w, r, "/reservation", http.StatusFound)
 }
@@ -148,7 +104,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session.Values["user"] = User{}
+	session.Values["client"] = Client{}
 	session.Options.MaxAge = -1
 
 	err = session.Save(r, w)
@@ -166,11 +122,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := getUser(session)
+	client := getClient(session)
 
-	log.Printf("username: %s", user.Username)
+	log.Printf("username: %s", client.Username)
 
-	tpl.ExecuteTemplate(w, "index.gohtml", user)
+	tpl.ExecuteTemplate(w, "index.gohtml", client)
 }
 
 func signupHandler(w http.ResponseWriter, r *http.Request) {
@@ -180,9 +136,9 @@ func signupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := getUser(session)
+	client := getClient(session)
 
-	tpl.ExecuteTemplate(w, "signup.gohtml", user)
+	tpl.ExecuteTemplate(w, "signup.gohtml", client)
 }
 
 func reservationHandler(w http.ResponseWriter, r *http.Request) {
@@ -192,20 +148,17 @@ func reservationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := getUser(session)
+	client := getClient(session)
 
-	clients := Clients{}
-	clients.Authenticated = user.Authenticated
-
-	if user.Authenticated {
-		err := store.GetClientInfo(&clients, user.Username)
+	if client.Authenticated {
+		err := store.GetClientInfo(&client)
 
 		if err != nil {
 			log.Panicf("Error getting client info: %s", err.Error())
 		}
 	}
 
-	tpl.ExecuteTemplate(w, "reservation.gohtml", clients)
+	tpl.ExecuteTemplate(w, "reservation.gohtml", client)
 }
 
 func createreservationHandler(w http.ResponseWriter, r *http.Request) {
@@ -215,19 +168,7 @@ func createreservationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := getUser(session)
+	client := getClient(session)
 
-	//if user.Authenticated {
-	//	session.Values["user"] = User{}
-	//	session.Options.MaxAge = -1
-	//
-	//	err = session.Save(r, w)
-	//	if err != nil {
-	//		http.Error(w, err.Error(), http.StatusInternalServerError)
-	//		return
-	//	}
-	//}
-
-	//toast notification that reservations has been created
-	tpl.ExecuteTemplate(w, "created.gohtml", user)
+	tpl.ExecuteTemplate(w, "created.gohtml", client)
 }
