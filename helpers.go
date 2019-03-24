@@ -4,7 +4,8 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-func getClient(s *sessions.Session) Client {
+// GetClient - return the signed in user stored in a session cookie
+func GetClient(s *sessions.Session) Client {
 	val := s.Values["client"]
 	var client = Client{}
 	client, ok := val.(Client)

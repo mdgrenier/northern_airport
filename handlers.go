@@ -122,7 +122,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := getClient(session)
+	client := GetClient(session)
 
 	log.Printf("username: %s", client.Username)
 
@@ -136,7 +136,7 @@ func signupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := getClient(session)
+	client := GetClient(session)
 
 	tpl.ExecuteTemplate(w, "signup.gohtml", client)
 }
@@ -148,7 +148,7 @@ func reservationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := getClient(session)
+	client := GetClient(session)
 
 	if client.Authenticated {
 		err := store.GetClientInfo(&client)
@@ -158,7 +158,23 @@ func reservationHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tpl.ExecuteTemplate(w, "reservation.gohtml", client)
+	venues := store.GetVenues()
+
+	cities := store.GetCities()
+
+	reservation := Reservation{}
+
+	reservation.Client = client
+	reservation.Venues = venues
+	reservation.Cities = cities
+
+	//for i, venue := range reservation.venues {
+	//	log.Printf("Venue Name %d: %s", i, venue.VenueName)
+	//}
+	//
+	//log.Printf("Firstname: %s", reservation.client.Firstname
+
+	tpl.ExecuteTemplate(w, "reservation.gohtml", reservation)
 }
 
 func createreservationHandler(w http.ResponseWriter, r *http.Request) {
@@ -168,7 +184,7 @@ func createreservationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := getClient(session)
+	client := GetClient(session)
 
 	tpl.ExecuteTemplate(w, "created.gohtml", client)
 }

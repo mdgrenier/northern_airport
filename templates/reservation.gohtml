@@ -16,121 +16,123 @@
         <form id="reservation" action="/createreservation" method="post">
             <h3>Client Information</h3>
             <div class="client-info">
-                <div class="row justify-content-around">
-                    <div class="form-group col-3">
-                        <label for="firstname">Firstname</label>
-                        {{ if .Authenticated }}
-                            <input type="text" class="form-control" id="firstname" name="firstname" value={{.Firstname}}>
-                        {{else}}
-                            <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname">
-                        {{end}}
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="lastname">Lastname</label>
-                        {{ if .Authenticated }}
-                            <input type="lastname" class="form-control" id="lastname" name="lastname" value={{.Lastname}}>
-                        {{else}}
-                            <input type="lastname" class="form-control" id="lastname" name="lastname" placeholder="Lastname">
-                        {{end}}
-                    </div>
-                    <div class="form-group col-3"></div>
-                </div>
-
-                <div class="row justify-content-around">
-                    <div class="form-group col-3">
-                        <label for="email">Email</label>
-                        {{ if .Authenticated }}
-                            <input type="text" class="form-control" id="email" name="email" value={{.Email}}>
-                        {{else}}
-                            <input type="text" class="form-control" id="email" name="email" placeholder="Email">
-                        {{end}}
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="phone">Phone Number</label>
-                        {{ if .Authenticated }}
-                            <input type="phone" class="form-control" id="phone" name="phone" value={{.Phone}}>
-                        {{else}}
-                            <input type="phone" class="form-control" id="phone" name="phone" placeholder="Phone">
-                        {{end}}
-                    </div>
-                    <div class="col-3"></div>
-                </div>
-
-                <div class="row justify-content-around">
-                    <div class="form-group col-3">
-                        <label for="streetaddress">Street Address</label>
-                        {{ if .Authenticated }}
-                            <input type="text" class="form-control" id="streetaddress" name="streetaddress" value={{.StreetAddress}}>
-                        {{else}}
-                            <input type="text" class="form-control" id="streetaddress" name="streetaddress" placeholder="Street Address">
-                        {{end}}
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="city">City</label>
-                        {{ if .Authenticated }}
-                            <input type="city" class="form-control" id="city" name="city" value={{.City}}>
-                        {{else}}
-                            <input type="city" class="form-control" id="city" name="city" placeholder="City">
-                        {{end}}
-                    </div>
-                    <div class="col-3"></div>
-                </div>
-
-                <div class="row justify-content-around">
-                    <div class="form-group col-3">
-                        <label for="provstate">Province/State</label>
-                        {{ if .Authenticated }}
-                            <input type="text" class="form-control" id="provstate" name="provstate" value={{.Province}}>
-                        {{else}}
-                            <input type="text" class="form-control" id="provstate" name="provstate" placeholder="Province/State">
-                        {{end}}
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="postalzip">Postal/Zip Code</label>
-                        {{ if .Authenticated }}
-                            <input type="postalzip" class="form-control" id="postalzip" name="postalzip" value={{.PostalCode}}>
-                        {{else}}
-                            <input type="postalzip" class="form-control" id="postalzip" name="postalzip" placeholder="Postal/Zip">
-                        {{end}}
-                    </div>
-                    <div class="form-group col-3">
-                    
-                    </div>
-                </div>
-
-                <div class="row justify-content-around">
-                    <div class="form-group col-3">
-                        <label for="country">Country</label>
-                        {{ if .Authenticated }}
-                            <input type="text" class="form-control" id="country" name="country" value={{.Country}}>
-                        {{else}}
-                            <input type="text" class="form-control" id="country" name="country" placeholder="Country">
-                        {{end}}
-                    </div>
-                    <div class="col-3">
-                    
-                    </div>
-                    <div class="col-3">
-                    
-                    </div>
-                </div>
-
-                <h3>Travel Agents Use Only</h3>
-                <div class="travel-agent-info">
-                    <div class="row justify-content-around">    
+                {{ with .Client }}
+                    <div class="row justify-content-around">
                         <div class="form-group col-3">
-                            <label for="iata">Travel Agent IATA#</label>
-                            <input type="text" class="form-control" id="iata" name="iata" placeholder="IATA #">
+                            <label for="firstname">Firstname</label>
+                            {{ if .Authenticated }}
+                                <input type="text" class="form-control" id="firstname" name="firstname" value={{.Firstname}}>
+                            {{else}}
+                                <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname">
+                            {{end}}
                         </div>
                         <div class="form-group col-3">
-                            <label for="agentname">Agent Name</label>
-                            <input type="text" class="form-control" id="agentname" name="agentname" placeholder="Agent Name">
+                            <label for="lastname">Lastname</label>
+                            {{ if .Authenticated }}
+                                <input type="lastname" class="form-control" id="lastname" name="lastname" value={{.Lastname}}>
+                            {{else}}
+                                <input type="lastname" class="form-control" id="lastname" name="lastname" placeholder="Lastname">
+                            {{end}}
+                        </div>
+                        <div class="form-group col-3"></div>
+                    </div>
+
+                    <div class="row justify-content-around">
+                        <div class="form-group col-3">
+                            <label for="email">Email</label>
+                            {{ if .Authenticated }}
+                                <input type="text" class="form-control" id="email" name="email" value={{.Email}}>
+                            {{else}}
+                                <input type="text" class="form-control" id="email" name="email" placeholder="Email">
+                            {{end}}
                         </div>
                         <div class="form-group col-3">
+                            <label for="phone">Phone Number</label>
+                            {{ if .Authenticated }}
+                                <input type="phone" class="form-control" id="phone" name="phone" value={{.Phone}}>
+                            {{else}}
+                                <input type="phone" class="form-control" id="phone" name="phone" placeholder="Phone">
+                            {{end}}
+                        </div>
+                        <div class="col-3"></div>
                     </div>
-                    <div class="form-group col-3">
+
+                    <div class="row justify-content-around">
+                        <div class="form-group col-3">
+                            <label for="streetaddress">Street Address</label>
+                            {{ if .Authenticated }}
+                                <input type="text" class="form-control" id="streetaddress" name="streetaddress" value={{.StreetAddress}}>
+                            {{else}}
+                                <input type="text" class="form-control" id="streetaddress" name="streetaddress" placeholder="Street Address">
+                            {{end}}
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="city">City</label>
+                            {{ if .Authenticated }}
+                                <input type="city" class="form-control" id="city" name="city" value={{.City}}>
+                            {{else}}
+                                <input type="city" class="form-control" id="city" name="city" placeholder="City">
+                            {{end}}
+                        </div>
+                        <div class="col-3"></div>
                     </div>
-                </div>
+
+                    <div class="row justify-content-around">
+                        <div class="form-group col-3">
+                            <label for="provstate">Province/State</label>
+                            {{ if .Authenticated }}
+                                <input type="text" class="form-control" id="provstate" name="provstate" value={{.Province}}>
+                            {{else}}
+                                <input type="text" class="form-control" id="provstate" name="provstate" placeholder="Province/State">
+                            {{end}}
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="postalzip">Postal/Zip Code</label>
+                            {{ if .Authenticated }}
+                                <input type="postalzip" class="form-control" id="postalzip" name="postalzip" value={{.PostalCode}}>
+                            {{else}}
+                                <input type="postalzip" class="form-control" id="postalzip" name="postalzip" placeholder="Postal/Zip">
+                            {{end}}
+                        </div>
+                        <div class="form-group col-3">
+                        
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-around">
+                        <div class="form-group col-3">
+                            <label for="country">Country</label>
+                            {{ if .Authenticated }}
+                                <input type="text" class="form-control" id="country" name="country" value={{.Country}}>
+                            {{else}}
+                                <input type="text" class="form-control" id="country" name="country" placeholder="Country">
+                            {{end}}
+                        </div>
+                        <div class="col-3">
+                        
+                        </div>
+                        <div class="col-3">
+                        
+                        </div>
+                    </div>
+
+                    <h3>Travel Agents Use Only</h3>
+                    <div class="travel-agent-info">
+                        <div class="row justify-content-around">    
+                            <div class="form-group col-3">
+                                <label for="iata">Travel Agent IATA#</label>
+                                <input type="text" class="form-control" id="iata" name="iata" placeholder="IATA #">
+                            </div>
+                            <div class="form-group col-3">
+                                <label for="agentname">Agent Name</label>
+                                <input type="text" class="form-control" id="agentname" name="agentname" placeholder="Agent Name">
+                            </div>
+                            <div class="form-group col-3">
+                        </div>
+                        <div class="form-group col-3">
+                        </div>
+                    </div>
+                {{ end }}
             </div>
             
             <h3>Trip Information</h3>
@@ -154,13 +156,19 @@
                     <div class="form-group col-3">
                         <label for="departurecity">Departure City</label>
                         <select class="form-control" id="departurecity" name="departurecity" placeholder="Departure City">
-                            <option value="test">Test City</option>
+                            <option value="0">Select a City</option>
+                            {{ range .Cities }}
+                                <option value="{{ .CityID }}">{{ .CityName }}</option>
+                            {{ end }}
                         </select>
                     </div>
                     <div class="form-group col-3">
                         <label for="departurevenue">Departure Venue</label>
                         <select class="form-control" id="departurevenue" name="departurevenue" placeholder="Departure Venue">
-                            <option value="test">Test Venue</option>
+                            <option value="0">Select a Venue</option>
+                            {{ range .Venues }}
+                                <option value="{{ .VenueID }}">{{ .VenueName }}</option>
+                            {{ end }}
                         </select>
                     </div>
                     <div class="form-group col-3">
@@ -178,13 +186,19 @@
                     <div class="form-group col-3">
                         <label for="destinationcity">Destination City</label>
                         <select class="form-control" id="destinationcity" name="destinationcity" placeholder="Destination City">
-                            <option value="test">Test City</option>
+                            <option value="0">Select a City</option>
+                            {{ range .Cities }}
+                                <option value="{{ .CityID }}">{{ .CityName }}</option>
+                            {{ end }}
                         </select>
                     </div>
                     <div class="form-group col-3">
                         <label for="destinationvenue">Destination Venue</label>
                         <select class="form-control" id="destinationvenue" name="destinationvenue" placeholder="Destination Venue">
-                            <option value="test">Test Venue</option>
+                            <option value="0">Select a Venue</option>
+                            {{ range .Venues }}
+                                <option value="{{ .VenueID }}">{{ .VenueName }}</option>
+                            {{ end }}
                         </select>
                     </div>
                     <div class="form-group col-3">

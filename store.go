@@ -12,8 +12,10 @@ import (
 type Store interface {
 	CreateUser(client *Client) error
 	SignInUser(client *Client) error
-	GetVenues(venues *Venues) error
-	GetCities(cities *Cities) error
+	GetVenues() []Venues
+	GetVenueCount() int
+	GetCities() []Cities
+	GetCityCount() int
 	GetClientInfo(client *Client) error
 }
 
@@ -114,64 +116,125 @@ func (store *dbStore) SignInUser(client *Client) error {
 	return err
 }
 
-func (store *dbStore) GetVenues(venues *Venues) error {
+func (store *dbStore) GetVenues() []Venues {
+
+	venueCount := store.GetVenueCount()
+
 	row, err := store.db.Query("select venueid, name from venues")
 	// We return in case of an error, and defer the closing of the row structure
 	if err != nil {
-		return err
+		return nil
 	}
 	defer row.Close()
+
+	var venueSlice = make([]Venues, venueCount)
 
 	var venueid int
 	var name string
+	var indx int
+
+	indx = 0
+	for row.Next() {
+		err = row.Scan(
+			&venueid, &name,
+		)
+		if err != nil {
+			// If an entry with the username does not exist, send an "Unauthorized"(401) status
+			if err == sql.ErrNoRows {
+				log.Print("No venue found")
+			} else {
+				log.Printf("Error retrieving venues: %s", err.Error())
+			}
+		} else {
+			venueSlice[indx].VenueID = venueid
+			venueSlice[indx].VenueName = name
+		}
+
+		indx++
+	}
+
+	return venueSlice
+}
+
+func (store *dbStore) GetVenueCount() int {
+	var venueCount int
+
+	row, err := store.db.Query("select count(venueid) from venues")
 
 	row.Next()
 	err = row.Scan(
-		&venueid, &name,
+		&venueCount,
 	)
 	if err != nil {
 		// If an entry with the username does not exist, send an "Unauthorized"(401) status
 		if err == sql.ErrNoRows {
-			log.Print("No client found")
+			log.Print("No venues returned")
 		} else {
-			log.Printf("Error saving client: %s", err.Error())
+			log.Printf("Error retrieving venues: %s", err.Error())
 		}
-	} else {
-		venues.VenueID = venueid
-		venues.VenueName = name
 	}
 
-	return err
+	return venueCount
 }
 
-func (store *dbStore) GetCities(cities *Cities) error {
+func (store *dbStore) GetCities() []Cities {
+	cityCount := store.GetCityCount()
+
 	row, err := store.db.Query("select cityid, name from cities")
 	// We return in case of an error, and defer the closing of the row structure
 	if err != nil {
-		return err
+		return nil
 	}
 	defer row.Close()
 
+	var citySlice = make([]Cities, cityCount)
+
 	var cityid int
 	var name string
+	var indx int
+
+	indx = 0
+	for row.Next() {
+		err = row.Scan(
+			&cityid, &name,
+		)
+		if err != nil {
+			// If an entry with the username does not exist, send an "Unauthorized"(401) status
+			if err == sql.ErrNoRows {
+				log.Print("No cities found")
+			} else {
+				log.Printf("Error retrieving cities: %s", err.Error())
+			}
+		} else {
+			citySlice[indx].CityID = cityid
+			citySlice[indx].CityName = name
+		}
+
+		indx++
+	}
+
+	return citySlice
+}
+
+func (store *dbStore) GetCityCount() int {
+	var cityCount int
+
+	row, err := store.db.Query("select count(cityid) from cities")
 
 	row.Next()
 	err = row.Scan(
-		&cityid, &name,
+		&cityCount,
 	)
 	if err != nil {
 		// If an entry with the username does not exist, send an "Unauthorized"(401) status
 		if err == sql.ErrNoRows {
-			log.Print("No client found")
+			log.Print("No venues returned")
 		} else {
-			log.Printf("Error saving client: %s", err.Error())
+			log.Printf("Error retrieving venues: %s", err.Error())
 		}
-	} else {
-		cities.CityID = cityid
-		cities.CityName = name
 	}
 
-	return err
+	return cityCount
 }
 
 //GetClientInfo takes a client and username
