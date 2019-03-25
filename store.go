@@ -120,7 +120,7 @@ func (store *dbStore) GetVenues() []Venues {
 
 	venueCount := store.GetVenueCount()
 
-	row, err := store.db.Query("select venueid, name from venues")
+	row, err := store.db.Query("select venueid, cityid, name from venues")
 	// We return in case of an error, and defer the closing of the row structure
 	if err != nil {
 		return nil
@@ -130,13 +130,14 @@ func (store *dbStore) GetVenues() []Venues {
 	var venueSlice = make([]Venues, venueCount)
 
 	var venueid int
+	var cityid int
 	var name string
 	var indx int
 
 	indx = 0
 	for row.Next() {
 		err = row.Scan(
-			&venueid, &name,
+			&venueid, &cityid, &name,
 		)
 		if err != nil {
 			// If an entry with the username does not exist, send an "Unauthorized"(401) status
@@ -147,6 +148,7 @@ func (store *dbStore) GetVenues() []Venues {
 			}
 		} else {
 			venueSlice[indx].VenueID = venueid
+			venueSlice[indx].CityID = cityid
 			venueSlice[indx].VenueName = name
 		}
 
@@ -160,6 +162,10 @@ func (store *dbStore) GetVenueCount() int {
 	var venueCount int
 
 	row, err := store.db.Query("select count(venueid) from venues")
+
+	if err != nil {
+		log.Printf("Error querying venues: %s", err.Error())
+	}
 
 	row.Next()
 	err = row.Scan(

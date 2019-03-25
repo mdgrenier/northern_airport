@@ -166,13 +166,8 @@ func reservationHandler(w http.ResponseWriter, r *http.Request) {
 
 	reservation.Client = client
 	reservation.Venues = venues
+	reservation.VenueCount = len(venues)
 	reservation.Cities = cities
-
-	//for i, venue := range reservation.venues {
-	//	log.Printf("Venue Name %d: %s", i, venue.VenueName)
-	//}
-	//
-	//log.Printf("Firstname: %s", reservation.client.Firstname
 
 	tpl.ExecuteTemplate(w, "reservation.gohtml", reservation)
 }

@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="../../assets/css/main.css">
 </head>
 <body>
+    <div class="header">
+        <img src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
+    </div>
+
     {{ template "navbar" }}
     
     <a href="/index"></a>
@@ -152,64 +156,72 @@
                     <div class="form-group col-3">
                     </div>
                 </div>
-                <div class="row justify-content-around">    
-                    <div class="form-group col-3">
-                        <label for="departurecity">Departure City</label>
-                        <select class="form-control" id="departurecity" name="departurecity" placeholder="Departure City">
-                            <option value="0">Select a City</option>
-                            {{ range .Cities }}
-                                <option value="{{ .CityID }}">{{ .CityName }}</option>
-                            {{ end }}
-                        </select>
+                <div class="group">
+                    <div class="row justify-content-around">    
+                        <div class="form-group col-3">
+                            <label for="departurecity">Departure City</label>
+                            <select class="form-control" id="departurecity" name="departurecity" placeholder="Departure City">
+                                <option value="0">Select a City</option>
+                                {{ range .Cities }}
+                                    <option value="{{ .CityID }}">{{ .CityName }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="departurevenue">Departure Venue</label>
+                            <select class="form-control" id="departurevenue" name="departurevenue" placeholder="Departure Venue">
+                                <option value="0">First Select a City</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-3"></div>
                     </div>
-                    <div class="form-group col-3">
-                        <label for="departurevenue">Departure Venue</label>
-                        <select class="form-control" id="departurevenue" name="departurevenue" placeholder="Departure Venue">
-                            <option value="0">Select a Venue</option>
-                            {{ range .Venues }}
-                                <option value="{{ .VenueID }}">{{ .VenueName }}</option>
-                            {{ end }}
-                        </select>
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="departuredate">Departure Date</label>
-                        <input type="date" class="form-control" id="departuredate" name="departuredate">
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="departuretime">Departure Time</label>
-                        <select class="form-control" id="departuretime" name="departuretime" placeholder="Departure Time">
-                            <option value="test">Test Time</option>
-                        </select>
+                    <div class="row justify-content-around">
+                        <div class="form-group col-3">
+                            <label for="departuredate">Departure Date</label>
+                            <input type="date" class="form-control" id="departuredate" name="departuredate">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="departuretime">Departure Time</label>
+                            <select class="form-control" id="departuretime" name="departuretime" placeholder="Departure Time">
+                                <option value="test">Test Time</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-3"></div>
+                        <div class="form-group col-3"></div>
                     </div>
                 </div>
-                <div class="row justify-content-around">    
-                    <div class="form-group col-3">
-                        <label for="destinationcity">Destination City</label>
-                        <select class="form-control" id="destinationcity" name="destinationcity" placeholder="Destination City">
-                            <option value="0">Select a City</option>
-                            {{ range .Cities }}
-                                <option value="{{ .CityID }}">{{ .CityName }}</option>
-                            {{ end }}
-                        </select>
+                <div class="group">
+                    <div class="row justify-content-around">    
+                        <div class="form-group col-3">
+                            <label for="destinationcity">Destination City</label>
+                            <select class="form-control" id="destinationcity" name="destinationcity" placeholder="Destination City">
+                                <option value="0">Select a City</option>
+                                {{ range .Cities }}
+                                    <option value="{{ .CityID }}">{{ .CityName }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="destinationvenue">Destination Venue</label>
+                            <select class="form-control" id="destinationvenue" name="destinationvenue" placeholder="Destination Venue">
+                                <option value="0">First Select a City</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-3"></div>
                     </div>
-                    <div class="form-group col-3">
-                        <label for="destinationvenue">Destination Venue</label>
-                        <select class="form-control" id="destinationvenue" name="destinationvenue" placeholder="Destination Venue">
-                            <option value="0">Select a Venue</option>
-                            {{ range .Venues }}
-                                <option value="{{ .VenueID }}">{{ .VenueName }}</option>
-                            {{ end }}
-                        </select>
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="destinationdate">Destination Date</label>
-                        <input type="date" class="form-control" id="destinationdate" name="destinationdate">
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="destinationtime">Destination Time</label>
-                        <select class="form-control" id="destinationtime" name="destinationtime" placeholder="Destination Time">
-                            <option value="test">Test Time</option>
-                        </select>
+                    <div class="row justify-content-around">
+                        <div class="form-group col-3">
+                            <label for="destinationdate">Destination Date</label>
+                            <input type="date" class="form-control" id="destinationdate" name="destinationdate">
+                        </div>
+                        <div class="form-group col-3">
+                            <label for="destinationtime">Destination Time</label>
+                            <select class="form-control" id="destinationtime" name="destinationtime" placeholder="Destination Time">
+                                <option value="test">Test Time</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-3"></div>
+                        <div class="form-group col-3"></div>
                     </div>
                 </div>
                 <p>Number of Passengers</p>  
@@ -318,6 +330,67 @@
                 document.getElementById('return-info').style.display = "inline-block";
 
             }
+        };
+
+        var departurevenue = document.getElementById("departurevenue");
+        var departurecity = document.getElementById("departurecity");
+
+        var destinationvenue = document.getElementById("destinationvenue");
+        var destinationcity = document.getElementById("destinationcity");
+
+        var venuecount = {{ .VenueCount }};
+        var venues = {{ .Venues }};
+
+        departurecity.onchange = function() { 
+            var selectvenuecount = departurevenue.options.length;
+
+            for(i=0; i<selectvenuecount; i++)
+            {
+                document.querySelectorAll('#departurevenue option').forEach(option => option.remove());
+                
+            }
+
+            {{ range .Venues }}
+                var temp = {{ .VenueID }};
+                var cityid = {{ .CityID }}
+                if(departurecity.options[departurecity.selectedIndex].value == cityid)
+                {
+                    var opt = document.createElement('option');
+                    var venuename = {{ .VenueName }}
+                    var venueid = {{ .VenueID }}
+                    
+                    opt.appendChild(document.createTextNode(venuename));
+                    opt.value = venueid;
+            
+                    departurevenue.appendChild(opt);
+                }
+            {{ end }}
+        };
+
+        destinationcity.onchange = function() { 
+            var selectvenuecount = destinationvenue.options.length;
+
+            for(i=0; i<selectvenuecount; i++)
+            {
+                document.querySelectorAll('#destinationvenue option').forEach(option => option.remove()); 
+            }
+
+            {{ range .Venues }}
+                var temp = {{ .VenueID }};
+                var cityid = {{ .CityID }}
+                
+                if(destinationcity.options[destinationcity.selectedIndex].value == cityid)
+                {
+                    var opt = document.createElement('option');
+                    var venuename = {{ .VenueName }}
+                    var venueid = {{ .VenueID }}
+                    
+                    opt.appendChild(document.createTextNode(venuename));
+                    opt.value = venueid;
+            
+                    destinationvenue.appendChild(opt);
+                }
+            {{ end }}
         };
     })();
 </script>

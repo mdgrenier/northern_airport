@@ -34,6 +34,7 @@ type Client struct {
 // Venues - stores venues
 type Venues struct {
 	VenueID   int    `json:"venueid" db:"venueid"`
+	CityID    int    `json:"cityid" db:"cityid"`
 	VenueName string `json:"venuename" db:"venuename"`
 }
 
@@ -45,9 +46,10 @@ type Cities struct {
 
 // Reservation - store values to populate reservations form
 type Reservation struct {
-	Client Client   `json:"client" db:"client"`
-	Venues []Venues `json:"venues" db:"venues"`
-	Cities []Cities `json:"cities" db:"cities"`
+	Client     Client   `json:"client" db:"client"`
+	Venues     []Venues `json:"venues" db:"venues"`
+	VenueCount int      `json:"venuecount" db:"venuecount"`
+	Cities     []Cities `json:"cities" db:"cities"`
 }
 
 var sessionStore *sessions.CookieStore
