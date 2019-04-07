@@ -162,13 +162,16 @@ func reservationHandler(w http.ResponseWriter, r *http.Request) {
 
 	cities := store.GetCities()
 
+	departuretimes := store.GetDepartureTimes()
+
 	reservation := Reservation{}
 
 	reservation.Client = client
 	reservation.Venues = venues
 	reservation.VenueCount = len(venues)
 	reservation.Cities = cities
-
+	reservation.DepartureTimes = departuretimes
+	
 	tpl.ExecuteTemplate(w, "reservation.gohtml", reservation)
 }
 

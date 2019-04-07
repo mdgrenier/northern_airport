@@ -4,6 +4,9 @@ package main
 import (
 	"database/sql"
 	"log"
+	"time"
+
+	"github.com/go-sql-driver/mysql"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -12,11 +15,13 @@ import (
 type Store interface {
 	CreateUser(client *Client) error
 	SignInUser(client *Client) error
+	GetClientInfo(client *Client) error
 	GetVenues() []Venues
 	GetVenueCount() int
 	GetCities() []Cities
 	GetCityCount() int
-	GetClientInfo(client *Client) error
+	GetDepartureTimesCount() int
+	GetDepartureTimes() []DepartureTimes
 }
 
 // The `dbStore` struct will implement the `Store` interface
@@ -186,9 +191,11 @@ func (store *dbStore) GetVenueCount() int {
 func (store *dbStore) GetCities() []Cities {
 	cityCount := store.GetCityCount()
 
-	row, err := store.db.Query("select cityid, name from cities")
+	row, err := store.db.Query("select c.cityid, name, northoffset, southoffset from cities c " +
+		"inner join cityoffsets cos on c.cityid = cos.cityid")
 	// We return in case of an error, and defer the closing of the row structure
 	if err != nil {
+		log.Printf("Error querying cities: %s", err.Error())
 		return nil
 	}
 	defer row.Close()
@@ -197,13 +204,16 @@ func (store *dbStore) GetCities() []Cities {
 
 	var cityid int
 	var name string
+	var northoffset int
+	var southoffset int
 	var indx int
 
 	indx = 0
 	for row.Next() {
 		err = row.Scan(
-			&cityid, &name,
+			&cityid, &name, &northoffset, &southoffset,
 		)
+
 		if err != nil {
 			// If an entry with the username does not exist, send an "Unauthorized"(401) status
 			if err == sql.ErrNoRows {
@@ -214,6 +224,8 @@ func (store *dbStore) GetCities() []Cities {
 		} else {
 			citySlice[indx].CityID = cityid
 			citySlice[indx].CityName = name
+			citySlice[indx].NorthOffset = northoffset
+			citySlice[indx].SouthOffset = southoffset
 		}
 
 		indx++
@@ -241,6 +253,86 @@ func (store *dbStore) GetCityCount() int {
 	}
 
 	return cityCount
+}
+
+func (store *dbStore) GetDepartureTimes() []DepartureTimes {
+	departuretimeCount := store.GetDepartureTimesCount()
+
+	row, err := store.db.Query("select departuretimeid, cityid, departuretime, " +
+		"recurring, startdate, enddate from departuretimes")
+	// We return in case of an error, and defer the closing of the row structure
+	if err != nil {
+		log.Printf("Error retrieving departure times: %s", err.Error())
+		return nil
+	}
+	defer row.Close()
+
+	var departureTimesSlice = make([]DepartureTimes, departuretimeCount)
+
+	var departuretimeid int
+	var cityid int
+	var departuretime int
+	var recurring int
+	var startdate mysql.NullTime
+	var enddate mysql.NullTime
+	var indx int
+
+	indx = 0
+	for row.Next() {
+		err = row.Scan(
+			&departuretimeid, &cityid, &departuretime, &recurring, &startdate, &enddate,
+		)
+		if err != nil {
+			// If an entry with the username does not exist, send an "Unauthorized"(401) status
+			if err == sql.ErrNoRows {
+				log.Print("No times found")
+			} else {
+				log.Printf("Error retrieving times: %s", err.Error())
+			}
+		} else {
+			departureTimesSlice[indx].DepartureTimeID = departuretimeid
+			departureTimesSlice[indx].CityID = cityid
+			departureTimesSlice[indx].DepartureTime = departuretime
+			departureTimesSlice[indx].Recurring = recurring
+
+			if startdate.Valid {
+				departureTimesSlice[indx].StartDate = startdate.Time
+			} else {
+				departureTimesSlice[indx].StartDate = time.Time{}
+			}
+
+			if enddate.Valid {
+				departureTimesSlice[indx].EndDate = enddate.Time
+			} else {
+				departureTimesSlice[indx].EndDate = time.Time{}
+			}
+		}
+
+		indx++
+	}
+
+	return departureTimesSlice
+}
+
+func (store *dbStore) GetDepartureTimesCount() int {
+	var departuretimeCount int
+
+	row, err := store.db.Query("select count(departuretimeid) from departuretimes")
+
+	row.Next()
+	err = row.Scan(
+		&departuretimeCount,
+	)
+	if err != nil {
+		// If an entry with the username does not exist, send an "Unauthorized"(401) status
+		if err == sql.ErrNoRows {
+			log.Print("No venues returned")
+		} else {
+			log.Printf("Error retrieving venues: %s", err.Error())
+		}
+	}
+
+	return departuretimeCount
 }
 
 //GetClientInfo takes a client and username

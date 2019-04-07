@@ -124,6 +124,7 @@ INSERT INTO `airlines` (`airlineid`, `name`, `terminal`) VALUES
 CREATE TABLE `cities` (
   `CityID` int(11) NOT NULL,
   `Name` varchar(50) NOT NULL
+  
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -138,6 +139,7 @@ INSERT INTO `cities` (`cityid`, `name`) VALUES
 (5, 'Callander'),
 (7, 'Emsdale'),
 (8, 'Gravenhurst'),
+(9, 'Huntsville Deerhurst Resort'),
 (10, 'Huntsville'),
 (11, 'Katrine'),
 (14, 'Novar'),
@@ -145,10 +147,38 @@ INSERT INTO `cities` (`cityid`, `name`) VALUES
 (16, 'Powassan'),
 (17, 'South River'),
 (18, 'Sundridge'),
-(20, 'Trout Creek'),
-(9, 'Huntsville Deerhurst Resort');
+(20, 'Trout Creek');
 
 -- --------------------------------------------------------
+
+CREATE TABLE `cityoffsets` (
+  `CityOffsetID` int(11) NOT NULL,
+  `CityID` int(11) NOT NULL,
+  `NorthOffset` int(11) NOT NULL,
+  `SouthOffset` int(11) NOT NULL
+  
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `cities`
+--
+
+INSERT INTO `cityoffsets` (`cityoffsetid`, `cityid`, `northoffset`, `southoffset`) VALUES
+(1, 1, 0, 240),
+(2, 2, 240, 0),
+(3, 3, 115, 125),
+(4, 4, 55, 185),
+(5, 5, 10, 230),
+(6, 7, 65, 175),
+(7, 8, 135, 105),
+(8, 10, 85, 155),
+(9, 11, 60, 180),
+(10, 14, 75, 165),
+(11, 15, 90, 150),
+(12, 16, 25, 215),
+(13, 17, 40, 200),
+(14, 18, 45, 195),
+(15, 20, 30, 210);
 
 --
 -- Table structure for table `clients`
@@ -218,13 +248,26 @@ CREATE TABLE `customvenues` (
 
 CREATE TABLE `departuretimes` (
   `DepartureTimeID` int(11) NOT NULL,
+  `CityID` int(11) NOT NULL,
   `DepartureTime` int(11) NOT NULL,
   `Recurring` int(11) NOT NULL,
   `StartDate` date DEFAULT NULL,
   `EndDate` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `times`
+--
+
+INSERT INTO `departuretimes` (`DepartureTimeID`, `CityID`, `DepartureTime`, `Recurring`, `StartDate`, `EndDate`) VALUES
+(1, 1, 0630, 1, null, null),
+(2, 1, 1120, 1, null, null),
+(3, 1, 1200, 1, null, null),
+(4, 1, 2240, 1, null, null),
+(6, 2, 1130, 1, null, null),
+(5, 2, 1330, 1, null, null),
+(7, 2, 1630, 1, null, null),
+(8, 2, 1800, 1, null, null);
 
 --
 -- Table structure for table `discountcodes`
@@ -589,60 +632,61 @@ CREATE TABLE `venues` (
   `CityID` int(11) NOT NULL,
   `Name` varchar(100) NOT NULL,
   `ExtraCost` float DEFAULT NULL,
-  `Active` int(11) NOT NULL
+  `Active` int(11) NOT NULL,
+  `ExtraTime` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `venues`
 --
 
-INSERT INTO `venues` (`venueid`, `cityid`, `name`, `extracost`, `active`) VALUES
-(1, 8, 'McDonald''s Restaurant located at Bethune Dr. and Muskoka Rd', 0.00, 1),
-(2, 3, 'Tim Hortons coffee shop corner of Depot Rd. and Taylor Rd', 0.00, 1),
-(3, 4, 'Tim Horton''s located at 27 Commercial Dr', 0.00, 1),
-(4, 5, 'Wasi Petro Canada located at the corner of Wasi Rd and Callander Bay Dr', 0.00, 1),
-(5, 7, 'Tourist information centre located on Emsdale Rd. Exit #244', 0.00, 1),
-(6, 10, 'Holiday Inn Express located at Howland Dr', 0.00, 1),
-(7, 11, 'The Lucky Dollar on old Hwy 11', 0.00, 1),
-(8, 1, 'Country Style coffee shop located at 1401 Seymour St. and Hwy 11', 0.00, 1),
-(9, 14, 'Foodland', 0.00, 1),
-(10, 15, 'Smiths Resaurant located on highway 11', 0.00, 1),
-(11, 16, 'East Himsworth Cafe, previous Ethels', 0.00, 1),
-(12, 17, 'Shell gas station highway 124', 0.00, 1),
-(13, 18, 'Blue Roof restaurant', 0.00, 1),
-(14, 20, 'TJ''s Variety on highway 522', 0.00, 1),
-(99, 2, 'AIRPORT AIRLINES: CLICK HERE FOR AIRLINE LIST', 0.00, 1),
-(100, 1, 'Home Pickup or Dropoff', 15.00, 1),
-(15, 2, 'Nu Hotel-6465 Airport Rd.', 0.00, 1),
-(19, 2, 'UP Express train Pearson Terminal 1', 0.00, 1),
-(17, 2, 'YYZ No Flight TERMINAL 1,', 0.00, 0),
-(49, 10, 'Deerhurst Resort', 30.00, 1),
-(18, 2, 'YYZ No Flight  Terminal 3,', 0.00, 0),
-(48, 1, 'North Bay Office 191 Booth Rd #7', 0.00, 1),
-(16, 2, 'Quality Inn 2180 Islington', 0.00, 1),
-(25, 2, 'Sheraton Airport, 801 Dixon Rd', 0.00, 1),
-(26, 2, 'Comfort Inn, 6355 Airport Rd.', 0.00, 1),
-(27, 2, 'Carlingview, 221 Carlingview Dr.', 0.00, 1),
-(28, 2, 'Crown Plaza, 33 Carlson Crt.', 0.00, 1),
-(29, 2, 'Delta Hotels 655 Dixon Rd', 0.00, 1),
-(30, 2, 'Fairfield Inn, 3299 Caroga Dr.', 0.00, 1),
-(31, 2, 'Four Points Sheraton, 6257 Airport Rd.', 0.00, 1),
-(32, 2, 'Hampton Inn, 3279 Caroga Dr.', 0.00, 1),
-(33, 2, 'Hilton, 5875 Airport Rd', 0.00, 1),
-(34, 2, 'Holiday Inn , 970 Dixon Rd', 0.00, 1),
-(35, 2, 'Holiday Inn, 600 Dixon Rd.', 0.00, 1),
-(36, 2, 'Embassy Suites, 262 Carlingview Dr.', 0.00, 1),
-(37, 2, 'Hilton Garden Inn,  3311 Caroga Dr.', 0.00, 1),
-(38, 2, 'Radisson Suite, 640 Dixon Rd', 0.00, 1),
-(39, 2, 'Residence Inn Marriott, 17 Reading Crt.', 0.00, 1),
-(40, 2, 'Sheraton Gateway, PIA terminal 3', 0.00, 1),
-(41, 2, 'Marriott Toronto Airport, 901 Dixon Rd.', 0.00, 1),
-(42, 2, 'Double Tree,  925 Dixon Rd.', 0.00, 1),
-(43, 2, 'The Westin Toronto Airport, 950 Dixon Rd.', 0.00, 1),
-(44, 2, 'Best Western Premier, 135 Carlingview Dr.', 0.00, 1),
-(45, 2, 'Sandman Signature, 55 Reading Crt.', 0.00, 1),
-(46, 2, 'Alt Hotel,  6080 Viscount Rd.', 0.00, 1),
-(47, 2, 'Courtyard by Marriot-231 Carlingview', 0.00, 1);
+INSERT INTO `venues` (`venueid`, `cityid`, `name`, `extracost`, `active`, `extratime`) VALUES
+(1, 8, 'McDonald''s Restaurant located at Bethune Dr. and Muskoka Rd', 0.00, 1, 0),
+(2, 3, 'Tim Hortons coffee shop corner of Depot Rd. and Taylor Rd', 0.00, 1, 0),
+(3, 4, 'Tim Horton''s located at 27 Commercial Dr', 0.00, 1, 0),
+(4, 5, 'Wasi Petro Canada located at the corner of Wasi Rd and Callander Bay Dr', 0.00, 1, 0),
+(5, 7, 'Tourist information centre located on Emsdale Rd. Exit #244', 0.00, 1, 0),
+(6, 10, 'Holiday Inn Express located at Howland Dr', 0.00, 1, 0),
+(7, 11, 'The Lucky Dollar on old Hwy 11', 0.00, 1, 0),
+(8, 1, 'Country Style coffee shop located at 1401 Seymour St. and Hwy 11', 0.00, 1, 0),
+(9, 14, 'Foodland', 0.00, 1, 0),
+(10, 15, 'Smiths Resaurant located on highway 11', 0.00, 1, 0),
+(11, 16, 'East Himsworth Cafe, previous Ethels', 0.00, 1, 0),
+(12, 17, 'Shell gas station highway 124', 0.00, 1, 0),
+(13, 18, 'Blue Roof restaurant', 0.00, 1, 0),
+(14, 20, 'TJ''s Variety on highway 522', 0.00, 1, 0),
+(99, 2, 'AIRPORT AIRLINES: CLICK HERE FOR AIRLINE LIST', 0.00, 1, 0),
+(100, 1, 'Home Pickup or Dropoff', 15.00, 1, 30),
+(15, 2, 'Nu Hotel-6465 Airport Rd.', 0.00, 1, 0),
+(19, 2, 'UP Express train Pearson Terminal 1', 0.00, 1, 0),
+(17, 2, 'YYZ No Flight TERMINAL 1,', 0.00, 0, 0),
+(49, 10, 'Deerhurst Resort', 30.00, 1, 0),
+(18, 2, 'YYZ No Flight  Terminal 3,', 0.00, 0, 0),
+(48, 1, 'North Bay Office 191 Booth Rd #7', 0.00, 1, 0),
+(16, 2, 'Quality Inn 2180 Islington', 0.00, 1, 0),
+(25, 2, 'Sheraton Airport, 801 Dixon Rd', 0.00, 1, 0),
+(26, 2, 'Comfort Inn, 6355 Airport Rd.', 0.00, 1, 0),
+(27, 2, 'Carlingview, 221 Carlingview Dr.', 0.00, 1, 0),
+(28, 2, 'Crown Plaza, 33 Carlson Crt.', 0.00, 1, 0),
+(29, 2, 'Delta Hotels 655 Dixon Rd', 0.00, 1, 0),
+(30, 2, 'Fairfield Inn, 3299 Caroga Dr.', 0.00, 1, 0),
+(31, 2, 'Four Points Sheraton, 6257 Airport Rd.', 0.00, 1, 0),
+(32, 2, 'Hampton Inn, 3279 Caroga Dr.', 0.00, 1, 0),
+(33, 2, 'Hilton, 5875 Airport Rd', 0.00, 1, 0),
+(34, 2, 'Holiday Inn , 970 Dixon Rd', 0.00, 1, 0),
+(35, 2, 'Holiday Inn, 600 Dixon Rd.', 0.00, 1, 0),
+(36, 2, 'Embassy Suites, 262 Carlingview Dr.', 0.00, 1, 0),
+(37, 2, 'Hilton Garden Inn,  3311 Caroga Dr.', 0.00, 1, 0),
+(38, 2, 'Radisson Suite, 640 Dixon Rd', 0.00, 1, 0),
+(39, 2, 'Residence Inn Marriott, 17 Reading Crt.', 0.00, 1, 0),
+(40, 2, 'Sheraton Gateway, PIA terminal 3', 0.00, 1, 0),
+(41, 2, 'Marriott Toronto Airport, 901 Dixon Rd.', 0.00, 1, 0),
+(42, 2, 'Double Tree,  925 Dixon Rd.', 0.00, 1, 0),
+(43, 2, 'The Westin Toronto Airport, 950 Dixon Rd.', 0.00, 1, 0),
+(44, 2, 'Best Western Premier, 135 Carlingview Dr.', 0.00, 1, 0),
+(45, 2, 'Sandman Signature, 55 Reading Crt.', 0.00, 1, 0),
+(46, 2, 'Alt Hotel,  6080 Viscount Rd.', 0.00, 1, 0),
+(47, 2, 'Courtyard by Marriot-231 Carlingview', 0.00, 1, 0);
 
 --
 -- Indexes for table `accountdetails`

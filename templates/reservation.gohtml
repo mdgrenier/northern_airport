@@ -9,17 +9,20 @@
     <link rel="stylesheet" href="../../assets/css/main.css">
 </head>
 <body>
-    <div class="header">
+    <header>
         <img src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
-    </div>
 
-    {{ template "navbar" }}
+        {{ template "navbar" }}
+
+    </header>
     
-    <a href="/index"></a>
-    <div class="container">
+    <main>
         <form id="reservation" action="/createreservation" method="post">
-            <h3>Client Information</h3>
-            <div class="client-info">
+            
+            <section class="client-info">
+                <header>
+                    <h3>Client Information</h3>
+                </header>
                 {{ with .Client }}
                     <div class="row justify-content-around">
                         <div class="form-group col-3">
@@ -137,10 +140,12 @@
                         </div>
                     </div>
                 {{ end }}
-            </div>
+            </section>
             
-            <h3>Trip Information</h3>
-            <div class="trip-info">
+            <section class="trip-info">
+                <header>
+                    <h3>Trip Information</h3>
+                </header>
                 <div class="row justify-content-around">    
                     <div class="form-group col-3">
                         <label for="triptype">Trip Type</label>
@@ -175,22 +180,6 @@
                         </div>
                         <div class="form-group col-3"></div>
                     </div>
-                    <div class="row justify-content-around">
-                        <div class="form-group col-3">
-                            <label for="departuredate">Departure Date</label>
-                            <input type="date" class="form-control" id="departuredate" name="departuredate">
-                        </div>
-                        <div class="form-group col-3">
-                            <label for="departuretime">Departure Time</label>
-                            <select class="form-control" id="departuretime" name="departuretime" placeholder="Departure Time">
-                                <option value="test">Test Time</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-3"></div>
-                        <div class="form-group col-3"></div>
-                    </div>
-                </div>
-                <div class="group">
                     <div class="row justify-content-around">    
                         <div class="form-group col-3">
                             <label for="destinationcity">Destination City</label>
@@ -211,16 +200,15 @@
                     </div>
                     <div class="row justify-content-around">
                         <div class="form-group col-3">
-                            <label for="destinationdate">Destination Date</label>
-                            <input type="date" class="form-control" id="destinationdate" name="destinationdate">
+                            <label for="departuredate">Departure Date</label>
+                            <input type="date" class="form-control" id="departuredate" name="departuredate">
                         </div>
-                        <div class="form-group col-3">
-                            <label for="destinationtime">Destination Time</label>
-                            <select class="form-control" id="destinationtime" name="destinationtime" placeholder="Destination Time">
-                                <option value="test">Test Time</option>
+                        <div class="form-group col-6">
+                            <label for="departuretime">Departure Time</label>
+                            <select class="form-control" id="departuretime" name="departuretime" placeholder="Departure Time">
+                                <option value="0">First Select Cities and Venues</option>
                             </select>
                         </div>
-                        <div class="form-group col-3"></div>
                         <div class="form-group col-3"></div>
                     </div>
                 </div>
@@ -243,60 +231,63 @@
                         <input type="text" class="form-control" id="numchildren" name="numchildren">
                     </div>
                 </div>
-
-                <div id="return-info">
-                <p>Return Trip Information</p>  
-                    <div class="row justify-content-around">    
-                        <div class="form-group col-3">
-                            <label for="returndeparturecity">Return Departure City</label>
-                            <select class="form-control" id="returndeparturecity" name="returndeparturecity" placeholder="Departure City">
-                                <option value="test">Test City</option>
-                            </select>
+            </section>
+            <section id="return-info">
+                <header>
+                    <h3>Return Trip Information</h3>  
+                </header>
+                <div class="group">
+                        <div class="row justify-content-around">    
+                            <div class="form-group col-3">
+                                <label for="returndeparturecity">Return Departure City</label>
+                                <select class="form-control" id="returndeparturecity" name="returndeparturecity" placeholder="Departure City">
+                                    {{ range .Cities }}
+                                        <option value="{{ .CityID }}">{{ .CityName }}</option>
+                                    {{ end }}
+                                </select>
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="returndeparturevenue">Return Departure Venue</label>
+                                <select class="form-control" id="returndeparturevenue" name="returndeparturevenue" placeholder="Departure Venue">
+                                    <option value="0">First Select a City</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-3"></div>
                         </div>
-                        <div class="form-group col-3">
-                            <label for="returndeparturevenue">Return Departure Venue</label>
-                            <select class="form-control" id="returndeparturevenue" name="returndeparturevenue" placeholder="Departure Venue">
-                                <option value="test">Test Venue</option>
-                            </select>
+                        <div class="row justify-content-around">    
+                            <div class="form-group col-3">
+                                <label for="returndestinationcity">Return Destination City</label>
+                                <select class="form-control" id="returndestinationcity" name="returndestinationcity" placeholder="Destination City">
+                                    <option value="0">Select a City</option>
+                                    {{ range .Cities }}
+                                        <option value="{{ .CityID }}">{{ .CityName }}</option>
+                                    {{ end }}
+                                </select>
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="returndestinationvenue">Return Destination Venue</label>
+                                <select class="form-control" id="returndestinationvenue" name="returndestinationvenue" placeholder="Destination Venue">
+                                    <option value="0">First Select a City</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-3"></div>
                         </div>
-                        <div class="form-group col-3">
-                            <label for="returndeparturedate">return Departure Date</label>
-                            <input type="date" class="form-control" id="returndeparturedate" name="returndeparturedate">
+                        <div class="row justify-content-around">    
+                            <div class="form-group col-3">
+                                <label for="returndeparturedate">Return Departure Date</label>
+                                <input type="date" class="form-control" id="returndeparturedate" name="returndeparturedate">
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="returndeparturetime">Return Departure Time</label>
+                                <select class="form-control" id="returndeparturetime" name="returndeparturetime" placeholder="Departure Time">
+                                    <option value="0">First Select Cities and Venues</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-3"></div>
                         </div>
-                        <div class="form-group col-3">
-                            <label for="returndeparturetime">Return Departure Time</label>
-                            <select class="form-control" id="returndeparturetime" name="returndeparturetime" placeholder="Departure Time">
-                                <option value="test">Test Time</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row justify-content-around">    
-                        <div class="form-group col-3">
-                            <label for="returndestinationcity">Return Destination City</label>
-                            <select class="form-control" id="returndestinationcity" name="returndestinationcity" placeholder="Destination City">
-                                <option value="test">Test City</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-3">
-                            <label for="returndestinationvenue">Return Destination Venue</label>
-                            <select class="form-control" id="returndestinationvenue" name="returndestinationvenue" placeholder="Destination Venue">
-                                <option value="test">Test Venue</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-3">
-                            <label for="returndestinationdate">Destination Date</label>
-                            <input type="date" class="form-control" id="returndestinationdate" name="returndestinationdate">
-                        </div>
-                        <div class="form-group col-3">
-                            <label for="returndestinationtime">Return Destination Time</label>
-                            <select class="form-control" id="returndestinationtime" name="returndestinationtime" placeholder="Destination Time">
-                                <option value="test">Test Time</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <p>Number of Return Passengers</p>  
-                    <div class="row justify-content-around">  
+                </div>
+                <p>Number of Return Passengers</p>  
+                <div class="row justify-content-around">  
                         <div class="form-group col-3">
                             <label for="numadults">Adults</label>
                             <input type="text" class="form-control" id="numadults" name="numadults">
@@ -313,18 +304,19 @@
                             <label for="numchildren">Children (under 12)</label>
                             <input type="text" class="form-control" id="numchildren" name="numchildren">
                         </div>
-                    </div>
                 </div>
-            </div>
+                </div>
+            </section>
 
             <button id="submit" type="submit" class="btn btn-primary">Submit</button>
         </form>
-    </div>
+    </main>
 
     {{ template "footer" }}
 
+
     <script type="text/javascript" >
-    (function() {
+
         document.getElementById("triptype").onchange = function() { 
             if(document.getElementById('triptype').value == "roundtrip") {
                 document.getElementById('return-info').style.display = "inline-block";
@@ -334,65 +326,155 @@
 
         var departurevenue = document.getElementById("departurevenue");
         var departurecity = document.getElementById("departurecity");
+        var departuretime = document.getElementById("departuretime");
 
         var destinationvenue = document.getElementById("destinationvenue");
         var destinationcity = document.getElementById("destinationcity");
 
+        var returndeparturevenue = document.getElementById("returndeparturevenue");
+        var returndeparturecity = document.getElementById("returndeparturecity");
+        var returndeparturetime = document.getElementById("returndeparturetime");
+
+        var returndestinationvenue = document.getElementById("returndestinationvenue");
+        var returndestinationcity = document.getElementById("returndestinationcity");
+
         var venuecount = {{ .VenueCount }};
         var venues = {{ .Venues }};
+        
+        departurecity.onchange = UpdateVenue(departurecity, departurevenue);
+        destinationcity.onchange = UpdateVenue(destinationcity, destinationvenue);
+        returndeparturecity.onchange = UpdateVenue(returndeparturecity, returndeparturevenue);
+        returndestinationcity.onchange = UpdateVenue(returndestinationcity, returndestinationvenue);
 
-        departurecity.onchange = function() { 
-            var selectvenuecount = departurevenue.options.length;
+        departuretime.onclick = UpdateTime(departurecity, destinationcity, departuretime);
+        returndeparturetime.onclick = UpdateTime(returndeparturecity, returndestinationcity, returndeparturetime);
+        
+        function UpdateVenue(cityselect, venueselect) {
+            return function() {
+                var selectvenuecount = venueselect.options.length;
 
-            for(i=0; i<selectvenuecount; i++)
-            {
-                document.querySelectorAll('#departurevenue option').forEach(option => option.remove());
-                
-            }
-
-            {{ range .Venues }}
-                var temp = {{ .VenueID }};
-                var cityid = {{ .CityID }}
-                if(departurecity.options[departurecity.selectedIndex].value == cityid)
+                for(i=0; i<selectvenuecount; i++)
                 {
-                    var opt = document.createElement('option');
-                    var venuename = {{ .VenueName }}
-                    var venueid = {{ .VenueID }}
-                    
-                    opt.appendChild(document.createTextNode(venuename));
-                    opt.value = venueid;
-            
-                    departurevenue.appendChild(opt);
+                    venueselect.remove(venueselect.options[i]);
                 }
-            {{ end }}
+
+                var defaultopt = document.createElement('option');
+                defaultopt.appendChild(document.createTextNode('select value'));
+                defaultopt.value = 0;
+                venueselect.appendChild(defaultopt);
+
+                {{ range .Venues }}
+                    var temp = {{ .VenueID }};
+                    var cityid = {{ .CityID }}
+                    if(cityselect.options[cityselect.selectedIndex].value == cityid)
+                    {
+                        var opt = document.createElement('option');
+                        var venuename = {{ .VenueName }}
+                        var venueid = {{ .VenueID }}
+                        
+                        opt.appendChild(document.createTextNode(venuename));
+                        opt.value = venueid;
+                
+                        venueselect.appendChild(opt);
+                    }
+                {{ end }}
+            };
         };
 
-        destinationcity.onchange = function() { 
-            var selectvenuecount = destinationvenue.options.length;
+        function UpdateTime(departurecityselect, destinationcityselect, timeselect) {
+            return function() {
+                var departurenorthoffset = -1;
+                var departuresouthoffset = -1;
+                var destinationnorthoffset = -1;
+                var destinationsouthoffset = -1;
+                var departurecityid = departurecityselect.options[departurecityselect.selectedIndex].value;
+                var destinationcityid = destinationcityselect.options[destinationcityselect.selectedIndex].value;
 
-            for(i=0; i<selectvenuecount; i++)
-            {
-                document.querySelectorAll('#destinationvenue option').forEach(option => option.remove()); 
-            }
+                var departuretimecount = timeselect.options.length;
 
-            {{ range .Venues }}
-                var temp = {{ .VenueID }};
-                var cityid = {{ .CityID }}
-                
-                if(destinationcity.options[destinationcity.selectedIndex].value == cityid)
+                for(i=0; i<departuretimecount; i++)
                 {
-                    var opt = document.createElement('option');
-                    var venuename = {{ .VenueName }}
-                    var venueid = {{ .VenueID }}
-                    
-                    opt.appendChild(document.createTextNode(venuename));
-                    opt.value = venueid;
-            
-                    destinationvenue.appendChild(opt);
+                    timeselect.remove(timeselect.options[i]);
                 }
-            {{ end }}
+
+                {{ range .Cities }}
+
+                    if(departurecityid == {{ .CityID }})
+                    {
+                        departurenorthoffset = {{ .NorthOffset }};
+                        departuresouthoffset = {{ .SouthOffset }};
+                    }
+
+                    if(destinationcityid == {{ .CityID }})
+                    {
+                        destinationnorthoffset = {{ .NorthOffset }};
+                        destinationsouthoffset = {{ .SouthOffset }};
+                    }
+
+                {{ end }}
+                
+                {{ range .DepartureTimes }}
+
+                    var opt = document.createElement('option');
+                    var time = {{ .DepartureTime }};
+                    var departuretimeid = {{ .DepartureTimeID }};
+                    var departuretimecityid = {{ .CityID }}                 
+            
+                    if(departurecityid == 1) 
+                    {
+                        if(departuretimecityid == 1)
+                        {
+                            opt.appendChild(document.createTextNode(time));
+                            opt.value = departuretimeid;
+                            timeselect.appendChild(opt);
+                        }
+                    } 
+                    else if(departurecityid == 2) 
+                    {
+                        if(departuretimecityid == 2)
+                        {
+                            opt.appendChild(document.createTextNode(time));
+                            opt.value = departuretimeid;
+                            timeselect.appendChild(opt);
+                        }
+                    }
+                    else
+                    {
+                        if(departurecityid == 0 || destinationcityid == 0)
+                        {
+                            if(timeselect.options.length == 0)
+                            {
+                                opt.appendChild(document.createTextNode('please select departure and destination venues'));
+                                opt.value = 0;
+                                timeselect.appendChild(opt);
+                            }
+                        }
+                        else if (departurenorthoffset > destinationnorthoffset)
+                        {
+                            if(departuretimecityid == 2)
+                            {
+                                var timewithoffset = time + departurenorthoffset;
+                                opt.appendChild(document.createTextNode(timewithoffset));
+                                opt.value = departuretimeid;
+                                timeselect.appendChild(opt);
+                            }
+                        }
+                        else
+                        {
+                            if(departuretimecityid == 1)
+                            {
+                                var timewithoffset = time + departuresouthoffset;
+                                opt.appendChild(document.createTextNode(timewithoffset));
+                                opt.value = departuretimeid;
+                                timeselect.appendChild(opt);
+                            }
+                        }
+                    }
+
+                {{ end }}
+            }
         };
-    })();
+        
 </script>
 </body>
 </html>

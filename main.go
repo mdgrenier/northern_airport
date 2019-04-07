@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"html/template"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/sessions"
 
@@ -40,18 +41,32 @@ type Venues struct {
 
 // Cities - stores cities
 type Cities struct {
-	CityID   int    `json:"cityid" db:"cityid"`
-	CityName string `json:"cityname" db:"cityname"`
+	CityID      int    `json:"cityid" db:"cityid"`
+	CityName    string `json:"cityname" db:"cityname"`
+	NorthOffset int    `json:"northoffset" db:"northoffset"`
+	SouthOffset int    `json:"southoffset" db:"southoffset"`
 }
 
 // Reservation - store values to populate reservations form
 type Reservation struct {
-	Client     Client   `json:"client" db:"client"`
-	Venues     []Venues `json:"venues" db:"venues"`
-	VenueCount int      `json:"venuecount" db:"venuecount"`
-	Cities     []Cities `json:"cities" db:"cities"`
+	Client         Client           `json:"client" db:"client"`
+	Venues         []Venues         `json:"venues" db:"venues"`
+	VenueCount     int              `json:"venuecount" db:"venuecount"`
+	Cities         []Cities         `json:"cities" db:"cities"`
+	DepartureTimes []DepartureTimes `json:"departuretimes" db:"departuretimes"`
 }
 
+// DepartureTimes - store departure times
+type DepartureTimes struct {
+	DepartureTimeID int       `json:"departuretimeid" db:"departuretimeid"`
+	CityID          int       `json:"cityid" db:"cityid"`
+	DepartureTime   int       `json:"departuretime" db:"departuretime"`
+	Recurring       int       `json:"recurring" db:"recurring"`
+	StartDate       time.Time `json:"startdate" db:"startdate"`
+	EndDate         time.Time `json:"enddate" db:"enddate"`
+}
+
+var dateLayout string
 var sessionStore *sessions.CookieStore
 
 // tpl holds all parsed templates
@@ -59,7 +74,7 @@ var tpl *template.Template
 
 func newRouter() *mux.Router {
 	r := mux.NewRouter()
-	// Declare the static file directory and point it to the directory we just made
+	// Declare the static file directory and point it to the directory
 	staticFileDirectory := http.Dir("./assets/")
 	// Declare the handler, that routes requests to their respective filename.
 	// The fileserver is wrapped in the `stripPrefix` method, because we want to
@@ -73,14 +88,16 @@ func newRouter() *mux.Router {
 	// with "/assets/", instead of the absolute route itself
 	r.PathPrefix("/assets/").Handler(staticFileHandler).Methods("GET")
 
+	//map urls to handler functions
+	//any method
 	r.HandleFunc("/", indexHandler)
 	r.HandleFunc("/signup", signupHandler)
 	r.HandleFunc("/logout", logoutHandler)
 	r.HandleFunc("/reservation", reservationHandler)
-
+	r.HandleFunc("/createreservation", createreservationHandler)
+	//post method only
 	r.HandleFunc("/signin", signinHandler).Methods("POST")
 	r.HandleFunc("/register", registerHandler).Methods("POST")
-	r.HandleFunc("/createreservation", createreservationHandler)
 
 	return r
 }
@@ -94,11 +111,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	//err = db.Ping()
-	//
-	//if err != nil {
-	//	panic(err)
-	//}
 
 	InitStore(&dbStore{db: db})
 
@@ -118,7 +130,7 @@ func InitSession() {
 	)
 
 	sessionStore.Options = &sessions.Options{
-		MaxAge:   60 * 15,
+		MaxAge:   60 * 2,
 		HttpOnly: true,
 	}
 
