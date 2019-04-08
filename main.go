@@ -90,14 +90,14 @@ func newRouter() *mux.Router {
 
 	//map urls to handler functions
 	//any method
-	r.HandleFunc("/", indexHandler)
-	r.HandleFunc("/signup", signupHandler)
-	r.HandleFunc("/logout", logoutHandler)
-	r.HandleFunc("/reservation", reservationHandler)
-	r.HandleFunc("/createreservation", createreservationHandler)
+	r.HandleFunc("/", IndexHandler)
+	r.HandleFunc("/signup", SignupHandler)
+	r.HandleFunc("/logout", LogoutHandler)
+	r.HandleFunc("/reservation", ReservationHandler)
+	r.HandleFunc("/createreservation", CreateReservationHandler)
 	//post method only
-	r.HandleFunc("/signin", signinHandler).Methods("POST")
-	r.HandleFunc("/register", registerHandler).Methods("POST")
+	r.HandleFunc("/signin", SigninHandler).Methods("POST")
+	r.HandleFunc("/register", RegisterHandler).Methods("POST")
 
 	return r
 }
@@ -121,20 +121,25 @@ func main() {
 
 // InitSession initializes a user session
 func InitSession() {
+	//generate random cookie authentication and encryption keys
 	authKeyOne := securecookie.GenerateRandomKey(64)
 	encryptionKeyOne := securecookie.GenerateRandomKey(32)
 
+	//initialize new session store
 	sessionStore = sessions.NewCookieStore(
 		authKeyOne,
 		encryptionKeyOne,
 	)
 
+	//must update, currently setting maxage to 2 minutes and http only (will need secure when live)
 	sessionStore.Options = &sessions.Options{
 		MaxAge:   60 * 2,
 		HttpOnly: true,
 	}
 
+	//register client so it is stored in session
 	gob.Register(Client{})
 
+	//map template directory
 	tpl = template.Must(template.ParseGlob("templates/*.gohtml"))
 }

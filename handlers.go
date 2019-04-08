@@ -7,9 +7,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func registerHandler(w http.ResponseWriter, r *http.Request) {
+//RegisterHandler - parse data from client registration from and store in db
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	client := &Client{}
 
+	//get form data
 	err := r.ParseForm()
 
 	if err != nil {
@@ -18,6 +20,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//store form data in client data structure
 	client.Username = r.Form.Get("username")
 	client.Password = r.Form.Get("password")
 	client.Firstname = r.Form.Get("firstname")
@@ -48,21 +51,25 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	// We reach this point if the credentials we correctly stored in the database, and the default status of 200 is sent back
 	log.Print("user created")
 
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-func signinHandler(w http.ResponseWriter, r *http.Request) {
+//SigninHandler - compare credentials entered vs credentials in db, if match found store
+//				  the username in client structure and create authentication cookie to
+//				  allow for authentication persistence site wide
+func SigninHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := sessionStore.Get(r, "northern-airport")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	//create a client object
 	client := &Client{}
 
+	//get credentials from form
 	err = r.ParseForm()
 
 	if err != nil {
@@ -72,8 +79,9 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	client.Username = r.Form.Get("username")
-	client.Password = r.Form.Get("password")
+	//client.Password = r.Form.Get("password")
 
+	//validate user credentials
 	err = store.SignInUser(client)
 	if err != nil {
 		log.Print("Error: ", err)
@@ -82,40 +90,41 @@ func signinHandler(w http.ResponseWriter, r *http.Request) {
 
 	client.Authenticated = true
 
+	//update authentication cookie
 	session.Values["client"] = client
-
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// We reach this point if the credentials we correctly stored in the database, and the default status of 200 is sent back
 	log.Printf("%s is signed in", session.Values["client"])
 
 	http.Redirect(w, r, "/reservation", http.StatusFound)
 }
 
-// logout revokes authentication for a user
-func logoutHandler(w http.ResponseWriter, r *http.Request) {
+//LogoutHandler - set authentication cookie to be expired
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := sessionStore.Get(r, "northern-airport")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	//set authentication cookie to be expired
 	session.Values["client"] = Client{}
 	session.Options.MaxAge = -1
-
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
+//IndexHandler - display homepage
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := sessionStore.Get(r, "northern-airport")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -129,7 +138,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "index.gohtml", client)
 }
 
-func signupHandler(w http.ResponseWriter, r *http.Request) {
+//SignupHandler - display signup page
+func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := sessionStore.Get(r, "northern-airport")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -141,15 +151,18 @@ func signupHandler(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "signup.gohtml", client)
 }
 
-func reservationHandler(w http.ResponseWriter, r *http.Request) {
+//ReservationHandler - display reservation page, populate client data if user is authenticated
+func ReservationHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := sessionStore.Get(r, "northern-airport")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	//get client data from session cookie
 	client := GetClient(session)
 
+	//if authenticated get all client info
 	if client.Authenticated {
 		err := store.GetClientInfo(&client)
 
@@ -158,12 +171,12 @@ func reservationHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	//get data need to populate dropdowns in reservation form
 	venues := store.GetVenues()
-
 	cities := store.GetCities()
-
 	departuretimes := store.GetDepartureTimes()
 
+	//store retrieved data in reservation structure and pass to template
 	reservation := Reservation{}
 
 	reservation.Client = client
@@ -171,11 +184,12 @@ func reservationHandler(w http.ResponseWriter, r *http.Request) {
 	reservation.VenueCount = len(venues)
 	reservation.Cities = cities
 	reservation.DepartureTimes = departuretimes
-	
+
 	tpl.ExecuteTemplate(w, "reservation.gohtml", reservation)
 }
 
-func createreservationHandler(w http.ResponseWriter, r *http.Request) {
+//CreateReservationHandler - ***will store reservation in database***
+func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := sessionStore.Get(r, "northern-airport")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

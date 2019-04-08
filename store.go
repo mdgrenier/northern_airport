@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -24,14 +23,15 @@ type Store interface {
 	GetDepartureTimes() []DepartureTimes
 }
 
-// The `dbStore` struct will implement the `Store` interface
-// It also takes the sql DB connection object, which represents
-// the database connection.
+//The `dbStore` struct will implement the `Store` interface it also takes the sql
+//DB connection object, which represents the database connection.
 type dbStore struct {
 	db *sql.DB
 }
 
+//CreateUser - store new client in database
 func (store *dbStore) CreateUser(client *Client) error {
+
 	result, err := store.db.Exec("INSERT INTO clients(firstname, lastname, phone, email, "+
 		"streetaddress, city, province, postalcode, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		client.Firstname, client.Lastname, client.Phone, client.Email, client.StreetAddress,
@@ -41,88 +41,91 @@ func (store *dbStore) CreateUser(client *Client) error {
 		return err
 	}
 
+	//get id from client insertion transaction
 	id, _ := result.LastInsertId()
 
-	log.Printf("New Client ID: %d", id)
+	//log.Printf("New Client ID: %d", id)
 
+	//create account details record linked to client record
 	result, err = store.db.Exec("INSERT INTO accountdetails(clientid, password, roleid, username) "+
 		"VALUES (?, ?, 2, ?)",
 		id, client.Password, client.Username)
 
-	id, _ = result.LastInsertId()
+	//id, _ = result.LastInsertId()
 
-	log.Printf("Account Details: %d", id)
+	//log.Printf("Account Details: %d", id)
 
 	return err
 }
 
+//CreateReservation - store new reservation in database
 func (store *dbStore) CreateReservation(client *Client) error {
-	result, err := store.db.Exec("INSERT INTO clients(firstname, lastname, phone, email, streetaddress, "+
-		"city, province, postalcode, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-		client.Firstname, client.Lastname, client.Phone, client.Email,
-		client.StreetAddress, client.City, client.Province, client.PostalCode, client.Country)
+	/*
+		result, err := store.db.Exec("INSERT INTO clients(firstname, lastname, phone, email, streetaddress, "+
+			"city, province, postalcode, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			client.Firstname, client.Lastname, client.Phone, client.Email,
+			client.StreetAddress, client.City, client.Province, client.PostalCode, client.Country)
 
-	if err != nil {
+		if err != nil {
+			return err
+		}
+
+		id, _ := result.LastInsertId()
+
+		log.Printf("New Client ID: %d", id)
+
+		result, err = store.db.Exec("INSERT INTO accountdetails(clientid, password, roleid, username) "+
+			"VALUES (?, ?, 2, ?)",
+			id, client.Password, client.Username)
+
+		id, _ = result.LastInsertId()
+
+		log.Printf("Account Details: %d", id)
+
 		return err
-	}
+	*/
 
-	id, _ := result.LastInsertId()
-
-	log.Printf("New Client ID: %d", id)
-
-	result, err = store.db.Exec("INSERT INTO accountdetails(clientid, password, roleid, username) "+
-		"VALUES (?, ?, 2, ?)",
-		id, client.Password, client.Username)
-
-	id, _ = result.LastInsertId()
-
-	log.Printf("Account Details: %d", id)
-
-	return err
+	return nil
 }
 
+//SignInUser - authenticate user
 func (store *dbStore) SignInUser(client *Client) error {
-	// Parse and decode the request body into a new `Credentials` instance
 
-	// Query the database for all birds, and return the result to the `rows` object
-	//rows, err := store.db.Query("SELECT username, password from users")
 	row, err := store.db.Query("select password from accountdetails where username=?", client.Username)
-	// We return in case of an error, and defer the closing of the row structure
+
 	if err != nil {
 		return err
 	}
 	defer row.Close()
 
-	// Create the data structure that is returned from the function.
-	// By default, this will be an empty array of birds
+	//create a client object
 	storedClient := &Client{}
 
+	//get returned client record if one exists
 	row.Next()
 	err = row.Scan(&storedClient.Password)
 	if err != nil {
-		// If an entry with the username does not exist, send an "Unauthorized"(401) status
 		if err == sql.ErrNoRows {
 			log.Print("Unauthorized")
-			//w.WriteHeader(http.StatusUnauthorized)
-			//return
+			//***handle this better, display credential error***
 		} else {
 			log.Printf("Sign In Error: %s", err.Error())
-			//log.Fatal("Error: ", err)
 		}
 	}
 
 	// Compare the stored hashed password, with the hashed version of the password that was received
 	if err = bcrypt.CompareHashAndPassword([]byte(storedClient.Password), []byte(client.Password)); err != nil {
 		// If the two passwords don't match, return a 401 status
-		//w.WriteHeader(http.StatusUnauthorized)
 		log.Print("Incorrect Password")
 	}
 
 	return err
 }
 
+//GetVenues - return all venues in database
 func (store *dbStore) GetVenues() []Venues {
 
+	//Get venue count
 	venueCount := store.GetVenueCount()
 
 	row, err := store.db.Query("select venueid, cityid, name from venues")
@@ -132,29 +135,23 @@ func (store *dbStore) GetVenues() []Venues {
 	}
 	defer row.Close()
 
+	//create slice to store venues
 	var venueSlice = make([]Venues, venueCount)
-
-	var venueid int
-	var cityid int
-	var name string
 	var indx int
 
+	//loop through returned venues
 	indx = 0
 	for row.Next() {
 		err = row.Scan(
-			&venueid, &cityid, &name,
+			&venueSlice[indx].VenueID, &venueSlice[indx].CityID, &venueSlice[indx].VenueName,
 		)
 		if err != nil {
-			// If an entry with the username does not exist, send an "Unauthorized"(401) status
+			//if error print to console
 			if err == sql.ErrNoRows {
 				log.Print("No venue found")
 			} else {
 				log.Printf("Error retrieving venues: %s", err.Error())
 			}
-		} else {
-			venueSlice[indx].VenueID = venueid
-			venueSlice[indx].CityID = cityid
-			venueSlice[indx].VenueName = name
 		}
 
 		indx++
@@ -163,6 +160,7 @@ func (store *dbStore) GetVenues() []Venues {
 	return venueSlice
 }
 
+//GetVenueCount - return number of venues
 func (store *dbStore) GetVenueCount() int {
 	var venueCount int
 
@@ -188,44 +186,39 @@ func (store *dbStore) GetVenueCount() int {
 	return venueCount
 }
 
+//GetCities - return all cities in database
 func (store *dbStore) GetCities() []Cities {
+
+	//get count of all cities
 	cityCount := store.GetCityCount()
 
 	row, err := store.db.Query("select c.cityid, name, northoffset, southoffset from cities c " +
 		"inner join cityoffsets cos on c.cityid = cos.cityid")
-	// We return in case of an error, and defer the closing of the row structure
+
 	if err != nil {
 		log.Printf("Error querying cities: %s", err.Error())
 		return nil
 	}
 	defer row.Close()
 
+	//create slice to store all cities
 	var citySlice = make([]Cities, cityCount)
-
-	var cityid int
-	var name string
-	var northoffset int
-	var southoffset int
 	var indx int
 
+	//loop through returned cities
 	indx = 0
 	for row.Next() {
 		err = row.Scan(
-			&cityid, &name, &northoffset, &southoffset,
+			&citySlice[indx].CityID, &citySlice[indx].CityName, &citySlice[indx].NorthOffset,
+			&citySlice[indx].SouthOffset,
 		)
 
 		if err != nil {
-			// If an entry with the username does not exist, send an "Unauthorized"(401) status
 			if err == sql.ErrNoRows {
 				log.Print("No cities found")
 			} else {
 				log.Printf("Error retrieving cities: %s", err.Error())
 			}
-		} else {
-			citySlice[indx].CityID = cityid
-			citySlice[indx].CityName = name
-			citySlice[indx].NorthOffset = northoffset
-			citySlice[indx].SouthOffset = southoffset
 		}
 
 		indx++
@@ -234,6 +227,7 @@ func (store *dbStore) GetCities() []Cities {
 	return citySlice
 }
 
+//GetCityCount  - return number of cities
 func (store *dbStore) GetCityCount() int {
 	var cityCount int
 
@@ -244,7 +238,6 @@ func (store *dbStore) GetCityCount() int {
 		&cityCount,
 	)
 	if err != nil {
-		// If an entry with the username does not exist, send an "Unauthorized"(401) status
 		if err == sql.ErrNoRows {
 			log.Print("No venues returned")
 		} else {
@@ -255,24 +248,24 @@ func (store *dbStore) GetCityCount() int {
 	return cityCount
 }
 
+//GetDepartureTimes - return all departuretimes in database
 func (store *dbStore) GetDepartureTimes() []DepartureTimes {
+
+	//get count for all departure times
 	departuretimeCount := store.GetDepartureTimesCount()
 
 	row, err := store.db.Query("select departuretimeid, cityid, departuretime, " +
 		"recurring, startdate, enddate from departuretimes")
-	// We return in case of an error, and defer the closing of the row structure
+
 	if err != nil {
 		log.Printf("Error retrieving departure times: %s", err.Error())
 		return nil
 	}
 	defer row.Close()
 
+	//create slice to store all departure times
 	var departureTimesSlice = make([]DepartureTimes, departuretimeCount)
 
-	var departuretimeid int
-	var cityid int
-	var departuretime int
-	var recurring int
 	var startdate mysql.NullTime
 	var enddate mysql.NullTime
 	var indx int
@@ -280,7 +273,9 @@ func (store *dbStore) GetDepartureTimes() []DepartureTimes {
 	indx = 0
 	for row.Next() {
 		err = row.Scan(
-			&departuretimeid, &cityid, &departuretime, &recurring, &startdate, &enddate,
+			&departureTimesSlice[indx].DepartureTimeID, &departureTimesSlice[indx].CityID,
+			&departureTimesSlice[indx].DepartureTime, &departureTimesSlice[indx].Recurring,
+			&startdate, &enddate,
 		)
 		if err != nil {
 			// If an entry with the username does not exist, send an "Unauthorized"(401) status
@@ -290,11 +285,7 @@ func (store *dbStore) GetDepartureTimes() []DepartureTimes {
 				log.Printf("Error retrieving times: %s", err.Error())
 			}
 		} else {
-			departureTimesSlice[indx].DepartureTimeID = departuretimeid
-			departureTimesSlice[indx].CityID = cityid
-			departureTimesSlice[indx].DepartureTime = departuretime
-			departureTimesSlice[indx].Recurring = recurring
-
+			//store dates in departure time slice if valid dates, otherwise empty date
 			if startdate.Valid {
 				departureTimesSlice[indx].StartDate = startdate.Time
 			} else {
@@ -314,6 +305,7 @@ func (store *dbStore) GetDepartureTimes() []DepartureTimes {
 	return departureTimesSlice
 }
 
+//GetDepartureTimesCount - return count of all departure times
 func (store *dbStore) GetDepartureTimesCount() int {
 	var departuretimeCount int
 
@@ -324,7 +316,6 @@ func (store *dbStore) GetDepartureTimesCount() int {
 		&departuretimeCount,
 	)
 	if err != nil {
-		// If an entry with the username does not exist, send an "Unauthorized"(401) status
 		if err == sql.ErrNoRows {
 			log.Print("No venues returned")
 		} else {
@@ -335,10 +326,9 @@ func (store *dbStore) GetDepartureTimesCount() int {
 	return departuretimeCount
 }
 
-//GetClientInfo takes a client and username
+//GetClientInfo - from client username return all client info
 func (store *dbStore) GetClientInfo(client *Client) error {
 
-	// Query the database for all birds, and return the result to the `rows` object
 	row, err := store.db.Query(
 		"select firstname, lastname, phone, email, streetaddress, "+
 			"city, province, postalcode, country from clients c inner join "+
@@ -351,40 +341,18 @@ func (store *dbStore) GetClientInfo(client *Client) error {
 	}
 	defer row.Close()
 
-	var firstname string
-	var lastname string
-	var phone string
-	var email string
-	var streetaddress string
-	var city string
-	var province string
-	var postalcode string
-	var country string
-
+	//store client into into local variables
 	row.Next()
 	err = row.Scan(
-		&firstname, &lastname, &phone, &email, &streetaddress,
-		&city, &province, &postalcode, &country,
+		&client.Firstname, &client.Lastname, &client.Phone, &client.Email, &client.StreetAddress,
+		&client.City, &client.Province, &client.PostalCode, &client.Country,
 	)
 	if err != nil {
-		// If an entry with the username does not exist, send an "Unauthorized"(401) status
 		if err == sql.ErrNoRows {
 			log.Print("No client found")
 		} else {
 			log.Printf("Error saving client: %s", err.Error())
 		}
-	} else {
-		//clients.Username =
-		//clients.Password = firstname
-		client.Firstname = firstname
-		client.Lastname = lastname
-		client.Phone = phone
-		client.Email = email
-		client.StreetAddress = streetaddress
-		client.City = city
-		client.Province = province
-		client.PostalCode = postalcode
-		client.Country = country
 	}
 
 	return err
