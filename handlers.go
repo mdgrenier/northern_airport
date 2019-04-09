@@ -79,7 +79,7 @@ func SigninHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	client.Username = r.Form.Get("username")
-	//client.Password = r.Form.Get("password")
+	client.Password = r.Form.Get("password")
 
 	//validate user credentials
 	err = store.SignInUser(client)
