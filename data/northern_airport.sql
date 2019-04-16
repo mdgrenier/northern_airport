@@ -282,7 +282,13 @@ CREATE TABLE `discountcodes` (
   `EndDate` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `discountcodes`
+--
+
+INSERT INTO `discountcodes` (`discountcodeid`, `name`, `percentage`, `amount`, `startdate`, `enddate`) VALUES
+(1, 'test code', 10, 0, '2000-01-01', '2020-01-01');
+
 
 --
 -- Table structure for table `drivers`
@@ -460,23 +466,34 @@ CREATE TABLE `reservations` (
   `DepartureTimeID` int(11) NOT NULL,
   `DestinationCityID` int(11) NOT NULL,
   `DestinationVenueID` int(11) NOT NULL,
-  `DiscountCodeID` int(11) NOT NULL,
+  `ReturnDepartureCityID` int(11),
+  `ReturnDepartureVenueID` int(11),
+  `ReturnDepartureTimeID` int(11),
+  `ReturnDestinationCityID` int(11),
+  `ReturnDestinationVenueID` int(11),
+  `DiscountCodeID` int(11) DEFAULT 0,
   `DepartureAirlineID` int(11) NOT NULL,
-  `ReturnAirlineID` int(11) NOT NULL,
+  `ReturnAirlineID` int(11),
   `DriverNotes` text,
   `InternalNotes` text,
-  `NumAdults` int(11) NOT NULL,
-  `NumStudents` int(11) NOT NULL,
-  `NumSeniors` int(11) NOT NULL,
+  `DepartureNumAdults` int(11) NOT NULL,
+  `DepartureNumStudents` int(11) NOT NULL,
+  `DepartureNumSeniors` int(11) NOT NULL,
+  `DepartureNumChildren` int(11) NOT NULL,
+  `ReturnNumAdults` int(11),
+  `ReturnNumStudents` int(11),
+  `ReturnNumSeniors` int(11),
+  `ReturnNumChildren` int(11),
   `Price` float NOT NULL,
-  `Status` varchar(25) NOT NULL,
-  `Hash` varchar(255) NOT NULL,
+  `Status` varchar(25) DEFAULT NULL,
+  `Hash` varchar(255) DEFAULT NULL,
   `CustomDepartureID` int(11) DEFAULT NULL,
   `CustomDestinationID` int(11) DEFAULT NULL,
+  `DepartureDate` date NOT NULL,
   `ReturnDate` date DEFAULT NULL,
   `TripTypeID` int(11) NOT NULL,
-  `BalanceOwing` float NOT NULL,
-  `ElvaonTransactionID` int(11) DEFAULT NULL
+  `BalanceOwing` float NULL,
+  `ElavonTransactionID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -490,7 +507,13 @@ CREATE TABLE `reservationtypes` (
   `Name` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `reservationtypes`
+--
+
+INSERT INTO `reservationtypes` (`reservationtypeid`, `name`) VALUES
+(1, 'one way'),
+(2, 'round trip');
 
 --
 -- Table structure for table `roles`
@@ -600,7 +623,14 @@ CREATE TABLE `triptypes` (
   `Name` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- --------------------------------------------------------
+--
+-- Dumping data for table `triptypes`
+--
+
+INSERT INTO `triptypes` (`triptypeid`, `name`) VALUES
+(1, 'one way'),
+(2, 'return');
+
 
 --
 -- Table structure for table `vehicles`
@@ -1010,17 +1040,10 @@ ALTER TABLE `prices`
 ALTER TABLE `reservations`
   ADD CONSTRAINT `FK_155` FOREIGN KEY (`ReservationTypeID`) REFERENCES `reservationtypes` (`ReservationTypeID`),
   ADD CONSTRAINT `FK_163` FOREIGN KEY (`DepartureCityID`) REFERENCES `cities` (`CityID`),
-  ADD CONSTRAINT `FK_181` FOREIGN KEY (`DiscountCodeID`) REFERENCES `discountcodes` (`DiscountCodeID`),
   ADD CONSTRAINT `FK_195` FOREIGN KEY (`DepartureTimeID`) REFERENCES `departuretimes` (`DepartureTimeID`),
   ADD CONSTRAINT `FK_203` FOREIGN KEY (`DestinationCityID`) REFERENCES `cities` (`CityID`),
   ADD CONSTRAINT `FK_211` FOREIGN KEY (`DepartureVenueID`) REFERENCES `venues` (`VenueID`),
-  ADD CONSTRAINT `FK_214` FOREIGN KEY (`DestinationVenueID`) REFERENCES `venues` (`VenueID`),
-  ADD CONSTRAINT `FK_273` FOREIGN KEY (`DepartureAirlineID`) REFERENCES `airlines` (`AirlineID`),
-  ADD CONSTRAINT `FK_311` FOREIGN KEY (`ReturnAirlineID`) REFERENCES `trips` (`TripID`),
-  ADD CONSTRAINT `FK_330` FOREIGN KEY (`CustomDepartureID`) REFERENCES `customvenues` (`CustomVenueID`),
-  ADD CONSTRAINT `FK_333` FOREIGN KEY (`CustomDestinationID`) REFERENCES `customvenues` (`CustomVenueID`),
-  ADD CONSTRAINT `FK_341` FOREIGN KEY (`TripTypeID`) REFERENCES `triptypes` (`TripTypeID`);
-
+  ADD CONSTRAINT `FK_214` FOREIGN KEY (`DestinationVenueID`) REFERENCES `venues` (`VenueID`);
 --
 -- Constraints for table `transactions`
 --

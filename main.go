@@ -19,6 +19,7 @@ import (
 // Client - data structure to hold client information and account details
 type Client struct {
 	Authenticated bool
+	ClientID      int    `json:"clientid" db:"clientid"`
 	Password      string `json:"password" db:"password"`
 	Username      string `json:"username" db:"username"`
 	Firstname     string `json:"firstname" db:"firstname"`
@@ -47,13 +48,52 @@ type Cities struct {
 	SouthOffset int    `json:"southoffset" db:"southoffset"`
 }
 
-// Reservation - store values to populate reservations form
-type Reservation struct {
+// ResFormData - store values to populate reservations form
+type ResFormData struct {
 	Client         Client           `json:"client" db:"client"`
 	Venues         []Venues         `json:"venues" db:"venues"`
 	VenueCount     int              `json:"venuecount" db:"venuecount"`
 	Cities         []Cities         `json:"cities" db:"cities"`
 	DepartureTimes []DepartureTimes `json:"departuretimes" db:"departuretimes"`
+}
+
+// Reservation - store reservation information
+type Reservation struct {
+	ClientID                 int       `json:"clientid" db:"clientid"`
+	ReservationTypeID        int       `json:"reservationtypeid" db:"reservationtypeid"`
+	DepartureCityID          int       `json:"departurecityid" db:"departurecityid"`
+	DepartureVenueID         int       `json:"departurevenueid" db:"departurevenueid"`
+	DepartureTimeID          int       `json:"departuretimeid" db:"departuretimeid"`
+	DestinationCityID        int       `json:"destinationcityid" db:"destinationcityid"`
+	DestinationVenueID       int       `json:"destinationvenueid" db:"destinationvenueid"`
+	ReturnDepartureCityID    int       `json:"returndeparturecityid" db:"returndeparturecityid"`
+	ReturnDepartureVenueID   int       `json:"returndeparturevenueid" db:"returndeparturevenueid"`
+	ReturnDepartureTimeID    int       `json:"returndeparturetimeid" db:"returndeparturetimeid"`
+	ReturnDestinationCityID  int       `json:"returndestinationcityid" db:"returndestinationcityid"`
+	ReturnDestinationVenueID int       `json:"returndestinationvenueid" db:"returndestinationvenueid"`
+	DiscountCodeID           int       `json:"discountcodeid" db:"discountcodeid"`
+	DepartureAirlineID       int       `json:"departureairlineid" db:"departureairlineid"`
+	ReturnAirlineID          int       `json:"returnairlineid" db:"returnairlineid"`
+	DriverNotes              string    `json:"drivernotes" db:"drivernotes"`
+	InternalNotes            string    `json:"internalnotes" db:"internalnotes"`
+	DepartureNumAdults       int       `json:"departurenumadults" db:"departurenumadults"`
+	DepartureNumStudents     int       `json:"departurenumstudents" db:"departurenumstudent"`
+	DepartureNumSeniors      int       `json:"departurenumseniors" db:"departurenumseniors"`
+	DepartureNumChildren     int       `json:"departurenumchildren" db:"departurenumchildren"`
+	ReturnNumAdults          int       `json:"returnnumadults" db:"returnnumadults"`
+	ReturnNumStudents        int       `json:"returnnumstudents" db:"returnnumstudent"`
+	ReturnNumSeniors         int       `json:"returnnumseniors" db:"returnnumseniors"`
+	ReturnNumChildren        int       `json:"returnnumchildren" db:"returnnumchildren"`
+	Price                    float32   `json:"price" db:"price"`
+	Status                   string    `json:"status" db:"status"`
+	Hash                     string    `json:"hash" db:"hash"`
+	CustomDepartureID        int       `json:"customdepartureid" db:"customdepartureid"`
+	CustomDestinationID      int       `json:"customdestinationid" db:"customdestinationid"`
+	DepartureDate            time.Time `json:"departuredate" db:"departuredate"`
+	ReturnDate               time.Time `json:"returndate" db:"returndate"`
+	TripTypeID               int       `json:"triptypeid" db:"triptypeid"`
+	BalanceOwing             float32   `json:"balanceowing" db:"balanceowing"`
+	ElavonTransactionID      int       `json:"elavontranscationid" db:"elavontransactionid"`
 }
 
 // DepartureTimes - store departure times
@@ -64,6 +104,22 @@ type DepartureTimes struct {
 	Recurring       int       `json:"recurring" db:"recurring"`
 	StartDate       time.Time `json:"startdate" db:"startdate"`
 	EndDate         time.Time `json:"enddate" db:"enddate"`
+}
+
+// Trips - store trip data
+type Trips struct {
+	TripID          int       `json:"tripid" db:"tripid"`
+	DepartureDate   time.Time `json:"departuredate" db:"departuredate"`
+	DepartureTimeID int       `json:"departuretimeid" db:"departuretimeid"`
+	ReservationID   int       `json:"reservationid" db:"reservationid"`
+	NumPassengers   int       `json:"numpassengers" db:"numpassengers"`
+	DriverID        int       `json:"driverid" db:"driverid"`
+	VehicleID       int       `json:"vehicleid" db:"vehicleid"`
+	OmitTrip        bool      `json:"omittrip" db:"omittrip"`
+	Postpone        bool      `json:"postpone" db:"postpone"`
+	RescheduleDate  time.Time `json:"rescheduledate" db:"rescheduledate"`
+	RescheduleTime  time.Time `json:"rescheduletime" db:"rescheduletime"`
+	Cancelled       bool      `json:"cancelled" db:"cancelled"`
 }
 
 var dateLayout string
@@ -95,6 +151,7 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/logout", LogoutHandler)
 	r.HandleFunc("/reservation", ReservationHandler)
 	r.HandleFunc("/createreservation", CreateReservationHandler)
+	r.HandleFunc("/reservationcreated", ReservationCreatedHandler)
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")

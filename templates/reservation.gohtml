@@ -25,6 +25,9 @@
                 </header>
                 {{ with .Client }}
                     <div class="row justify-content-around">
+                        {{ if .Authenticated }}
+                                <input type="hidden" class="form-control" id="clientid" name="clientid" value={{.ClientID}}>
+                        {{end}}
                         <div class="form-group col-3">
                             <label for="firstname">Firstname</label>
                             {{ if .Authenticated }}
@@ -150,8 +153,8 @@
                     <div class="form-group col-3">
                         <label for="triptype">Trip Type</label>
                         <select class="form-control" id="triptype" name="triptype" placeholder="Trip Type">
-                            <option value="oneway">One Way</option>
-                            <option value="roundtrip">Round Trip</option>
+                            <option value="1">One Way</option>
+                            <option value="2">Round Trip</option>
                         </select>
                     </div>
                     <div class="form-group col-3">
@@ -308,6 +311,40 @@
                 </div>
             </section>
 
+            <section id="notes">
+                <header>
+                    <h3>Notes</h3>
+                </header>
+                <div class="row justify-content-around">    
+                    <div class="form-group col-3">
+                        <label for="internalnotes">Internal Notes</label>
+                        <textarea class="form-control" id="internalnotes" name="internalnotes" cols="40" rows="5"></textarea>
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="drivernotes">Driver Notes</label>
+                        <textarea class="form-control" id="drivernotes" name="drivernotes" cols="40" rows="5"></textarea>
+                    </div>
+                    <div class="form-group col-3"></div>
+                </div>
+            </section>
+            <section>
+                <header>
+                    <h3>Price</h3>
+                </header>
+                <div class="row justify-content-around"> 
+                    <div class="form-group col-3">
+                        <label for="promocode">Promotional Code</label>
+                        <input type="text" class="form-control" id="promocode" name="promocode">
+                    </div>
+                    <div class="form-group col-3">
+                        <label for="price">Price</label>
+                        <input type="text" class="form-control" id="price" name="price">
+                    </div>
+                    <div class="form-group col-3"></div>
+                </div>
+            </section>
+
+
             <button id="submit" type="submit" class="btn btn-primary">Submit</button>
         </form>
     </main>
@@ -318,7 +355,7 @@
     <script type="text/javascript" >
 
         document.getElementById("triptype").onchange = function() { 
-            if(document.getElementById('triptype').value == "roundtrip") {
+            if(document.getElementById('triptype').value == "2") {
                 document.getElementById('return-info').style.display = "inline-block";
 
             }

@@ -14,6 +14,7 @@ import (
 type Store interface {
 	CreateUser(client *Client) error
 	SignInUser(client *Client) error
+	CreateReservation(reservation *Reservation) error
 	GetClientInfo(client *Client) error
 	GetVenues() []Venues
 	GetVenueCount() int
@@ -59,33 +60,68 @@ func (store *dbStore) CreateUser(client *Client) error {
 }
 
 //CreateReservation - store new reservation in database
-func (store *dbStore) CreateReservation(client *Client) error {
-	/*
-		result, err := store.db.Exec("INSERT INTO clients(firstname, lastname, phone, email, streetaddress, "+
-			"city, province, postalcode, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-			client.Firstname, client.Lastname, client.Phone, client.Email,
-			client.StreetAddress, client.City, client.Province, client.PostalCode, client.Country)
+func (store *dbStore) CreateReservation(reservation *Reservation) error {
 
-		if err != nil {
-			return err
-		}
+	//temporarily hardcoding some values until they are either implemented or removed
+	reservation.DiscountCodeID = 1
+	reservation.DepartureAirlineID = 1
+	reservation.ReturnAirlineID = 1
+	reservation.Status = ""
+	reservation.Hash = ""
+	reservation.ElavonTransactionID = 0
 
-		id, _ := result.LastInsertId()
+	log.Print("Inserting reservation into DB")
 
-		log.Printf("New Client ID: %d", id)
+	var insertError error
+	var id int64
 
-		result, err = store.db.Exec("INSERT INTO accountdetails(clientid, password, roleid, username) "+
-			"VALUES (?, ?, 2, ?)",
-			id, client.Password, client.Username)
+	if reservation.TripTypeID == 2 {
+		result, err := store.db.Exec("INSERT INTO reservations("+
+			"clientid, reservationtypeid, departurecityid, departurevenueid, departuretimeid, "+
+			"destinationcityid, destinationvenueid, returndeparturecityid, returndeparturevenueid, returndeparturetimeid, "+
+			"returndestinationcityid, returndestinationvenueid, discountcodeid, departureairlineid, returnairlineid, "+
+			"drivernotes, internalnotes, departurenumadults, departurenumstudents, departurenumseniors, "+
+			"departurenumchildren, returnnumadults, returnnumstudents, returnnumseniors, returnnumchildren, "+
+			"price, status, hash, customdepartureid, customdestinationid, "+
+			"departuredate, returndate, triptypeid, balanceowing, elavontransactionid) VALUES "+
+			"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
+			"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
+			"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
+			"?, ?, ?, ?, ?)",
+			reservation.ClientID, reservation.ReservationTypeID, reservation.DepartureCityID, reservation.DepartureVenueID, reservation.DepartureTimeID,
+			reservation.DestinationCityID, reservation.DestinationVenueID, reservation.ReturnDepartureCityID, reservation.ReturnDepartureVenueID, reservation.ReturnDepartureTimeID,
+			reservation.ReturnDestinationCityID, reservation.ReturnDestinationVenueID, reservation.DiscountCodeID, reservation.DepartureAirlineID, reservation.ReturnAirlineID,
+			reservation.DriverNotes, reservation.InternalNotes, reservation.DepartureNumAdults, reservation.DepartureNumStudents, reservation.DepartureNumSeniors,
+			reservation.DepartureNumChildren, reservation.ReturnNumAdults, reservation.ReturnNumStudents, reservation.ReturnNumSeniors, reservation.ReturnNumChildren,
+			reservation.Price, reservation.Status, reservation.Hash, reservation.CustomDepartureID, reservation.CustomDepartureID,
+			reservation.DepartureDate, reservation.ReturnDate, reservation.TripTypeID, reservation.BalanceOwing, reservation.ElavonTransactionID)
+
+		insertError = err
 
 		id, _ = result.LastInsertId()
+	} else {
+		result, err := store.db.Exec("INSERT INTO reservations("+
+			"clientid, reservationtypeid, departurecityid, departurevenueid, departuretimeid, "+
+			"destinationcityid, destinationvenueid, discountcodeid, departureairlineid, "+
+			"drivernotes, internalnotes, departurenumadults, departurenumstudents, departurenumseniors, "+
+			"departurenumchildren, price, status, hash, customdepartureid, "+
+			"customdestinationid, departuredate, triptypeid, balanceowing, elavontransactionid) VALUES "+
+			"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
+			"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
+			"?, ?, ?, ?)",
+			reservation.ClientID, reservation.ReservationTypeID, reservation.DepartureCityID, reservation.DepartureVenueID, reservation.DepartureTimeID,
+			reservation.DestinationCityID, reservation.DestinationVenueID, reservation.DiscountCodeID, reservation.DepartureAirlineID,
+			reservation.DriverNotes, reservation.InternalNotes, reservation.DepartureNumAdults, reservation.DepartureNumStudents, reservation.DepartureNumSeniors,
+			reservation.DepartureNumChildren, reservation.Price, reservation.Status, reservation.Hash, reservation.CustomDepartureID,
+			reservation.CustomDepartureID, reservation.DepartureDate, reservation.TripTypeID, reservation.BalanceOwing, reservation.ElavonTransactionID)
 
-		log.Printf("Account Details: %d", id)
+		insertError = err
 
-		return err
-	*/
+		id, _ = result.LastInsertId()
+	}
 
-	return nil
+	log.Printf("New Reservation ID: %d", id)
+	return insertError
 }
 
 //SignInUser - authenticate user
@@ -330,7 +366,7 @@ func (store *dbStore) GetDepartureTimesCount() int {
 func (store *dbStore) GetClientInfo(client *Client) error {
 
 	row, err := store.db.Query(
-		"select firstname, lastname, phone, email, streetaddress, "+
+		"select c.clientid, firstname, lastname, phone, email, streetaddress, "+
 			"city, province, postalcode, country from clients c inner join "+
 			"accountdetails a on c.clientid = a.clientid "+
 			"where a.username=?", client.Username)
@@ -344,8 +380,8 @@ func (store *dbStore) GetClientInfo(client *Client) error {
 	//store client into into local variables
 	row.Next()
 	err = row.Scan(
-		&client.Firstname, &client.Lastname, &client.Phone, &client.Email, &client.StreetAddress,
-		&client.City, &client.Province, &client.PostalCode, &client.Country,
+		&client.ClientID, &client.Firstname, &client.Lastname, &client.Phone, &client.Email,
+		&client.StreetAddress, &client.City, &client.Province, &client.PostalCode, &client.Country,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {

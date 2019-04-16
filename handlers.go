@@ -98,7 +98,7 @@ func SigninHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("%s is signed in", session.Values["client"])
+	log.Printf("%s is signed in", session.Values["client.Username"])
 
 	http.Redirect(w, r, "/reservation", http.StatusFound)
 }
@@ -177,26 +177,47 @@ func ReservationHandler(w http.ResponseWriter, r *http.Request) {
 	departuretimes := store.GetDepartureTimes()
 
 	//store retrieved data in reservation structure and pass to template
-	reservation := Reservation{}
+	resform := ResFormData{}
 
-	reservation.Client = client
-	reservation.Venues = venues
-	reservation.VenueCount = len(venues)
-	reservation.Cities = cities
-	reservation.DepartureTimes = departuretimes
+	resform.Client = client
+	resform.Venues = venues
+	resform.VenueCount = len(venues)
+	resform.Cities = cities
+	resform.DepartureTimes = departuretimes
 
-	tpl.ExecuteTemplate(w, "reservation.gohtml", reservation)
+	tpl.ExecuteTemplate(w, "reservation.gohtml", resform)
 }
 
-//CreateReservationHandler - ***will store reservation in database***
+//CreateReservationHandler - store reservation in database
 func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
-	session, err := sessionStore.Get(r, "northern-airport")
+	//session, err := sessionStore.Get(r, "northern-airport")
+	//if err != nil {
+	//	http.Error(w, err.Error(), http.StatusInternalServerError)
+	//	return
+	//}
+
+	//client := GetClient(session)
+
+	//resformdata := ResFormData{}
+	reservation := Reservation{}
+
+	//get reservation data from form
+	reservation = GetReservationFormValues(r, true)
+
+	err := store.CreateReservation(&reservation)
+
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Fatal("Error Creating User: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 
-	client := GetClient(session)
+	log.Print("reservation created")
 
-	tpl.ExecuteTemplate(w, "created.gohtml", client)
+	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+//ReservationCreatedHandler - redirect to created page
+func ReservationCreatedHandler(w http.ResponseWriter, r *http.Request) {
+
+	tpl.ExecuteTemplate(w, "created.gohtml", r)
 }
