@@ -3,10 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Go Sessions Example</title>
+    <title>Northern Airport Reservation Form</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../../assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    <script src="../assets/js/validate.min.js"></script>
 </head>
 <body>
     <header>
@@ -17,7 +19,7 @@
     </header>
     
     <main>
-        <form id="reservation" action="/createreservation" method="post">
+        <form id="reservation" method="post" action="/reservationcreated" onsubmit="submit.disabled = true; return true;">
             
             <section class="client-info">
                 <header>
@@ -31,18 +33,20 @@
                         <div class="form-group col-3">
                             <label for="firstname">Firstname</label>
                             {{ if .Authenticated }}
-                                <input type="text" class="form-control" id="firstname" name="firstname" value={{.Firstname}}>
+                                <input type="text" class="form-control" id="firstname" name="firstname" value={{.Firstname}} required autofocus>
                             {{else}}
-                                <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname">
+                                <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname" required autofocus>
                             {{end}}
+                            <div class="col-sm-5 messages"></div>
                         </div>
                         <div class="form-group col-3">
                             <label for="lastname">Lastname</label>
                             {{ if .Authenticated }}
-                                <input type="lastname" class="form-control" id="lastname" name="lastname" value={{.Lastname}}>
+                                <input type="lastname" class="form-control" id="lastname" name="lastname" value={{.Lastname}} required>
                             {{else}}
-                                <input type="lastname" class="form-control" id="lastname" name="lastname" placeholder="Lastname">
+                                <input type="lastname" class="form-control" id="lastname" name="lastname" placeholder="Lastname" required>
                             {{end}}
+                            <div class="col-sm-5 messages"></div>
                         </div>
                         <div class="form-group col-3"></div>
                     </div>
@@ -51,17 +55,18 @@
                         <div class="form-group col-3">
                             <label for="email">Email</label>
                             {{ if .Authenticated }}
-                                <input type="text" class="form-control" id="email" name="email" value={{.Email}}>
+                                <input type="email" class="form-control" id="email" name="email" value={{.Email}} required>
                             {{else}}
-                                <input type="text" class="form-control" id="email" name="email" placeholder="Email">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
                             {{end}}
+                            <div class="col-sm-5 messages"></div>
                         </div>
                         <div class="form-group col-3">
                             <label for="phone">Phone Number</label>
                             {{ if .Authenticated }}
-                                <input type="phone" class="form-control" id="phone" name="phone" value={{.Phone}}>
+                                <input type="tel" class="form-control" id="phone" name="phone" value={{.Phone}} required>
                             {{else}}
-                                <input type="phone" class="form-control" id="phone" name="phone" placeholder="Phone">
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone" required>
                             {{end}}
                         </div>
                         <div class="col-3"></div>
@@ -71,17 +76,17 @@
                         <div class="form-group col-3">
                             <label for="streetaddress">Street Address</label>
                             {{ if .Authenticated }}
-                                <input type="text" class="form-control" id="streetaddress" name="streetaddress" value={{.StreetAddress}}>
+                                <input type="text" class="form-control" id="streetaddress" name="streetaddress" value={{.StreetAddress}} required>
                             {{else}}
-                                <input type="text" class="form-control" id="streetaddress" name="streetaddress" placeholder="Street Address">
+                                <input type="text" class="form-control" id="streetaddress" name="streetaddress" placeholder="Street Address" required>
                             {{end}}
                         </div>
                         <div class="form-group col-3">
                             <label for="city">City</label>
                             {{ if .Authenticated }}
-                                <input type="city" class="form-control" id="city" name="city" value={{.City}}>
+                                <input type="city" class="form-control" id="city" name="city" value={{.City}} required>
                             {{else}}
-                                <input type="city" class="form-control" id="city" name="city" placeholder="City">
+                                <input type="city" class="form-control" id="city" name="city" placeholder="City" required>
                             {{end}}
                         </div>
                         <div class="col-3"></div>
@@ -91,17 +96,17 @@
                         <div class="form-group col-3">
                             <label for="provstate">Province/State</label>
                             {{ if .Authenticated }}
-                                <input type="text" class="form-control" id="provstate" name="provstate" value={{.Province}}>
+                                <input type="text" class="form-control" id="provstate" name="provstate" value={{.Province}} required>
                             {{else}}
-                                <input type="text" class="form-control" id="provstate" name="provstate" placeholder="Province/State">
+                                <input type="text" class="form-control" id="provstate" name="provstate" placeholder="Province/State" required>
                             {{end}}
                         </div>
                         <div class="form-group col-3">
                             <label for="postalzip">Postal/Zip Code</label>
                             {{ if .Authenticated }}
-                                <input type="postalzip" class="form-control" id="postalzip" name="postalzip" value={{.PostalCode}}>
+                                <input type="postalzip" class="form-control" id="postalzip" name="postalzip" value={{.PostalCode}} pattern="([A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]|(\d{5}([\-]\d{4})?))" required>
                             {{else}}
-                                <input type="postalzip" class="form-control" id="postalzip" name="postalzip" placeholder="Postal/Zip">
+                                <input type="postalzip" class="form-control" id="postalzip" name="postalzip" placeholder="Postal/Zip" pattern="([A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]|(\d{5}([\-]\d{4})?))" required>
                             {{end}}
                         </div>
                         <div class="form-group col-3">
@@ -113,9 +118,9 @@
                         <div class="form-group col-3">
                             <label for="country">Country</label>
                             {{ if .Authenticated }}
-                                <input type="text" class="form-control" id="country" name="country" value={{.Country}}>
+                                <input type="text" class="form-control" id="country" name="country" value={{.Country}} required>
                             {{else}}
-                                <input type="text" class="form-control" id="country" name="country" placeholder="Country">
+                                <input type="text" class="form-control" id="country" name="country" placeholder="Country" required>
                             {{end}}
                         </div>
                         <div class="col-3">
@@ -204,7 +209,7 @@
                     <div class="row justify-content-around">
                         <div class="form-group col-3">
                             <label for="departuredate">Departure Date</label>
-                            <input type="date" class="form-control" id="departuredate" name="departuredate">
+                            <input type="date" class="form-control" id="departuredate" name="departuredate" required>
                         </div>
                         <div class="form-group col-6">
                             <label for="departuretime">Departure Time</label>
@@ -219,19 +224,19 @@
                 <div class="row justify-content-around">  
                     <div class="form-group col-3">
                         <label for="numadults">Adults</label>
-                        <input type="text" class="form-control" id="numadults" name="numadults">
+                        <input type="text" class="form-control" id="numadults" name="numadults" value="0">
                     </div>
                     <div class="form-group col-3">
                         <label for="numseniors">Seniors (65+)</label>
-                        <input type="text" class="form-control" id="numseniors" name="numseniors">
+                        <input type="text" class="form-control" id="numseniors" name="numseniors" value="0">
                     </div>
                     <div class="form-group col-3">
                         <label for="numstudents">Students</label>
-                        <input type="text" class="form-control" id="numstudents" name="numstudents">
+                        <input type="text" class="form-control" id="numstudents" name="numstudents" value="0">
                     </div>
                     <div class="form-group col-3">
                         <label for="numchildren">Children (under 12)</label>
-                        <input type="text" class="form-control" id="numchildren" name="numchildren">
+                        <input type="text" class="form-control" id="numchildren" name="numchildren" value="0">
                     </div>
                 </div>
             </section>
@@ -293,19 +298,19 @@
                 <div class="row justify-content-around">  
                         <div class="form-group col-3">
                             <label for="numadults">Adults</label>
-                            <input type="text" class="form-control" id="numadults" name="numadults">
+                            <input type="text" class="form-control" id="numadults" name="numadults" value="0">
                         </div>
                         <div class="form-group col-3">
                             <label for="numseniors">Seniors (65+)</label>
-                            <input type="text" class="form-control" id="numseniors" name="numseniors">
+                            <input type="text" class="form-control" id="numseniors" name="numseniors" value="0">
                         </div>
                         <div class="form-group col-3">
                             <label for="numstudents">Students</label>
-                            <input type="text" class="form-control" id="numstudents" name="numstudents">
+                            <input type="text" class="form-control" id="numstudents" name="numstudents" value="0">
                         </div>
                         <div class="form-group col-3">
                             <label for="numchildren">Children (under 12)</label>
-                            <input type="text" class="form-control" id="numchildren" name="numchildren">
+                            <input type="text" class="form-control" id="numchildren" name="numchildren" value="0">
                         </div>
                 </div>
                 </div>
@@ -345,21 +350,13 @@
             </section>
 
 
-            <button id="submit" type="submit" class="btn btn-primary">Submit</button>
+            <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
         </form>
     </main>
 
     {{ template "footer" }}
 
-
     <script type="text/javascript" >
-
-        document.getElementById("triptype").onchange = function() { 
-            if(document.getElementById('triptype').value == "2") {
-                document.getElementById('return-info').style.display = "inline-block";
-
-            }
-        };
 
         var departurevenue = document.getElementById("departurevenue");
         var departurecity = document.getElementById("departurecity");
@@ -377,7 +374,14 @@
 
         var venuecount = {{ .VenueCount }};
         var venues = {{ .Venues }};
-        
+
+        document.getElementById("triptype").onchange = function() { 
+            if(document.getElementById('triptype').value == "2") {
+                document.getElementById('return-info').style.display = "inline-block";
+
+            }
+        };
+
         departurecity.onchange = UpdateVenue(departurecity, departurevenue);
         destinationcity.onchange = UpdateVenue(destinationcity, destinationvenue);
         returndeparturecity.onchange = UpdateVenue(returndeparturecity, returndeparturevenue);
@@ -511,7 +515,7 @@
                 {{ end }}
             }
         };
-        
+     
 </script>
 </body>
 </html>

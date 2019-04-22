@@ -144,8 +144,7 @@ func newRouter() *mux.Router {
 	// with "/assets/", instead of the absolute route itself
 	r.PathPrefix("/assets/").Handler(staticFileHandler).Methods("GET")
 
-	//map urls to handler functions
-	//any method
+	//map urls to handler functions any method
 	r.HandleFunc("/", IndexHandler)
 	r.HandleFunc("/signup", SignupHandler)
 	r.HandleFunc("/logout", LogoutHandler)
