@@ -19,7 +19,7 @@
     </header>
     
     <main>
-        <form id="reservation" method="post" action="/reservationcreated" onsubmit="submit.disabled = true; return true;">
+        <form id="reservation" method="post" action="/createreservation" onsubmit="submit.disabled = true; return true;">
             
             <section class="client-info">
                 <header>
@@ -156,8 +156,8 @@
                 </header>
                 <div class="row justify-content-around">    
                     <div class="form-group col-3">
-                        <label for="triptype">Trip Type</label>
-                        <select class="form-control" id="triptype" name="triptype" placeholder="Trip Type">
+                        <label for="reservationtype">Reservation Type</label>
+                        <select class="form-control" id="reservationtype" name="reservationtype">
                             <option value="1">One Way</option>
                             <option value="2">Round Trip</option>
                         </select>
@@ -375,10 +375,9 @@
         var venuecount = {{ .VenueCount }};
         var venues = {{ .Venues }};
 
-        document.getElementById("triptype").onchange = function() { 
-            if(document.getElementById('triptype').value == "2") {
+        document.getElementById("reservationtype").onchange = function() { 
+            if(document.getElementById('reservationtype').value == "2") {
                 document.getElementById('return-info').style.display = "inline-block";
-
             }
         };
 

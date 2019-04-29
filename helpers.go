@@ -64,8 +64,6 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 
 	//store trip info in resformdata
 	if gettripdata {
-		log.Printf("Trip Type Value: %s", r.FormValue("triptype"))
-		reservation.ReservationTypeID, err = strconv.Atoi(r.FormValue("triptype"))
 		reservation.TripTypeID, err = strconv.Atoi(r.FormValue("triptype"))
 
 		reservation.DepartureCityID, err = strconv.Atoi(r.FormValue("departurecity"))

@@ -92,6 +92,9 @@ func SigninHandler(w http.ResponseWriter, r *http.Request) {
 
 	//update authentication cookie
 	session.Values["client"] = client
+
+	log.Printf("creating session for %s", client.Username)
+
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -196,15 +199,16 @@ func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 	//	return
 	//}
 
-	//client := GetClient(session)
-
 	//resformdata := ResFormData{}
 	reservation := Reservation{}
 
 	//get reservation data from form
 	reservation = GetReservationFormValues(r, true)
 
-	err := store.CreateReservation(&reservation)
+	//check if trip exists, if not create one
+	err := store.GetOrAddTrip(&reservation)
+
+	err = store.CreateReservation(&reservation)
 
 	if err != nil {
 		log.Fatal("Error Creating User: ", err)
@@ -213,7 +217,7 @@ func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Print("reservation created")
 
-	http.Redirect(w, r, "/", http.StatusFound)
+	http.Redirect(w, r, "/reservationcreated", http.StatusFound)
 }
 
 //ReservationCreatedHandler - redirect to created page

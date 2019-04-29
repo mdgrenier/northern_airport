@@ -60,7 +60,6 @@ type ResFormData struct {
 // Reservation - store reservation information
 type Reservation struct {
 	ClientID                 int       `json:"clientid" db:"clientid"`
-	ReservationTypeID        int       `json:"reservationtypeid" db:"reservationtypeid"`
 	DepartureCityID          int       `json:"departurecityid" db:"departurecityid"`
 	DepartureVenueID         int       `json:"departurevenueid" db:"departurevenueid"`
 	DepartureTimeID          int       `json:"departuretimeid" db:"departuretimeid"`
@@ -92,6 +91,7 @@ type Reservation struct {
 	DepartureDate            time.Time `json:"departuredate" db:"departuredate"`
 	ReturnDate               time.Time `json:"returndate" db:"returndate"`
 	TripTypeID               int       `json:"triptypeid" db:"triptypeid"`
+	TripID                   int       `json:"tripid" db:"tripid"`
 	BalanceOwing             float32   `json:"balanceowing" db:"balanceowing"`
 	ElavonTransactionID      int       `json:"elavontranscationid" db:"elavontransactionid"`
 }
@@ -111,7 +111,6 @@ type Trips struct {
 	TripID          int       `json:"tripid" db:"tripid"`
 	DepartureDate   time.Time `json:"departuredate" db:"departuredate"`
 	DepartureTimeID int       `json:"departuretimeid" db:"departuretimeid"`
-	ReservationID   int       `json:"reservationid" db:"reservationid"`
 	NumPassengers   int       `json:"numpassengers" db:"numpassengers"`
 	DriverID        int       `json:"driverid" db:"driverid"`
 	VehicleID       int       `json:"vehicleid" db:"vehicleid"`
@@ -189,7 +188,7 @@ func InitSession() {
 
 	//must update, currently setting maxage to 2 minutes and http only (will need secure when live)
 	sessionStore.Options = &sessions.Options{
-		MaxAge:   60 * 2,
+		MaxAge:   60 * 15,
 		HttpOnly: true,
 	}
 
