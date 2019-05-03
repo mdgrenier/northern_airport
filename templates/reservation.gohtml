@@ -5,173 +5,197 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Northern Airport Reservation Form</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
-    <script src="../assets/js/validate.min.js"></script>
 </head>
 <body>
     <header>
-        <img src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
-
         {{ template "navbar" }}
+        
+        {{ with .Client }}
+            {{ if or (eq .RoleID 3) (eq .RoleID 4) (eq .RoleID 5) }}
+                <nav class="navbar navbar-inverse" role="navigation">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#admin-navbar-collapse">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        </div>
 
+                        <div class="collapse navbar-collapse" id="admin-navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown">
+                                    <a class="dropdown-toggle" href="/">Reports</a>
+                                    {{- /* if user is staff or admin */ -}}
+                                    <ul class="dropdown-menu">
+                                        {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
+                                            <li class="nav-link" href="/">Test Report</li>
+                                        {{ end }}
+                                        <li class="nav-link" href="/driver-report">Driver Report</li>
+                                    </ul>
+                                </li>
+                                {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
+                                    <li>
+                                        <a href="/driver">Add/Assign Driver</a>
+                                    </li>
+                                    <li>
+                                        <a href="/van">Add/Assign Van</a>
+                                    </li>
+                                    <li>
+                                        <a href="/trips">Add/Change Trip</a>
+                                    </li>
+                                    <li>
+                                        <a href="/venue">Add/Change Venue</a>
+                                    </li>
+                                {{ end }}
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            {{ end }}
+        {{ end }}
     </header>
     
     <main>
-        <form id="reservation" method="post" action="/createreservation" onsubmit="submit.disabled = true; return true;">
-            
-            <section class="client-info">
-                <header>
-                    <h3>Client Information</h3>
-                </header>
-                {{ with .Client }}
-                    <div class="row justify-content-around">
+        <div class="container">
+            <form id="reservation" method="post" action="/createreservation" onsubmit="submit.disabled = true; return true;">
+                <section class="client-info">
+                    <header>
+                        <h3>Client Information</h3>
+                    </header>
+                    {{ with .Client }}
                         {{ if .Authenticated }}
-                                <input type="hidden" class="form-control" id="clientid" name="clientid" value={{.ClientID}}>
+                            <input type="hidden" class="form-control" id="clientid" name="clientid" value={{.ClientID}}>
+                        {{ else }}
+                            <p>Create an account to have your information filled automatically! Click <a href="/signup">here</a></p>
                         {{end}}
-                        <div class="form-group col-3">
-                            <label for="firstname">Firstname</label>
-                            {{ if .Authenticated }}
-                                <input type="text" class="form-control" id="firstname" name="firstname" value={{.Firstname}} required autofocus>
-                            {{else}}
-                                <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname" required autofocus>
-                            {{end}}
-                            <div class="col-sm-5 messages"></div>
-                        </div>
-                        <div class="form-group col-3">
-                            <label for="lastname">Lastname</label>
-                            {{ if .Authenticated }}
-                                <input type="lastname" class="form-control" id="lastname" name="lastname" value={{.Lastname}} required>
-                            {{else}}
-                                <input type="lastname" class="form-control" id="lastname" name="lastname" placeholder="Lastname" required>
-                            {{end}}
-                            <div class="col-sm-5 messages"></div>
-                        </div>
-                        <div class="form-group col-3"></div>
-                    </div>
 
-                    <div class="row justify-content-around">
-                        <div class="form-group col-3">
-                            <label for="email">Email</label>
-                            {{ if .Authenticated }}
-                                <input type="email" class="form-control" id="email" name="email" value={{.Email}} required>
-                            {{else}}
-                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
-                            {{end}}
-                            <div class="col-sm-5 messages"></div>
-                        </div>
-                        <div class="form-group col-3">
-                            <label for="phone">Phone Number</label>
-                            {{ if .Authenticated }}
-                                <input type="tel" class="form-control" id="phone" name="phone" value={{.Phone}} required>
-                            {{else}}
-                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone" required>
-                            {{end}}
-                        </div>
-                        <div class="col-3"></div>
-                    </div>
-
-                    <div class="row justify-content-around">
-                        <div class="form-group col-3">
-                            <label for="streetaddress">Street Address</label>
-                            {{ if .Authenticated }}
-                                <input type="text" class="form-control" id="streetaddress" name="streetaddress" value={{.StreetAddress}} required>
-                            {{else}}
-                                <input type="text" class="form-control" id="streetaddress" name="streetaddress" placeholder="Street Address" required>
-                            {{end}}
-                        </div>
-                        <div class="form-group col-3">
-                            <label for="city">City</label>
-                            {{ if .Authenticated }}
-                                <input type="city" class="form-control" id="city" name="city" value={{.City}} required>
-                            {{else}}
-                                <input type="city" class="form-control" id="city" name="city" placeholder="City" required>
-                            {{end}}
-                        </div>
-                        <div class="col-3"></div>
-                    </div>
-
-                    <div class="row justify-content-around">
-                        <div class="form-group col-3">
-                            <label for="provstate">Province/State</label>
-                            {{ if .Authenticated }}
-                                <input type="text" class="form-control" id="provstate" name="provstate" value={{.Province}} required>
-                            {{else}}
-                                <input type="text" class="form-control" id="provstate" name="provstate" placeholder="Province/State" required>
-                            {{end}}
-                        </div>
-                        <div class="form-group col-3">
-                            <label for="postalzip">Postal/Zip Code</label>
-                            {{ if .Authenticated }}
-                                <input type="postalzip" class="form-control" id="postalzip" name="postalzip" value={{.PostalCode}} pattern="([A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]|(\d{5}([\-]\d{4})?))" required>
-                            {{else}}
-                                <input type="postalzip" class="form-control" id="postalzip" name="postalzip" placeholder="Postal/Zip" pattern="([A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]|(\d{5}([\-]\d{4})?))" required>
-                            {{end}}
-                        </div>
-                        <div class="form-group col-3">
+                        <div class="row justify-content-around">
+                            <div class="col-xs-4">
+                                <label for="firstname">Firstname</label>
+                                {{ if .Authenticated }}
+                                    <input type="text" class="form-control" id="firstname" name="firstname" value={{.Firstname}} required autofocus>
+                                {{else}}
+                                    <input type="text" class="form-control" id="firstname" name="firstname" placeholder="Firstname" required autofocus>
+                                {{end}}
+                            </div>
                         
+                            <div class="col-xs-4">
+                                <label for="lastname">Lastname</label>
+                                {{ if .Authenticated }}
+                                    <input type="lastname" class="form-control" id="lastname" name="lastname" value={{.Lastname}} required>
+                                {{else}}
+                                    <input type="lastname" class="form-control" id="lastname" name="lastname" placeholder="Lastname" required>
+                                {{end}}
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row justify-content-around">
-                        <div class="form-group col-3">
-                            <label for="country">Country</label>
-                            {{ if .Authenticated }}
-                                <input type="text" class="form-control" id="country" name="country" value={{.Country}} required>
-                            {{else}}
-                                <input type="text" class="form-control" id="country" name="country" placeholder="Country" required>
-                            {{end}}
+                        <div class="row justify-content-around">
+                            <div class="col-xs-4">
+                                <label for="email">Email</label>
+                                {{ if .Authenticated }}
+                                    <input type="email" class="form-control" id="email" name="email" value={{.Email}} required>
+                                {{else}}
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                                {{end}}
+                            </div>
+                            <div class="col-xs-4">
+                                <label for="phone">Phone Number</label>
+                                {{ if .Authenticated }}
+                                    <input type="tel" class="form-control" id="phone" name="phone" value={{.Phone}} required>
+                                {{else}}
+                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone" required>
+                                {{end}}
+                            </div>
                         </div>
-                        <div class="col-3">
-                        
-                        </div>
-                        <div class="col-3">
-                        
-                        </div>
-                    </div>
 
-                    <h3>Travel Agents Use Only</h3>
-                    <div class="travel-agent-info">
-                        <div class="row justify-content-around">    
-                            <div class="form-group col-3">
-                                <label for="iata">Travel Agent IATA#</label>
-                                <input type="text" class="form-control" id="iata" name="iata" placeholder="IATA #">
+                        <div class="row justify-content-around">
+                            <div class="col-xs-4">
+                                <label for="streetaddress">Street Address</label>
+                                {{ if .Authenticated }}
+                                    <input type="text" class="form-control" id="streetaddress" name="streetaddress" value={{.StreetAddress}} required>
+                                {{else}}
+                                    <input type="text" class="form-control" id="streetaddress" name="streetaddress" placeholder="Street Address" required>
+                                {{end}}
+                            </div>
+                            <div class="col-xs-4">
+                                <label for="city">City</label>
+                                {{ if .Authenticated }}
+                                    <input type="city" class="form-control" id="city" name="city" value={{.City}} required>
+                                {{else}}
+                                    <input type="city" class="form-control" id="city" name="city" placeholder="City" required>
+                                {{end}}
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-around">
+                            <div class="col-xs-4">
+                                <label for="provstate">Province/State</label>
+                                {{ if .Authenticated }}
+                                    <input type="text" class="form-control" id="provstate" name="provstate" value={{.Province}} required>
+                                {{else}}
+                                    <input type="text" class="form-control" id="provstate" name="provstate" placeholder="Province/State" required>
+                                {{end}}
+                            </div>
+                            <div class="col-xs-4">
+                                <label for="postalzip">Postal/Zip Code</label>
+                                {{ if .Authenticated }}
+                                    <input type="postalzip" class="form-control" id="postalzip" name="postalzip" value={{.PostalCode}} pattern="([A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]|[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]|(\d{5}([\-]\d{4})?))" required>
+                                {{else}}
+                                    <input type="postalzip" class="form-control" id="postalzip" name="postalzip" placeholder="Postal/Zip" pattern="([A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]|[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]|(\d{5}([\-]\d{4})?))" required>
+                                {{end}}
                             </div>
                             <div class="form-group col-3">
-                                <label for="agentname">Agent Name</label>
-                                <input type="text" class="form-control" id="agentname" name="agentname" placeholder="Agent Name">
+                            
                             </div>
-                            <div class="form-group col-3">
                         </div>
-                        <div class="form-group col-3">
+
+                        <div class="row justify-content-around">
+                            <div class="col-xs-4">
+                                <label for="country">Country</label>
+                                {{ if .Authenticated }}
+                                    <input type="text" class="form-control" id="country" name="country" value={{.Country}} required>
+                                {{else}}
+                                    <input type="text" class="form-control" id="country" name="country" placeholder="Country" required>
+                                {{end}}
+                            </div>
                         </div>
-                    </div>
-                {{ end }}
-            </section>
-            
-            <section class="trip-info">
-                <header>
-                    <h3>Trip Information</h3>
-                </header>
-                <div class="row justify-content-around">    
-                    <div class="form-group col-3">
-                        <label for="reservationtype">Reservation Type</label>
-                        <select class="form-control" id="reservationtype" name="reservationtype">
-                            <option value="1">One Way</option>
-                            <option value="2">Round Trip</option>
-                        </select>
-                    </div>
-                    <div class="form-group col-3">
-                    </div>
-                    <div class="form-group col-3">
-                    </div>
-                    <div class="form-group col-3">
-                    </div>
-                </div>
-                <div class="group">
+
+                        <h3>Travel Agents Use Only</h3>
+                        <div class="travel-agent-info">
+                            <div class="row justify-content-around">    
+                                <div class="col-xs-4">
+                                    <label for="iata">Travel Agent IATA#</label>
+                                    <input type="text" class="form-control" id="iata" name="iata" placeholder="IATA #">
+                                </div>
+                                <div class="col-xs-4">
+                                    <label for="agentname">Agent Name</label>
+                                    <input type="text" class="form-control" id="agentname" name="agentname" placeholder="Agent Name">
+                                </div>
+                            </div>
+                        </div>
+                    {{ end }}
+                </section>
+                
+                <section class="trip-info">
+                    <header>
+                        <h3>Trip Information</h3>
+                    </header>
                     <div class="row justify-content-around">    
-                        <div class="form-group col-3">
+                        <div class="col-xs-4">
+                            <label for="reservationtype">Reservation Type</label>
+                            <select class="form-control" id="reservationtype" name="reservationtype">
+                                <option value="1">One Way</option>
+                                <option value="2">Round Trip</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row justify-content-around">    
+                        <div class="col-xs-4">
                             <label for="departurecity">Departure City</label>
                             <select class="form-control" id="departurecity" name="departurecity" placeholder="Departure City">
                                 <option value="0">Select a City</option>
@@ -180,16 +204,16 @@
                                 {{ end }}
                             </select>
                         </div>
-                        <div class="form-group col-6">
+                        <div class="col-xs-4">
                             <label for="departurevenue">Departure Venue</label>
                             <select class="form-control" id="departurevenue" name="departurevenue" placeholder="Departure Venue">
                                 <option value="0">First Select a City</option>
                             </select>
                         </div>
-                        <div class="form-group col-3"></div>
                     </div>
+
                     <div class="row justify-content-around">    
-                        <div class="form-group col-3">
+                        <div class="col-xs-4">
                             <label for="destinationcity">Destination City</label>
                             <select class="form-control" id="destinationcity" name="destinationcity" placeholder="Destination City">
                                 <option value="0">Select a City</option>
@@ -198,165 +222,166 @@
                                 {{ end }}
                             </select>
                         </div>
-                        <div class="form-group col-6">
+                        <div class="col-xs-4">
                             <label for="destinationvenue">Destination Venue</label>
                             <select class="form-control" id="destinationvenue" name="destinationvenue" placeholder="Destination Venue">
                                 <option value="0">First Select a City</option>
                             </select>
                         </div>
-                        <div class="form-group col-3"></div>
                     </div>
+
                     <div class="row justify-content-around">
-                        <div class="form-group col-3">
+                        <div class="col-xs-4">
                             <label for="departuredate">Departure Date</label>
                             <input type="date" class="form-control" id="departuredate" name="departuredate" required>
                         </div>
-                        <div class="form-group col-6">
+                        <div class="col-xs-4">
                             <label for="departuretime">Departure Time</label>
                             <select class="form-control" id="departuretime" name="departuretime" placeholder="Departure Time">
                                 <option value="0">First Select Cities and Venues</option>
                             </select>
                         </div>
-                        <div class="form-group col-3"></div>
                     </div>
-                </div>
-                <p>Number of Passengers</p>  
-                <div class="row justify-content-around">  
-                    <div class="form-group col-3">
-                        <label for="numadults">Adults</label>
-                        <input type="text" class="form-control" id="numadults" name="numadults" value="0">
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="numseniors">Seniors (65+)</label>
-                        <input type="text" class="form-control" id="numseniors" name="numseniors" value="0">
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="numstudents">Students</label>
-                        <input type="text" class="form-control" id="numstudents" name="numstudents" value="0">
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="numchildren">Children (under 12)</label>
-                        <input type="text" class="form-control" id="numchildren" name="numchildren" value="0">
-                    </div>
-                </div>
-            </section>
-            <section id="return-info">
-                <header>
-                    <h3>Return Trip Information</h3>  
-                </header>
-                <div class="group">
-                        <div class="row justify-content-around">    
-                            <div class="form-group col-3">
-                                <label for="returndeparturecity">Return Departure City</label>
-                                <select class="form-control" id="returndeparturecity" name="returndeparturecity" placeholder="Departure City">
-                                    {{ range .Cities }}
-                                        <option value="{{ .CityID }}">{{ .CityName }}</option>
-                                    {{ end }}
-                                </select>
-                            </div>
-                            <div class="form-group col-6">
-                                <label for="returndeparturevenue">Return Departure Venue</label>
-                                <select class="form-control" id="returndeparturevenue" name="returndeparturevenue" placeholder="Departure Venue">
-                                    <option value="0">First Select a City</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-3"></div>
-                        </div>
-                        <div class="row justify-content-around">    
-                            <div class="form-group col-3">
-                                <label for="returndestinationcity">Return Destination City</label>
-                                <select class="form-control" id="returndestinationcity" name="returndestinationcity" placeholder="Destination City">
-                                    <option value="0">Select a City</option>
-                                    {{ range .Cities }}
-                                        <option value="{{ .CityID }}">{{ .CityName }}</option>
-                                    {{ end }}
-                                </select>
-                            </div>
-                            <div class="form-group col-6">
-                                <label for="returndestinationvenue">Return Destination Venue</label>
-                                <select class="form-control" id="returndestinationvenue" name="returndestinationvenue" placeholder="Destination Venue">
-                                    <option value="0">First Select a City</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-3"></div>
-                        </div>
-                        <div class="row justify-content-around">    
-                            <div class="form-group col-3">
-                                <label for="returndeparturedate">Return Departure Date</label>
-                                <input type="date" class="form-control" id="returndeparturedate" name="returndeparturedate">
-                            </div>
-                            <div class="form-group col-6">
-                                <label for="returndeparturetime">Return Departure Time</label>
-                                <select class="form-control" id="returndeparturetime" name="returndeparturetime" placeholder="Departure Time">
-                                    <option value="0">First Select Cities and Venues</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-3"></div>
-                        </div>
-                </div>
-                <p>Number of Return Passengers</p>  
-                <div class="row justify-content-around">  
-                        <div class="form-group col-3">
+                    
+                    <p>Number of Passengers</p>  
+                    <div class="row justify-content-around">  
+                        <div class="col-xs-2">
                             <label for="numadults">Adults</label>
                             <input type="text" class="form-control" id="numadults" name="numadults" value="0">
                         </div>
-                        <div class="form-group col-3">
+                        <div class="col-xs-2">
                             <label for="numseniors">Seniors (65+)</label>
                             <input type="text" class="form-control" id="numseniors" name="numseniors" value="0">
                         </div>
-                        <div class="form-group col-3">
+                        <div class="col-xs-2">
                             <label for="numstudents">Students</label>
                             <input type="text" class="form-control" id="numstudents" name="numstudents" value="0">
                         </div>
-                        <div class="form-group col-3">
+                        <div class="col-xs-2">
                             <label for="numchildren">Children (under 12)</label>
                             <input type="text" class="form-control" id="numchildren" name="numchildren" value="0">
                         </div>
-                </div>
-                </div>
-            </section>
+                    </div>
+                </section>
 
-            <section id="notes">
-                <header>
-                    <h3>Notes</h3>
-                </header>
-                <div class="row justify-content-around">    
-                    <div class="form-group col-3">
-                        <label for="internalnotes">Internal Notes</label>
-                        <textarea class="form-control" id="internalnotes" name="internalnotes" cols="40" rows="5"></textarea>
+                <section id="return-info">
+                    <header>
+                        <h3>Return Trip Information</h3>  
+                    </header>
+                    <div class="row justify-content-around">    
+                        <div class="col-xs-4">
+                            <label for="returndeparturecity">Return Departure City</label>
+                            <select class="form-control" id="returndeparturecity" name="returndeparturecity" placeholder="Departure City">
+                                {{ range .Cities }}
+                                    <option value="{{ .CityID }}">{{ .CityName }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                        <div class="col-xs-4">
+                            <label for="returndeparturevenue">Return Departure Venue</label>
+                            <select class="form-control" id="returndeparturevenue" name="returndeparturevenue" placeholder="Departure Venue">
+                                <option value="0">First Select a City</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-3"></div>
                     </div>
-                    <div class="form-group col-3">
-                        <label for="drivernotes">Driver Notes</label>
-                        <textarea class="form-control" id="drivernotes" name="drivernotes" cols="40" rows="5"></textarea>
-                    </div>
-                    <div class="form-group col-3"></div>
-                </div>
-            </section>
-            <section>
-                <header>
-                    <h3>Price</h3>
-                </header>
-                <div class="row justify-content-around"> 
-                    <div class="form-group col-3">
-                        <label for="promocode">Promotional Code</label>
-                        <input type="text" class="form-control" id="promocode" name="promocode">
-                    </div>
-                    <div class="form-group col-3">
-                        <label for="price">Price</label>
-                        <input type="text" class="form-control" id="price" name="price">
-                    </div>
-                    <div class="form-group col-3"></div>
-                </div>
-            </section>
 
+                    <div class="row justify-content-around">    
+                        <div class="col-xs-4">
+                            <label for="returndestinationcity">Return Destination City</label>
+                            <select class="form-control" id="returndestinationcity" name="returndestinationcity" placeholder="Destination City">
+                                <option value="0">Select a City</option>
+                                {{ range .Cities }}
+                                    <option value="{{ .CityID }}">{{ .CityName }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                        <div class="col-xs-4">
+                            <label for="returndestinationvenue">Return Destination Venue</label>
+                            <select class="form-control" id="returndestinationvenue" name="returndestinationvenue" placeholder="Destination Venue">
+                                <option value="0">First Select a City</option>
+                            </select>
+                        </div>
+                    </div>
 
-            <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
-        </form>
+                    <div class="row justify-content-around">    
+                        <div class="col-xs-4">
+                            <label for="returndeparturedate">Return Departure Date</label>
+                            <input type="date" class="form-control" id="returndeparturedate" name="returndeparturedate">
+                        </div>
+                        <div class="col-xs-4">
+                            <label for="returndeparturetime">Return Departure Time</label>
+                            <select class="form-control" id="returndeparturetime" name="returndeparturetime" placeholder="Departure Time">
+                                <option value="0">First Select Cities and Venues</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <p>Number of Return Passengers</p>  
+                    <div class="row justify-content-around">  
+                        <div class="col-xs-2">
+                            <label for="numadults">Adults</label>
+                            <input type="text" class="form-control" id="numadults" name="numadults" value="0">
+                        </div>
+                        <div class="col-xs-2">
+                            <label for="numseniors">Seniors (65+)</label>
+                            <input type="text" class="form-control" id="numseniors" name="numseniors" value="0">
+                        </div>
+                        <div class="col-xs-2">
+                            <label for="numstudents">Students</label>
+                            <input type="text" class="form-control" id="numstudents" name="numstudents" value="0">
+                        </div>
+                        <div class="col-xs-2">
+                            <label for="numchildren">Children (under 12)</label>
+                            <input type="text" class="form-control" id="numchildren" name="numchildren" value="0">
+                        </div>
+                    </div>
+                </section>
+
+                <section id="notes">
+                    <header>
+                        <h3>Notes</h3>
+                    </header>
+                    <div class="row justify-content-around">    
+                        <div class="col-xs-4">
+                            <label for="internalnotes">Internal Notes</label>
+                            <textarea class="form-control" id="internalnotes" name="internalnotes" cols="40" rows="5"></textarea>
+                        </div>
+                        <div class="col-xs-4">
+                            <label for="drivernotes">Driver Notes</label>
+                            <textarea class="form-control" id="drivernotes" name="drivernotes" cols="40" rows="5"></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="price">
+                    <header>
+                        <h3>Price</h3>
+                    </header>
+                    <div class="row justify-content-around"> 
+                        <div class="col-xs-4">
+                            <label for="promocode">Promotional Code</label>
+                            <input type="text" class="form-control" id="promocode" name="promocode">
+                        </div>
+                        <div class="col-xs-4">
+                            <label for="price">Price</label>
+                            <input type="text" class="form-control" id="price" name="price">
+                        </div>
+                    </div>
+                </section>
+
+                <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
     </main>
 
     {{ template "footer" }}
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
     <script type="text/javascript" >
+
 
         var departurevenue = document.getElementById("departurevenue");
         var departurecity = document.getElementById("departurecity");

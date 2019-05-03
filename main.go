@@ -19,6 +19,7 @@ import (
 // Client - data structure to hold client information and account details
 type Client struct {
 	Authenticated bool
+	RoleID        int    `json:"roleid" db:"roleid"`
 	ClientID      int    `json:"clientid" db:"clientid"`
 	Password      string `json:"password" db:"password"`
 	Username      string `json:"username" db:"username"`
@@ -150,6 +151,9 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/reservation", ReservationHandler)
 	r.HandleFunc("/createreservation", CreateReservationHandler)
 	r.HandleFunc("/reservationcreated", ReservationCreatedHandler)
+	r.HandleFunc("/driver", DriverHandler)
+	r.HandleFunc("/van", VanHandler)
+	r.HandleFunc("/createuser", CreateUserHandler)
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
@@ -188,7 +192,7 @@ func InitSession() {
 
 	//must update, currently setting maxage to 2 minutes and http only (will need secure when live)
 	sessionStore.Options = &sessions.Options{
-		MaxAge:   60 * 15,
+		MaxAge:   60 * 3,
 		HttpOnly: true,
 	}
 

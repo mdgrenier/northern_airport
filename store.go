@@ -371,7 +371,7 @@ func (store *dbStore) GetDepartureTimesCount() int {
 func (store *dbStore) GetClientInfo(client *Client) error {
 
 	row, err := store.db.Query(
-		"select c.clientid, firstname, lastname, phone, email, streetaddress, "+
+		"select c.clientid, a.roleid, firstname, lastname, phone, email, streetaddress, "+
 			"city, province, postalcode, country from clients c inner join "+
 			"accountdetails a on c.clientid = a.clientid "+
 			"where a.username=?", client.Username)
@@ -385,14 +385,14 @@ func (store *dbStore) GetClientInfo(client *Client) error {
 	//store client into into local variables
 	row.Next()
 	err = row.Scan(
-		&client.ClientID, &client.Firstname, &client.Lastname, &client.Phone, &client.Email,
+		&client.ClientID, &client.RoleID, &client.Firstname, &client.Lastname, &client.Phone, &client.Email,
 		&client.StreetAddress, &client.City, &client.Province, &client.PostalCode, &client.Country,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Print("No client found")
 		} else {
-			log.Printf("Error saving client: %s", err.Error())
+			log.Printf("Error retrieving client: %s", err.Error())
 		}
 	}
 

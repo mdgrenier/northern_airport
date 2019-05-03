@@ -13,3 +13,13 @@
     border: 1px groove;
     margin-bottom: 10px;
 }
+
+.logo {
+    padding-top: 50px;
+}
+
+.navbar-inverse {
+    background-color: #293144;
+    border-color: #FFFFFF;
+    opacity: 0.9;
+}

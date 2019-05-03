@@ -1,4 +1,4 @@
-version: '3'
+version: "3.4"
 
 services:
   db:
@@ -9,10 +9,14 @@ services:
     ports:
       - "3306:3306"
     volumes:
-       - ./data:/docker-entrypoint-initdb.d
+      - ./data:/docker-entrypoint-initdb.d
   web:
     depends_on:
       - db
     build: .
     ports:
       - "8080:8080"
+volumes:
+  data:
+    external: false
+    

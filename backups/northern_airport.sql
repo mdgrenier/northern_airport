@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `northernairport` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `northernairport`;
 -- MySQL dump 10.13  Distrib 8.0.16, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: northernairport
@@ -33,7 +35,7 @@ CREATE TABLE `accountdetails` (
   KEY `FK_266` (`RoleID`),
   CONSTRAINT `FK_148` FOREIGN KEY (`ClientID`) REFERENCES `clients` (`ClientID`),
   CONSTRAINT `FK_266` FOREIGN KEY (`RoleID`) REFERENCES `roles` (`RoleID`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -42,7 +44,9 @@ CREATE TABLE `accountdetails` (
 
 LOCK TABLES `accountdetails` WRITE;
 /*!40000 ALTER TABLE `accountdetails` DISABLE KEYS */;
-INSERT INTO `accountdetails` VALUES (1,3,'test','$2a$08$wy3Vf/Bhb27MVa7ZnVXqwujqxKkUtQ/rfHf9aryf84Tzr5zwXNa7q',1),(19,4,'admin','$2a$08$PqWfeEyR5hmCFCzRwf1cqeOH2ETBq/uKJ7QBWZ5f/RdSE.veBRPBu',4),(20,5,'staff','$2a$08$0D7V7U/EoTFickzAi0f2PeyGM/MhCePOw4ASEXVTlTTNhztcibtcW',3),(22,7,'driver','$2a$08$kKnH06GjwzRY6rYBBIRGR.88hUmmz6mS.Mn5ARP6BI2zDbqlJj1a6',5);
+INSERT INTO `accountdetails` VALUES 
+(1,3,'test','$2a$08$wy3Vf/Bhb27MVa7ZnVXqwujqxKkUtQ/rfHf9aryf84Tzr5zwXNa7q',1);
+
 /*!40000 ALTER TABLE `accountdetails` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -58,7 +62,7 @@ CREATE TABLE `airlines` (
   `Name` varchar(50) NOT NULL,
   `Terminal` int(11) NOT NULL,
   PRIMARY KEY (`AirlineID`)
-) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -82,7 +86,7 @@ CREATE TABLE `cities` (
   `CityID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) NOT NULL,
   PRIMARY KEY (`CityID`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -147,7 +151,7 @@ CREATE TABLE `clients` (
   KEY `FK_217` (`DefaultDepartureCityID`),
   CONSTRAINT `FK_171` FOREIGN KEY (`TravelAgentID`) REFERENCES `travelagents` (`TravelAgentID`),
   CONSTRAINT `FK_217` FOREIGN KEY (`DefaultDepartureCityID`) REFERENCES `cities` (`CityID`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -156,7 +160,7 @@ CREATE TABLE `clients` (
 
 LOCK TABLES `clients` WRITE;
 /*!40000 ALTER TABLE `clients` DISABLE KEYS */;
-INSERT INTO `clients` VALUES (3,'test','test',1234567890,'test@test.com','test','test','ontario','p1b8p4','canada',NULL,1,NULL,NULL),(4,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL,NULL),(5,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL,NULL),(6,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL,NULL),(7,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL,NULL);
+INSERT INTO `clients` VALUES (3,'test','test',1234567890,'test@test.com','test','test','ontario','p1b8p4','canada',NULL,1,NULL,NULL);
 /*!40000 ALTER TABLE `clients` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -171,7 +175,7 @@ CREATE TABLE `customertypes` (
   `CustomerTypeID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` varchar(25) NOT NULL,
   PRIMARY KEY (`CustomerTypeID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -225,7 +229,7 @@ CREATE TABLE `departuretimes` (
   `StartDate` date DEFAULT NULL,
   `EndDate` date DEFAULT NULL,
   PRIMARY KEY (`DepartureTimeID`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -253,7 +257,7 @@ CREATE TABLE `discountcodes` (
   `StartDate` date NOT NULL,
   `EndDate` date NOT NULL,
   PRIMARY KEY (`DiscountCodeID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -278,7 +282,7 @@ CREATE TABLE `drivers` (
   `FirstName` varchar(50) NOT NULL,
   `LastName` varchar(50) NOT NULL,
   PRIMARY KEY (`DriverID`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -411,7 +415,7 @@ CREATE TABLE `reservationtypes` (
   `ReservationTypeID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` varchar(25) NOT NULL,
   PRIMARY KEY (`ReservationTypeID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -435,7 +439,7 @@ CREATE TABLE `roles` (
   `RoleID` int(11) NOT NULL AUTO_INCREMENT,
   `RoleName` varchar(25) NOT NULL,
   PRIMARY KEY (`RoleID`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -461,7 +465,7 @@ CREATE TABLE `taxes` (
   `Name` varchar(25) NOT NULL,
   `Active` int(11) NOT NULL,
   PRIMARY KEY (`TaxID`,`Percentage`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -600,7 +604,7 @@ CREATE TABLE `triptypes` (
   `TripTypeID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` varchar(25) NOT NULL,
   PRIMARY KEY (`TripTypeID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -626,7 +630,7 @@ CREATE TABLE `vehicles` (
   `NumSeats` int(11) NOT NULL,
   `Make` varchar(25) NOT NULL,
   PRIMARY KEY (`VehicleID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -682,4 +686,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-04-30 20:37:52
+-- Dump completed on 2019-04-28 21:38:05

@@ -225,3 +225,33 @@ func ReservationCreatedHandler(w http.ResponseWriter, r *http.Request) {
 
 	tpl.ExecuteTemplate(w, "created.gohtml", r)
 }
+
+//DriverHandler - display driver admin page
+func DriverHandler(w http.ResponseWriter, r *http.Request) {
+
+	tpl.ExecuteTemplate(w, "driver.gohtml", r)
+}
+
+//VanHandler - display van admin page
+func VanHandler(w http.ResponseWriter, r *http.Request) {
+
+	tpl.ExecuteTemplate(w, "van.gohtml", r)
+}
+
+//CreateUserHandler - display create user page
+func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
+
+	tpl.ExecuteTemplate(w, "createuser.gohtml", r)
+}
+
+//TripHandler - display trip admin page
+func TripHandler(w http.ResponseWriter, r *http.Request) {
+
+	tpl.ExecuteTemplate(w, "trip.gohtml", r)
+}
+
+//VenueHandler - display venue admin page
+func VenueHandler(w http.ResponseWriter, r *http.Request) {
+
+	tpl.ExecuteTemplate(w, "venue.gohtml", r)
+}
