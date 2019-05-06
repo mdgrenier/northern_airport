@@ -3,27 +3,28 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Northern Airport Driver Admin</title>
+    <title>Northern Airport Van Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
 </head>
 <body>
     <header>
-        <img src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
         {{ template "navbar" }}
     </header>
-        <main>
+    <main>
         <div class="container">
-            <h1>Drivers</h1>
-            <div class="driver-wrapper">
-                <div class="box header" id="firstname-header">Firstname</div>
-                <div class="box header" id="lastname-header">Lastname</div>
+            <h1>Vehicles</h1>
+            <div class="vehicle-wrapper">
+                <div class="box header" id="license-plate">License</div>
+                <div class="box header" id="num-seats">Num Seats</div>
+                <div class="box header" id="make">Make</div>
             </div>
-            <div class="driver-wrapper">
+            <div class="vehicle-wrapper">
                 {{ range . }}
-                    <div class="box driver-row" id="firstname-">{{ .FirstName }}</div>
-                    <div class="box driver-row" id="lastname-">{{ .LastName }}</div>
+                    <div class="box vehicle-row" id="license-plate-">{{ .LicensePlate }}</div>
+                    <div class="box vehicle-row" id="num-seats-">{{ .NumSeats }}</div>
+                    <div class="box vehicle-row" id="make-">{{ .Make }}</div>
                 {{ end }}
             </div>
         </div>

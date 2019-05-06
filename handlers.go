@@ -229,13 +229,56 @@ func ReservationCreatedHandler(w http.ResponseWriter, r *http.Request) {
 //DriverHandler - display driver admin page
 func DriverHandler(w http.ResponseWriter, r *http.Request) {
 
-	tpl.ExecuteTemplate(w, "driver.gohtml", r)
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		drivers := store.GetDrivers()
+
+		for i := 0; i < len(drivers); i++ {
+			log.Printf("Trip ID: %d", drivers[i].DriverID)
+		}
+
+		tpl.ExecuteTemplate(w, "driver.gohtml", drivers)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+
 }
 
-//VanHandler - display van admin page
-func VanHandler(w http.ResponseWriter, r *http.Request) {
+//VehicleHandler - display van admin page
+func VehicleHandler(w http.ResponseWriter, r *http.Request) {
 
-	tpl.ExecuteTemplate(w, "van.gohtml", r)
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		//get data need to populate dropdowns in reservation form
+		vehicles := store.GetVehicles()
+
+		for i := 0; i < len(vehicles); i++ {
+			log.Printf("Vehicle ID: %d", vehicles[i].VehicleID)
+		}
+
+		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehicles)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+
 }
 
 //CreateUserHandler - display create user page
@@ -246,8 +289,29 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 //TripHandler - display trip admin page
 func TripHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	tpl.ExecuteTemplate(w, "trip.gohtml", r)
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		//get data need to populate dropdowns in reservation form
+		trips := store.GetTrips()
+
+		for i := 0; i < len(trips); i++ {
+			log.Printf("Trip ID: %d", trips[i].TripID)
+		}
+
+		tpl.ExecuteTemplate(w, "trip.gohtml", trips)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+
 }
 
 //VenueHandler - display venue admin page

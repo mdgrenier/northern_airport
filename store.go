@@ -23,6 +23,9 @@ type Store interface {
 	GetDepartureTimesCount() int
 	GetDepartureTimes() []DepartureTimes
 	GetOrAddTrip(reservation *Reservation) error
+	GetTrips() []Trips
+	GetDrivers() []Drivers
+	GetVehicles() []Vehicles
 }
 
 //The `dbStore` struct will implement the `Store` interface it also takes the sql
@@ -142,8 +145,8 @@ func (store *dbStore) SignInUser(client *Client) error {
 	//create a client object
 	storedClient := &Client{}
 
-	err := store.db.QueryRow("select password from accountdetails where username=?",
-		client.Username).Scan(&storedClient.Password)
+	err := store.db.QueryRow("select password, roleid from accountdetails where username=?",
+		client.Username).Scan(&storedClient.Password, &client.RoleID)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -399,7 +402,8 @@ func (store *dbStore) GetClientInfo(client *Client) error {
 	return err
 }
 
-//GetOrAddTrip
+//GetOrAddTrip - store appropriate tripid in reservation, if no trip
+//				 generate new trip
 func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 	var tripid int64
 	var numtrippassengers int
@@ -446,6 +450,233 @@ func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 	reservation.TripID = int(tripid)
 
 	return err
+}
+
+//GetTrips - return all trips (must add parameter to return by date)
+func (store *dbStore) GetTrips() []Trips {
+	var tripCount int
+
+	//need to add where clause to these queries to use today's date
+	row, err := store.db.Query("select count(tripid) from trips")
+
+	row.Next()
+	err = row.Scan(
+		&tripCount,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No trips returned")
+		} else {
+			log.Printf("Error retrieving trip count: %s", err.Error())
+		}
+	}
+
+	row, err = store.db.Query("select tripid, departuredate, t.departuretimeid, " +
+		"numpassengers, driverid, vehicleid, " +
+		"omittrip, postpone, cancelled from trips t inner join " +
+		"departuretimes dt on t.departuretimeid = dt.departuretimeid ")
+
+	if err != nil {
+		log.Printf("Error retrieving trips: %s", err.Error())
+		return nil
+	}
+	defer row.Close()
+
+	//create slice to store all departure times
+	var tripSlice = make([]Trips, tripCount)
+
+	var departuredate mysql.NullTime
+	var indx int
+
+	indx = 0
+	for row.Next() {
+		err = row.Scan(
+			&tripSlice[indx].TripID, &departuredate,
+			&tripSlice[indx].DepartureTimeID, &tripSlice[indx].NumPassengers,
+			&tripSlice[indx].DriverID, &tripSlice[indx].VehicleID,
+			&tripSlice[indx].OmitTrip, &tripSlice[indx].Postpone,
+			&tripSlice[indx].Cancelled,
+		)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				log.Print("No trips found")
+			} else {
+				log.Printf("Error retrieving trips: %s", err.Error())
+			}
+		} else {
+			//store dates in departure time slice if valid dates, otherwise empty date
+			if departuredate.Valid {
+				tripSlice[indx].DepartureDate = departuredate.Time
+			} else {
+				tripSlice[indx].DepartureDate = time.Time{}
+			}
+
+			//populate departuretime
+			{
+
+				dtrow, dterr := store.db.Query("select departuretime "+
+					"from departuretimes where departuretimeid = ? ",
+					tripSlice[indx].DepartureTimeID)
+
+				if dterr != nil {
+					log.Printf("Error retrieving departuretime: %s", dterr.Error())
+					return nil
+				}
+
+				dtrow.Next()
+				dterr = dtrow.Scan(
+					&tripSlice[indx].DepartureTime,
+				)
+
+				if dterr != nil {
+					if dterr == sql.ErrNoRows {
+						log.Print("No departuretime found")
+					} else {
+						log.Printf("Error retrieving departuretime: %s", dterr.Error())
+					}
+				}
+				dtrow.Close()
+			}
+
+			//populate drivers
+			tripSlice[indx].DriverList = make([]Drivers, store.GetDriverCount())
+			tripSlice[indx].DriverList = store.GetDrivers()
+
+			//populate vehicle
+			tripSlice[indx].VehicleList = make([]Vehicles, store.GetVehicleCount())
+			tripSlice[indx].VehicleList = store.GetVehicles()
+
+		}
+
+		indx++
+	}
+
+	return tripSlice
+}
+
+//GetVehicleCount - return count of all vehicles
+func (store *dbStore) GetVehicleCount() int {
+	var vehicleCount int
+
+	//need to add where clause to these queries to use today's date
+	row, err := store.db.Query("select count(vehicleid) from vehicles")
+
+	row.Next()
+	err = row.Scan(
+		&vehicleCount,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No vehicles returned")
+		} else {
+			log.Printf("Error retrieving vehicle count: %s", err.Error())
+		}
+
+		return 0
+	}
+
+	return vehicleCount
+}
+
+//GetVehicles - return all vehicles
+func (store *dbStore) GetVehicles() []Vehicles {
+
+	row, err := store.db.Query("select vehicleid, licenseplate, numseats, " +
+		"make from vehicles")
+
+	if err != nil {
+		log.Printf("Error retrieving vehicles times: %s", err.Error())
+		return nil
+	}
+	defer row.Close()
+
+	//create slice to store all departure times
+	var vehicleSlice = make([]Vehicles, store.GetVehicleCount())
+
+	var indx int
+	indx = 0
+	for row.Next() {
+		err = row.Scan(
+			&vehicleSlice[indx].VehicleID, &vehicleSlice[indx].LicensePlate,
+			&vehicleSlice[indx].NumSeats, &vehicleSlice[indx].Make,
+		)
+
+		if err != nil {
+			// If an entry with the username does not exist, send an "Unauthorized"(401) status
+			if err == sql.ErrNoRows {
+				log.Print("No vehicles found")
+			} else {
+				log.Printf("Error retrieving vehicles: %s", err.Error())
+			}
+		}
+
+		indx++
+	}
+
+	return vehicleSlice
+}
+
+//GetDriverCount - return count of all drivers
+func (store *dbStore) GetDriverCount() int {
+	var driverCount int
+
+	//need to add where clause to these queries to use today's date
+	row, err := store.db.Query("select count(driverid) from drivers")
+
+	row.Next()
+	err = row.Scan(
+		&driverCount,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No driver returned")
+		} else {
+			log.Printf("Error retrieving driver count: %s", err.Error())
+		}
+
+		return 0
+	}
+
+	return driverCount
+}
+
+//GetDrivers - return all vans
+func (store *dbStore) GetDrivers() []Drivers {
+
+	row, err := store.db.Query("select driverid, firstname, lastname " +
+		"from drivers")
+
+	if err != nil {
+		log.Printf("Error retrieving drivers: %s", err.Error())
+		return nil
+	}
+	defer row.Close()
+
+	//create slice to store all departure times
+	var driverSlice = make([]Drivers, store.GetDriverCount())
+
+	var indx int
+	indx = 0
+	for row.Next() {
+		err = row.Scan(
+			&driverSlice[indx].DriverID, &driverSlice[indx].FirstName,
+			&driverSlice[indx].LastName,
+		)
+
+		if err != nil {
+			// If an entry with the username does not exist, send an "Unauthorized"(401) status
+			if err == sql.ErrNoRows {
+				log.Print("No drivers found")
+			} else {
+				log.Printf("Error retrieving drivers: %s", err.Error())
+			}
+		}
+
+		indx++
+	}
+
+	return driverSlice
 }
 
 // The store variable is a package level variable that will be available for

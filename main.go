@@ -112,14 +112,32 @@ type Trips struct {
 	TripID          int       `json:"tripid" db:"tripid"`
 	DepartureDate   time.Time `json:"departuredate" db:"departuredate"`
 	DepartureTimeID int       `json:"departuretimeid" db:"departuretimeid"`
-	NumPassengers   int       `json:"numpassengers" db:"numpassengers"`
-	DriverID        int       `json:"driverid" db:"driverid"`
-	VehicleID       int       `json:"vehicleid" db:"vehicleid"`
+	DepartureTime   int
+	NumPassengers   int `json:"numpassengers" db:"numpassengers"`
+	DriverID        int `json:"driverid" db:"driverid"`
+	DriverList      []Drivers
+	VehicleID       int `json:"vehicleid" db:"vehicleid"`
+	VehicleList     []Vehicles
 	OmitTrip        bool      `json:"omittrip" db:"omittrip"`
 	Postpone        bool      `json:"postpone" db:"postpone"`
 	RescheduleDate  time.Time `json:"rescheduledate" db:"rescheduledate"`
 	RescheduleTime  time.Time `json:"rescheduletime" db:"rescheduletime"`
 	Cancelled       bool      `json:"cancelled" db:"cancelled"`
+}
+
+//Drivers - store driver data
+type Drivers struct {
+	DriverID  int    `json:"driverid" db:"driverid"`
+	FirstName string `json:"firstname" db:"firstname"`
+	LastName  string `json:"lastname" db:"lastname"`
+}
+
+//Vehicles - store vehicle data
+type Vehicles struct {
+	VehicleID    int    `json:"vehicleid" db:"vehicleid"`
+	LicensePlate string `json:"licenseplate" db:"licenseplate"`
+	NumSeats     int    `json:"numseats" db:"numseats"`
+	Make         string `json:"make" db:"make"`
 }
 
 var dateLayout string
@@ -151,9 +169,11 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/reservation", ReservationHandler)
 	r.HandleFunc("/createreservation", CreateReservationHandler)
 	r.HandleFunc("/reservationcreated", ReservationCreatedHandler)
-	r.HandleFunc("/driver", DriverHandler)
-	r.HandleFunc("/van", VanHandler)
+	r.HandleFunc("/drivers", DriverHandler)
+	r.HandleFunc("/vehicles", VehicleHandler)
 	r.HandleFunc("/createuser", CreateUserHandler)
+	r.HandleFunc("/trips", TripHandler)
+	r.HandleFunc("/venues", VenueHandler)
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")

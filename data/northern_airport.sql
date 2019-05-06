@@ -387,7 +387,7 @@ CREATE TABLE `reservations` (
   CONSTRAINT `FK_203` FOREIGN KEY (`DestinationCityID`) REFERENCES `cities` (`CityID`),
   CONSTRAINT `FK_211` FOREIGN KEY (`DepartureVenueID`) REFERENCES `venues` (`VenueID`),
   CONSTRAINT `FK_214` FOREIGN KEY (`DestinationVenueID`) REFERENCES `venues` (`VenueID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -396,7 +396,7 @@ CREATE TABLE `reservations` (
 
 LOCK TABLES `reservations` WRITE;
 /*!40000 ALTER TABLE `reservations` DISABLE KEYS */;
-INSERT INTO `reservations` VALUES (1,3,1,48,1,2,16,NULL,NULL,NULL,NULL,NULL,1,1,NULL,'dnotes','inotes',0,0,0,0,NULL,NULL,NULL,NULL,120,'','',0,0,'2019-04-30',NULL,0,1,0,0);
+INSERT INTO `reservations` VALUES (1,3,1,48,1,2,16,NULL,NULL,NULL,NULL,NULL,1,1,NULL,'dnotes','inotes',1,0,0,0,NULL,NULL,NULL,NULL,120,'','',0,0,'2019-04-30',NULL,0,1,0,0),(2,4,5,4,1,2,29,NULL,NULL,NULL,NULL,NULL,1,1,NULL,'testing','test trip',1,1,0,0,NULL,NULL,NULL,NULL,75,'','',0,0,'2019-05-09',NULL,0,2,0,0);
 /*!40000 ALTER TABLE `reservations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -576,7 +576,7 @@ CREATE TABLE `trips` (
   KEY `FK_288` (`DriverID`),
   KEY `FK_291` (`VehicleID`),
   CONSTRAINT `FK_254` FOREIGN KEY (`DepartureTimeID`) REFERENCES `departuretimes` (`DepartureTimeID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -585,7 +585,7 @@ CREATE TABLE `trips` (
 
 LOCK TABLES `trips` WRITE;
 /*!40000 ALTER TABLE `trips` DISABLE KEYS */;
-INSERT INTO `trips` VALUES (1,'2019-04-30',1,0,0,0,0,0,NULL,0,0);
+INSERT INTO `trips` VALUES (1,'2019-04-30',1,1,0,0,0,0,NULL,0,0),(2,'2019-05-09',1,2,0,0,0,0,NULL,0,0);
 /*!40000 ALTER TABLE `trips` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -682,4 +682,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-04-30 20:37:52
+-- Dump completed on 2019-05-03 23:39:21

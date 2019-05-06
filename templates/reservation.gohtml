@@ -39,16 +39,16 @@
                                 </li>
                                 {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
                                     <li>
-                                        <a href="/driver">Add/Assign Driver</a>
+                                        <a href="/drivers">Add/Assign Driver</a>
                                     </li>
                                     <li>
-                                        <a href="/van">Add/Assign Van</a>
+                                        <a href="/vehicles">Add/Assign Van</a>
                                     </li>
                                     <li>
                                         <a href="/trips">Add/Change Trip</a>
                                     </li>
                                     <li>
-                                        <a href="/venue">Add/Change Venue</a>
+                                        <a href="/venues">Add/Change Venue</a>
                                     </li>
                                 {{ end }}
                             </ul>
@@ -246,19 +246,19 @@
                     <p>Number of Passengers</p>  
                     <div class="row justify-content-around">  
                         <div class="col-xs-2">
-                            <label for="numadults">Adults</label>
+                            <label for="departurenumadults">Adults</label>
                             <input type="text" class="form-control" id="numadults" name="numadults" value="0">
                         </div>
                         <div class="col-xs-2">
-                            <label for="numseniors">Seniors (65+)</label>
+                            <label for="departurenumseniors">Seniors (65+)</label>
                             <input type="text" class="form-control" id="numseniors" name="numseniors" value="0">
                         </div>
                         <div class="col-xs-2">
-                            <label for="numstudents">Students</label>
+                            <label for="departurenumstudents">Students</label>
                             <input type="text" class="form-control" id="numstudents" name="numstudents" value="0">
                         </div>
                         <div class="col-xs-2">
-                            <label for="numchildren">Children (under 12)</label>
+                            <label for="departurenumchildren">Children (under 12)</label>
                             <input type="text" class="form-control" id="numchildren" name="numchildren" value="0">
                         </div>
                     </div>

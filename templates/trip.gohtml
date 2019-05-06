@@ -5,17 +5,57 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Northern Airport Trip Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
 </head>
 <body>
     <header>
-        <img src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
         {{ template "navbar" }}
     </header>
     <main>
-        <p>Trip Page</p>
+        <div class="container">
+            <h1>Trips</h1>
+            <div class="trip-wrapper">
+                <div class="box header" id="departuredate-header">Departure Date</div>
+                <div class="box header" id="departuretime-header">Departure Time</div>
+                <div class="box header" id="numpassengers-header">Num Passengers</div>
+                <div class="box header" id="driver-header">Driver</div>
+                <div class="box header" id="vehicle-header">Vehicle</div>
+                <div class="box header" id="omit-header">Omit</div>
+                <div class="box header" id="postpone-header">Postpone</div>
+                <div class="box header" id="cancel-header">Cancel</div>
+            </div>
+            <div class="trip-wrapper">
+                {{ range . }}
+                    <div class="box trip-row" id="departuredate-">{{ .DepartureDate.Format "2006-01-02" }}</div>
+                    <div class="box trip-row" id="departuretime-">{{ .DepartureTime }}</div>
+                    <div class="box trip-row" id="numpassengers-">{{ .NumPassengers }}</div>
+                    <select class="form-control" id="driverid-" name="driverid">
+                        {{ range .DriverList }}
+                            <option value="{{ .DriverID }}">{{ .FirstName }} {{ .LastName }}</option>
+                        {{ end }}
+                    </select>
+                    <select class="form-control" id="vehicleid-" name="vehicleid">
+                        {{ range .VehicleList }}
+                            <option value="{{ .VehicleID }}">{{ .LicensePlate }}</option>
+                        {{ end }}
+                    </select>
+                    <div class="box trip-row" id="omit-">{{ .Omit }}</div>
+                    <div class="box trip-row" id="postponed-">{{ .Postponed }}</div>
+                    <div class="box trip-row" id="cancel-">{{ .Cancelled }}</div>
+                    <div class="box trip-row" id="save-">
+                        <button>Save</button>
+                    </div>
+                {{ end }}
+            </div>
+        </div>
     </main>
     
     {{ template "footer" }}
+
+    <script type="text/javascript" >
+        //set driver list to correct one by driverid
+
+        //set vehicle list to correct one by vehicleid
+    </script>
 </body>
