@@ -39,13 +39,13 @@
                                 </li>
                                 {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
                                     <li>
-                                        <a href="/drivers">Add/Assign Driver</a>
+                                        <a href="/drivers">Add Driver</a>
                                     </li>
                                     <li>
-                                        <a href="/vehicles">Add/Assign Van</a>
+                                        <a href="/vehicles">Add Vehicle</a>
                                     </li>
                                     <li>
-                                        <a href="/trips">Add/Change Trip</a>
+                                        <a href="/trips">Update Trip</a>
                                     </li>
                                     <li>
                                         <a href="/venues">Add/Change Venue</a>
@@ -381,8 +381,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     
     <script type="text/javascript" >
-
-
         var departurevenue = document.getElementById("departurevenue");
         var departurecity = document.getElementById("departurecity");
         var departuretime = document.getElementById("departuretime");
@@ -540,6 +538,6 @@
             }
         };
      
-</script>
+    </script>
 </body>
 </html>

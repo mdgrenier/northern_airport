@@ -39,6 +39,7 @@ type Venues struct {
 	VenueID   int    `json:"venueid" db:"venueid"`
 	CityID    int    `json:"cityid" db:"cityid"`
 	VenueName string `json:"venuename" db:"venuename"`
+	RoleID    int
 }
 
 // Cities - stores cities
@@ -47,6 +48,7 @@ type Cities struct {
 	CityName    string `json:"cityname" db:"cityname"`
 	NorthOffset int    `json:"northoffset" db:"northoffset"`
 	SouthOffset int    `json:"southoffset" db:"southoffset"`
+	RoleID      int
 }
 
 // ResFormData - store values to populate reservations form
@@ -105,6 +107,7 @@ type DepartureTimes struct {
 	Recurring       int       `json:"recurring" db:"recurring"`
 	StartDate       time.Time `json:"startdate" db:"startdate"`
 	EndDate         time.Time `json:"enddate" db:"enddate"`
+	RoleID          int
 }
 
 // Trips - store trip data
@@ -123,6 +126,7 @@ type Trips struct {
 	RescheduleDate  time.Time `json:"rescheduledate" db:"rescheduledate"`
 	RescheduleTime  time.Time `json:"rescheduletime" db:"rescheduletime"`
 	Cancelled       bool      `json:"cancelled" db:"cancelled"`
+	RoleID          int
 }
 
 //Drivers - store driver data
@@ -130,6 +134,7 @@ type Drivers struct {
 	DriverID  int    `json:"driverid" db:"driverid"`
 	FirstName string `json:"firstname" db:"firstname"`
 	LastName  string `json:"lastname" db:"lastname"`
+	RoleID    int
 }
 
 //Vehicles - store vehicle data
@@ -138,6 +143,7 @@ type Vehicles struct {
 	LicensePlate string `json:"licenseplate" db:"licenseplate"`
 	NumSeats     int    `json:"numseats" db:"numseats"`
 	Make         string `json:"make" db:"make"`
+	RoleID       int
 }
 
 var dateLayout string
@@ -172,11 +178,14 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/drivers", DriverHandler)
 	r.HandleFunc("/vehicles", VehicleHandler)
 	r.HandleFunc("/createuser", CreateUserHandler)
-	r.HandleFunc("/trips", TripHandler)
+	r.HandleFunc("/trips", TripHandler).Methods("GET")
 	r.HandleFunc("/venues", VenueHandler)
+	r.HandleFunc("/reports", ReportHandler)
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
+	r.HandleFunc("/trips", TripHandler).Methods("POST")
+	//put method only
 
 	return r
 }
@@ -212,7 +221,7 @@ func InitSession() {
 
 	//must update, currently setting maxage to 2 minutes and http only (will need secure when live)
 	sessionStore.Options = &sessions.Options{
-		MaxAge:   60 * 3,
+		MaxAge:   60 * 15,
 		HttpOnly: true,
 	}
 

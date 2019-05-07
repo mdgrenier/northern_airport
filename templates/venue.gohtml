@@ -3,18 +3,75 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Northern Airport Venue Admin</title>
+    <title>Northern Airport Driver Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
 </head>
 <body>
     <header>
-        <img src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
         {{ template "navbar" }}
+
+        {{ with index . 0 }}
+            {{ if or (eq .RoleID 3) (eq .RoleID 4) (eq .RoleID 5) }}
+                <nav class="navbar navbar-inverse" role="navigation">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#admin-navbar-collapse">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        </div>
+
+                        <div class="collapse navbar-collapse" id="admin-navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown">
+                                    <a class="dropdown-toggle" href="/reports">Reports</a>
+                                    {{- /* if user is staff or admin */ -}}
+                                    <ul class="dropdown-menu">
+                                        {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
+                                            <li class="nav-link" href="/">Test Report</li>
+                                        {{ end }}
+                                        <li class="nav-link" href="/driver-report">Driver Report</li>
+                                    </ul>
+                                </li>
+                                {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
+                                    <li>
+                                        <a href="/drivers">Add Driver</a>
+                                    </li>
+                                    <li>
+                                        <a href="/vehicles">Add Vehicle</a>
+                                    </li>
+                                    <li>
+                                        <a href="/trips">Update Trip</a>
+                                    </li>
+                                    <li>
+                                        <a href="/venues">Add/Change Venue</a>
+                                    </li>
+                                {{ end }}
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            {{ end }}
+        {{ end }}
     </header>
-    <main>
-        <p>Venue Page</p>
+        <main>
+        <div class="container">
+            <h1>Venues</h1>
+            <div class="venue-wrapper">
+                <div class="box header" id="firstname-header">CityID</div>
+                <div class="box header" id="lastname-header">Name</div>
+            </div>
+            <div class="venue-wrapper">
+                {{ range . }}
+                    <div class="box venue-row" id="firstname-">{{ .City }}</div>
+                    <div class="box venue-row" id="lastname-">{{ .Name }}</div>
+                {{ end }}
+            </div>
+        </div>
     </main>
     
     {{ template "footer" }}

@@ -11,6 +11,52 @@
 <body>
     <header>
         {{ template "navbar" }}
+
+        {{ with index . 0 }}
+            {{ if or (eq .RoleID 3) (eq .RoleID 4) (eq .RoleID 5) }}
+                <nav class="navbar navbar-inverse" role="navigation">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#admin-navbar-collapse">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        </div>
+
+                        <div class="collapse navbar-collapse" id="admin-navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown">
+                                    <a class="dropdown-toggle" href="/reports">Reports</a>
+                                    {{- /* if user is staff or admin */ -}}
+                                    <ul class="dropdown-menu">
+                                        {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
+                                            <li class="nav-link" href="/">Test Report</li>
+                                        {{ end }}
+                                        <li class="nav-link" href="/driver-report">Driver Report</li>
+                                    </ul>
+                                </li>
+                                {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
+                                    <li>
+                                        <a href="/drivers">Add Driver</a>
+                                    </li>
+                                    <li>
+                                        <a href="/vehicles">Add Vehicle</a>
+                                    </li>
+                                    <li>
+                                        <a href="/trips">Update Trip</a>
+                                    </li>
+                                    <li>
+                                        <a href="/venues">Add/Change Venue</a>
+                                    </li>
+                                {{ end }}
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            {{ end }}
+        {{ end }}
     </header>
     <main>
         <div class="container">
@@ -21,29 +67,38 @@
                 <div class="box header" id="numpassengers-header">Num Passengers</div>
                 <div class="box header" id="driver-header">Driver</div>
                 <div class="box header" id="vehicle-header">Vehicle</div>
-                <div class="box header" id="omit-header">Omit</div>
-                <div class="box header" id="postpone-header">Postpone</div>
-                <div class="box header" id="cancel-header">Cancel</div>
+                <div class="box header" id="omitted-header">Omitted</div>
+                <div class="box header" id="postponed-header">Postponed</div>
+                <div class="box header" id="cancelled-header">Cancelled</div>
+                <div class="box header" id="save-header">Save Row</div>
             </div>
             <div class="trip-wrapper">
                 {{ range . }}
-                    <div class="box trip-row" id="departuredate-">{{ .DepartureDate.Format "2006-01-02" }}</div>
-                    <div class="box trip-row" id="departuretime-">{{ .DepartureTime }}</div>
-                    <div class="box trip-row" id="numpassengers-">{{ .NumPassengers }}</div>
-                    <select class="form-control" id="driverid-" name="driverid">
+                    <div class="box trip-row" id="departuredate-{{ .TripID }}">{{ .DepartureDate.Format "2006-01-02" }}</div>
+                    <div class="box trip-row" id="departuretime-{{ .TripID }}">{{ .DepartureTime }}</div>
+                    <div class="box trip-row" id="numpassengers-{{ .TripID }}">{{ .NumPassengers }}</div>
+                    <select class="form-control" id="driver-{{ .TripID }}" name="driverid">
+                        <option value="0">No Driver</option>
                         {{ range .DriverList }}
                             <option value="{{ .DriverID }}">{{ .FirstName }} {{ .LastName }}</option>
                         {{ end }}
                     </select>
-                    <select class="form-control" id="vehicleid-" name="vehicleid">
+                    <select class="form-control" id="vehicle-{{ .TripID }}" name="vehicleid">
+                        <option value="0">No Vehicle</option>
                         {{ range .VehicleList }}
                             <option value="{{ .VehicleID }}">{{ .LicensePlate }}</option>
                         {{ end }}
                     </select>
-                    <div class="box trip-row" id="omit-">{{ .Omit }}</div>
-                    <div class="box trip-row" id="postponed-">{{ .Postponed }}</div>
-                    <div class="box trip-row" id="cancel-">{{ .Cancelled }}</div>
-                    <div class="box trip-row" id="save-">
+                    <div class="box trip-row" id="omit-{{ .TripID }}">
+                        {{ .OmitTrip }}
+                    </div>
+                    <div class="box trip-row" id="postponed-{{ .TripID }}">
+                        {{ .Postpone }}
+                    </div>
+                    <div class="box trip-row" id="cancel-{{ .TripID }}">
+                        {{ .Cancelled }}
+                    </div>
+                    <div class="box trip-row" id="save-{{ .TripID }}">
                         <button>Save</button>
                     </div>
                 {{ end }}
@@ -53,9 +108,51 @@
     
     {{ template "footer" }}
 
-    <script type="text/javascript" >
-        //set driver list to correct one by driverid
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-        //set vehicle list to correct one by vehicleid
+    <script type="text/javascript" >
+        
+        {{ range . }} 
+            //set driver list to correct one by driverid
+            var driverid = {{ .DriverID }}
+            var driver = document.getElementById("driver-{{ .TripID }}");
+        
+            if (driverid != 0)
+            {
+                driver.value = driverid;
+            }
+
+            //set vehicle list to correct one by vehicleid
+            var vehicleid = {{ .VehicleID }}
+            var vehicle = document.getElementById("vehicle-{{ .TripID }}");
+            
+        
+            if (vehicleid != 0)
+            {
+                vehicle.value = vehicleid;
+            }
+
+            var save = document.getElementById("save-{{ .TripID }}");
+            save.onclick = function(){
+                var tripid = {{ .TripID }}
+                var vehicleid = document.getElementById("vehicle-{{ .TripID }}");
+                var driverid = document.getElementById("driver-{{ .TripID }}");    
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/trip?tripid='+tripid+'&driverid='+driverid+'&vehicleid='+vehicleid);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        alert('success');
+                    }
+                    else {
+                        alert('failed:' + xhr.status);
+                    }
+                };
+                xhr.send();
+            }
+        {{ end }}
     </script>
 </body>
+</html>

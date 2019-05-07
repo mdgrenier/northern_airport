@@ -10,12 +10,14 @@ services:
       - "3306:3306"
     volumes:
       - ./data:/docker-entrypoint-initdb.d
+    restart: always
   web:
     depends_on:
       - db
     build: .
     ports:
       - "8080:8080"
+    restart: always
 volumes:
   data:
     external: false

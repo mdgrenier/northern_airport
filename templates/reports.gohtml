@@ -28,7 +28,7 @@
                         <div class="collapse navbar-collapse" id="admin-navbar-collapse">
                             <ul class="nav navbar-nav">
                                 <li class="dropdown">
-                                    <a class="dropdown-toggle" href="/reports">Reports</a>
+                                    <a class="dropdown-toggle" href="/">Reports</a>
                                     {{- /* if user is staff or admin */ -}}
                                     <ul class="dropdown-menu">
                                         {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
@@ -60,19 +60,7 @@
     </header>
     <main>
         <div class="container">
-            <h1>Vehicles</h1>
-            <div class="vehicle-wrapper">
-                <div class="box header" id="license-plate">License</div>
-                <div class="box header" id="num-seats">Num Seats</div>
-                <div class="box header" id="make">Make</div>
-            </div>
-            <div class="vehicle-wrapper">
-                {{ range . }}
-                    <div class="box vehicle-row" id="license-plate-">{{ .LicensePlate }}</div>
-                    <div class="box vehicle-row" id="num-seats-">{{ .NumSeats }}</div>
-                    <div class="box vehicle-row" id="make-">{{ .Make }}</div>
-                {{ end }}
-            </div>
+            <h1>Reports Coming Soon</h1>
         </div>
     </main>
     

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -242,9 +243,7 @@ func DriverHandler(w http.ResponseWriter, r *http.Request) {
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
 		drivers := store.GetDrivers()
 
-		for i := 0; i < len(drivers); i++ {
-			log.Printf("Trip ID: %d", drivers[i].DriverID)
-		}
+		drivers[0].RoleID = client.RoleID
 
 		tpl.ExecuteTemplate(w, "driver.gohtml", drivers)
 	} else {
@@ -270,9 +269,7 @@ func VehicleHandler(w http.ResponseWriter, r *http.Request) {
 		//get data need to populate dropdowns in reservation form
 		vehicles := store.GetVehicles()
 
-		for i := 0; i < len(vehicles); i++ {
-			log.Printf("Vehicle ID: %d", vehicles[i].VehicleID)
-		}
+		vehicles[0].RoleID = client.RoleID
 
 		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehicles)
 	} else {
@@ -303,8 +300,48 @@ func TripHandler(w http.ResponseWriter, r *http.Request) {
 		//get data need to populate dropdowns in reservation form
 		trips := store.GetTrips()
 
+		trips[0].RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "trip.gohtml", trips)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+
+}
+
+//UpdateTripHandler - update trip
+func UpdateTripHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		//get data need to populate dropdowns in reservation form
+		trips := store.GetTrips()
+
 		for i := 0; i < len(trips); i++ {
-			log.Printf("Trip ID: %d", trips[i].TripID)
+			tripid, err := strconv.Atoi(r.Form.Get("tripid"))
+
+			if err != nil {
+				log.Printf("Error converting tripid: %s", err.Error())
+			}
+
+			log.Printf("Find matching trip - Trip ID: %d", trips[i].TripID)
+			if trips[i].TripID == tripid {
+				trips[i].DriverID, err = strconv.Atoi(r.Form.Get("driverid"))
+				trips[i].VehicleID, err = strconv.Atoi(r.Form.Get("vehicleid"))
+			}
+
+			if err != nil {
+				log.Printf("Error converting driverid or vehilceid: %s", err.Error())
+			}
+
 		}
 
 		tpl.ExecuteTemplate(w, "trip.gohtml", trips)
@@ -317,5 +354,38 @@ func TripHandler(w http.ResponseWriter, r *http.Request) {
 //VenueHandler - display venue admin page
 func VenueHandler(w http.ResponseWriter, r *http.Request) {
 
-	tpl.ExecuteTemplate(w, "venue.gohtml", r)
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		venues := store.GetVenues()
+
+		venues[0].RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "venue.gohtml", venues)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+}
+
+//ReportHandler - display reports admin page
+func ReportHandler(w http.ResponseWriter, r *http.Request) {
+
+	//session, err := sessionStore.Get(r, "northern-airport")
+	//if err != nil {
+	//	http.Error(w, err.Error(), http.StatusInternalServerError)
+	//	return
+	//}
+
+	//get client data from session cookie
+	//client := GetClient(session)
+
+	tpl.ExecuteTemplate(w, "reports.gohtml", r)
 }

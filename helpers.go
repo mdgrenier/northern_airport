@@ -48,18 +48,6 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 	*
 	**********************************************************************/
 
-	//resform.Client.Username = r.Form.Get("username")
-	//resform.Client.Password = r.Form.Get("password")
-	//resform.Client.Firstname = r.Form.Get("firstname")
-	//resform.Client.Lastname = r.Form.Get("lastname")
-	//resform.Client.Phone = r.Form.Get("phone")
-	//resform.Client.Email = r.Form.Get("email")
-	//resform.Client.StreetAddress = r.Form.Get("streetaddress")
-	//resform.Client.City = r.Form.Get("city")
-	//resform.Client.Province = r.Form.Get("provstate")
-	//resform.Client.PostalCode = r.Form.Get("postalzip")
-	//resform.Client.Country = r.Form.Get("country")
-
 	reservation.ClientID, err = strconv.Atoi(r.FormValue("clientid"))
 
 	//store trip info in resformdata

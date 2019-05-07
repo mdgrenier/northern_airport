@@ -555,6 +555,19 @@ func (store *dbStore) GetTrips() []Trips {
 	return tripSlice
 }
 
+func (store *dbStore) UpdateTrip(trip *Trips) error {
+	_, updateerr := store.db.Exec("UPDATE trips(driverid, vehicleid) "+
+		"VALUES (?,?)", trip.DriverID, trip.VehicleID)
+
+	if updateerr != nil {
+		log.Printf("Error updating trip: %s", updateerr.Error())
+	} else {
+		log.Printf("Update Trip: %d", trip.TripID)
+	}
+
+	return updateerr
+}
+
 //GetVehicleCount - return count of all vehicles
 func (store *dbStore) GetVehicleCount() int {
 	var vehicleCount int
@@ -677,6 +690,11 @@ func (store *dbStore) GetDrivers() []Drivers {
 	}
 
 	return driverSlice
+}
+
+//GetReports - return list of reports
+func (store *dbStore) GetReports() {
+
 }
 
 // The store variable is a package level variable that will be available for
