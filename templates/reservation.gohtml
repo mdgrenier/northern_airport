@@ -118,7 +118,7 @@
                                 {{ if .Authenticated }}
                                     <input type="text" class="form-control" id="streetaddress" name="streetaddress" value={{.StreetAddress}} required>
                                 {{else}}
-                                    <input type="text" class="form-control" id="streetaddress" name="streetaddress" placeholder="Street Address" required>
+                                    <input type="text" class="form-control" id="streetaddress" name="streetaddress" value="XXXXXXXXXXXX" required>
                                 {{end}}
                             </div>
                             <div class="col-xs-4">
@@ -126,7 +126,7 @@
                                 {{ if .Authenticated }}
                                     <input type="city" class="form-control" id="city" name="city" value={{.City}} required>
                                 {{else}}
-                                    <input type="city" class="form-control" id="city" name="city" placeholder="City" required>
+                                    <input type="city" class="form-control" id="city" name="city" value="XXXXXXXX" required>
                                 {{end}}
                             </div>
                         </div>
@@ -137,7 +137,7 @@
                                 {{ if .Authenticated }}
                                     <input type="text" class="form-control" id="provstate" name="provstate" value={{.Province}} required>
                                 {{else}}
-                                    <input type="text" class="form-control" id="provstate" name="provstate" placeholder="Province/State" required>
+                                    <input type="text" class="form-control" id="provstate" name="provstate" value="Ontario" required>
                                 {{end}}
                             </div>
                             <div class="col-xs-4">
@@ -145,7 +145,7 @@
                                 {{ if .Authenticated }}
                                     <input type="postalzip" class="form-control" id="postalzip" name="postalzip" value={{.PostalCode}} pattern="([A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]|[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]|(\d{5}([\-]\d{4})?))" required>
                                 {{else}}
-                                    <input type="postalzip" class="form-control" id="postalzip" name="postalzip" placeholder="Postal/Zip" pattern="([A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]|[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]|(\d{5}([\-]\d{4})?))" required>
+                                    <input type="postalzip" class="form-control" id="postalzip" name="postalzip" value="Z9Z 9Z9" pattern="([A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]|[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]|(\d{5}([\-]\d{4})?))" required>
                                 {{end}}
                             </div>
                             <div class="form-group col-3">
@@ -159,7 +159,7 @@
                                 {{ if .Authenticated }}
                                     <input type="text" class="form-control" id="country" name="country" value={{.Country}} required>
                                 {{else}}
-                                    <input type="text" class="form-control" id="country" name="country" placeholder="Country" required>
+                                    <input type="text" class="form-control" id="country" name="country" value="Canada" required>
                                 {{end}}
                             </div>
                         </div>

@@ -322,20 +322,24 @@ func UpdateTripHandler(w http.ResponseWriter, r *http.Request) {
 
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		values := r.URL.Query()
+
 		//get data need to populate dropdowns in reservation form
 		trips := store.GetTrips()
 
 		for i := 0; i < len(trips); i++ {
-			tripid, err := strconv.Atoi(r.Form.Get("tripid"))
+			tripid, err := strconv.Atoi(values["tripid"][0])
 
 			if err != nil {
 				log.Printf("Error converting tripid: %s", err.Error())
 			}
 
-			log.Printf("Find matching trip - Trip ID: %d", trips[i].TripID)
 			if trips[i].TripID == tripid {
-				trips[i].DriverID, err = strconv.Atoi(r.Form.Get("driverid"))
-				trips[i].VehicleID, err = strconv.Atoi(r.Form.Get("vehicleid"))
+				log.Printf("Matched Trip ID: %d", trips[i].TripID)
+				trips[i].DriverID, err = strconv.Atoi(values["driverid"][0])
+				trips[i].VehicleID, err = strconv.Atoi(values["vehicleid"][0])
+
+				store.UpdateTrip(&trips[i])
 			}
 
 			if err != nil {

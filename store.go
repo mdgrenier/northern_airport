@@ -26,6 +26,7 @@ type Store interface {
 	GetTrips() []Trips
 	GetDrivers() []Drivers
 	GetVehicles() []Vehicles
+	UpdateTrip(trip *Trips) error
 }
 
 //The `dbStore` struct will implement the `Store` interface it also takes the sql
@@ -556,8 +557,8 @@ func (store *dbStore) GetTrips() []Trips {
 }
 
 func (store *dbStore) UpdateTrip(trip *Trips) error {
-	_, updateerr := store.db.Exec("UPDATE trips(driverid, vehicleid) "+
-		"VALUES (?,?)", trip.DriverID, trip.VehicleID)
+	_, updateerr := store.db.Exec("UPDATE trips SET driverid = ?, "+
+		" vehicleid = ? WHERE tripid = ?", trip.DriverID, trip.VehicleID, trip.TripID)
 
 	if updateerr != nil {
 		log.Printf("Error updating trip: %s", updateerr.Error())

@@ -184,7 +184,9 @@ func newRouter() *mux.Router {
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
-	r.HandleFunc("/trips", TripHandler).Methods("POST")
+	r.HandleFunc("/trips", UpdateTripHandler).Methods("POST")
+
+	//r.HandleFunc("/trips", UpdateTripHandler).Methods("POST")
 	//put method only
 
 	return r
@@ -221,7 +223,7 @@ func InitSession() {
 
 	//must update, currently setting maxage to 2 minutes and http only (will need secure when live)
 	sessionStore.Options = &sessions.Options{
-		MaxAge:   60 * 15,
+		MaxAge:   60 * 2,
 		HttpOnly: true,
 	}
 

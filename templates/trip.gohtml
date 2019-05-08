@@ -136,21 +136,23 @@
             var save = document.getElementById("save-{{ .TripID }}");
             save.onclick = function(){
                 var tripid = {{ .TripID }}
-                var vehicleid = document.getElementById("vehicle-{{ .TripID }}");
-                var driverid = document.getElementById("driver-{{ .TripID }}");    
+                var vehicleid = document.getElementById("vehicle-{{ .TripID }}").value;
+                var driverid = document.getElementById("driver-{{ .TripID }}").value;    
 
                 var xhr = new XMLHttpRequest();
-                xhr.open('POST', '/trip?tripid='+tripid+'&driverid='+driverid+'&vehicleid='+vehicleid);
+                xhr.open('POST', '/trips?tripid='+tripid+'&driverid='+driverid+'&vehicleid='+vehicleid);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        alert('success');
-                    }
-                    else {
+                    if (xhr.status != 200) {
                         alert('failed:' + xhr.status);
                     }
-                };
-                xhr.send();
+                }
+
+                try {
+                    xhr.send();
+                } catch (err) {
+                    alert("Error sending request: " + err)
+                }
             }
         {{ end }}
     </script>
