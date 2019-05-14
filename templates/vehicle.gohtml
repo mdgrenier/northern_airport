@@ -39,16 +39,19 @@
                                 </li>
                                 {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
                                     <li>
-                                        <a href="/drivers">Add Driver</a>
-                                    </li>
-                                    <li>
-                                        <a href="/vehicles">Add Vehicle</a>
-                                    </li>
-                                    <li>
                                         <a href="/trips">Update Trip</a>
                                     </li>
                                     <li>
-                                        <a href="/venues">Add/Change Venue</a>
+                                        <a href="/drivers">Add/Change/Remove Driver</a>
+                                    </li>
+                                    <li>
+                                        <a href="/vehicles">Add/Change/Remove Vehicle</a>
+                                    </li>
+                                    <li>
+                                        <a href="/venues">Add/Change/Remove Venue</a>
+                                    </li>
+                                    <li>
+                                        <a href="/cities">Add/Change/Remove Cities</a>
                                     </li>
                                 {{ end }}
                             </ul>
@@ -68,10 +71,24 @@
             </div>
             <div class="vehicle-wrapper">
                 {{ range . }}
-                    <div class="box vehicle-row" id="license-plate-">{{ .LicensePlate }}</div>
-                    <div class="box vehicle-row" id="num-seats-">{{ .NumSeats }}</div>
-                    <div class="box vehicle-row" id="make-">{{ .Make }}</div>
+                    <div class="box vehicle-row" id="license-plate-{{ .VehicleID }}">{{ .LicensePlate }}</div>
+                    <div class="box vehicle-row" id="num-seats-{{ .VehicleID }}">{{ .NumSeats }}</div>
+                    <div class="box vehicle-row" id="make-{{ .VehicleID }}">{{ .Make }}</div>
                 {{ end }}
+            </div>
+            <div class="vehicle-wrapper">
+                <form id="add-vehicle" method="post" action="/vehicles" onsubmit="submit.disabled = true; return true;">
+                    <div class="box vehicle-row" id="license-plate-add">
+                        <input type="text" class="form-control" id="license-plate" name="license-plate" required>
+                    </div>
+                    <div class="box vehicle-row" id="num-seats-add">
+                        <input type="text" class="form-control" id="num-seats" name="num-seats" required>
+                    </div>
+                    <div class="box vehicle-row" id="make-add">
+                        <input type="text" class="form-control" id="make" name="make" required>
+                    </div>
+                    <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+                </form>
             </div>
         </div>
     </main>

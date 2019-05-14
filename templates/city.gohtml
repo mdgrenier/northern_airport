@@ -63,32 +63,32 @@
     </header>
         <main>
         <div class="container">
-            <h1>Venues</h1>
-            <div class="venue-wrapper">
-                <div class="box header" id="cityid-header">City Name</div>
-                <div class="box header" id="name-header">Venue Name</div>
-                <div class="box header" id="active-header">Active</div>
+            <h1>Cities</h1>
+            <div class="city-wrapper">
+                <div class="box header" id="cityname-header">City Name</div>
+                <div class="box header" id="northoffset-header">North Offset (mins from NB)</div>
+                <div class="box header" id="southoffset-header">South Offset (mins from TO)</div>
             </div>
-            <div class="venue-wrapper">
+            <div class="city-wrapper">
                 {{ range . }}
-                    <div class="box venue-row" id="cityname-{{ .VenueID }}">{{ .CityName }}</div>
-                    <div class="box venue-row" id="venuename-{{ .VenueID }}">{{ .VenueName }}</div>
-                    <div class="box venue-row" id="active-{{ .VenueID }}">{{ .Active }}</div>
+                    <div class="box city-row" id="cityname-{{ .CityID }}">{{ .CityName }}</div>
+                    <div class="box city-row" id="northoffset-{{ .CityID }}">{{ .NorthOffset }}</div>
+                    <div class="box city-row" id="southoffset-{{ .CityID }}">{{ .SouthOffset }}</div>
                 {{ end }}
             </div>
-            <div class="venue-wrapper">
-                <form id="add-venue" method="post" action="/venues" onsubmit="submit.disabled = true; return true;">
-                    <div class="box venue-row" id="cityname-add">
+            <div class="driver-wrapper">
+                <form id="add-driver" method="post" action="/cities" onsubmit="submit.disabled = true; return true;">
+                    <div class="box driver-row" id="cityname-add">
                         <input type="text" class="form-control" id="cityname" name="cityname" required>
                     </div>
-                    <div class="box venue-row" id="venuename-add">
-                        <input type="text" class="form-control" id="venuename" name="venuename" required>
+                    <div class="box driver-row" id="northoffset-add">
+                        <input type="text" class="form-control" id="northoffset" name="northoffset" required>
                     </div>
-                    <div class="box venue-row" id="active-add">
-                        <input type="text" class="form-control" id="active" name="active" required>
+                    <div class="box driver-row" id="southoffset-add">
+                        <input type="text" class="form-control" id="southoffset" name="southoffset" required>
                     </div>
                     <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
-                </form>
+                </div>
             </div>
         </div>
     </main>

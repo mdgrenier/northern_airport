@@ -18,14 +18,18 @@ type Store interface {
 	GetClientInfo(client *Client) error
 	GetVenues() []Venues
 	GetVenueCount() int
+	AddVenue(venue Venues) error
 	GetCities() []Cities
 	GetCityCount() int
+	GetCityID(string) int
 	GetDepartureTimesCount() int
 	GetDepartureTimes() []DepartureTimes
 	GetOrAddTrip(reservation *Reservation) error
 	GetTrips() []Trips
 	GetDrivers() []Drivers
+	AddDriver(driver Drivers) error
 	GetVehicles() []Vehicles
+	AddVehicle(vehicle Vehicles) error
 	UpdateTrip(trip *Trips) error
 }
 
@@ -50,16 +54,10 @@ func (store *dbStore) CreateUser(client *Client) error {
 	//get id from client insertion transaction
 	id, _ := result.LastInsertId()
 
-	//log.Printf("New Client ID: %d", id)
-
 	//create account details record linked to client record
 	result, err = store.db.Exec("INSERT INTO accountdetails(clientid, password, roleid, username) "+
 		"VALUES (?, ?, 2, ?)",
 		id, client.Password, client.Username)
-
-	//id, _ = result.LastInsertId()
-
-	//log.Printf("Account Details: %d", id)
 
 	return err
 }
@@ -173,9 +171,12 @@ func (store *dbStore) GetVenues() []Venues {
 	//Get venue count
 	venueCount := store.GetVenueCount()
 
-	row, err := store.db.Query("select venueid, cityid, name from venues")
+	row, err := store.db.Query("SELECT venueid, c.cityid, c.name, v.name, v.active FROM venues v " +
+		"INNER JOIN cities c ON v.cityid = c.cityid")
+
 	// We return in case of an error, and defer the closing of the row structure
 	if err != nil {
+		log.Printf("Error retrieving venues: %s", err.Error())
 		return nil
 	}
 	defer row.Close()
@@ -188,7 +189,9 @@ func (store *dbStore) GetVenues() []Venues {
 	indx = 0
 	for row.Next() {
 		err = row.Scan(
-			&venueSlice[indx].VenueID, &venueSlice[indx].CityID, &venueSlice[indx].VenueName,
+			&venueSlice[indx].VenueID, &venueSlice[indx].CityID,
+			&venueSlice[indx].CityName, &venueSlice[indx].VenueName,
+			&venueSlice[indx].Active,
 		)
 		if err != nil {
 			//if error print to console
@@ -231,6 +234,19 @@ func (store *dbStore) GetVenueCount() int {
 	return venueCount
 }
 
+//AddVenue - add venue
+func (store *dbStore) AddVenue(venue Venues) error {
+
+	_, err := store.db.Exec("INSERT INTO venues(cityid, name, active) "+
+		"VALUES (?,?,?)", venue.CityID, venue.VenueName, 1)
+
+	if err != nil {
+		log.Printf("Error inserting venues: %s", err.Error())
+	}
+
+	return err
+}
+
 //GetCities - return all cities in database
 func (store *dbStore) GetCities() []Cities {
 
@@ -270,6 +286,27 @@ func (store *dbStore) GetCities() []Cities {
 	}
 
 	return citySlice
+}
+
+//GetCities - return all cities in database
+func (store *dbStore) GetCityID(cityname string) int {
+
+	row := store.db.QueryRow("SELECT c.cityid from cities where name = ?",
+		cityname)
+
+	var cityid int
+
+	err := row.Scan(&cityid)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No city matches the name")
+		} else {
+			log.Printf("Error retrieving cityid from name: %s", err.Error())
+		}
+	}
+
+	return cityid
 }
 
 //GetCityCount  - return number of cities
@@ -556,6 +593,7 @@ func (store *dbStore) GetTrips() []Trips {
 	return tripSlice
 }
 
+//UpdateTrip - update driver and vehicle associated with trip
 func (store *dbStore) UpdateTrip(trip *Trips) error {
 	_, updateerr := store.db.Exec("UPDATE trips SET driverid = ?, "+
 		" vehicleid = ? WHERE tripid = ?", trip.DriverID, trip.VehicleID, trip.TripID)
@@ -631,6 +669,19 @@ func (store *dbStore) GetVehicles() []Vehicles {
 	return vehicleSlice
 }
 
+//AddVehicle - add vehicle
+func (store *dbStore) AddVehicle(vehicle Vehicles) error {
+
+	_, err := store.db.Exec("INSERT INTO vehicles(licenseplate, numseats, make) "+
+		"VALUES (?,?,?)", vehicle.LicensePlate, vehicle.NumSeats, vehicle.Make)
+
+	if err != nil {
+		log.Printf("Error inserting vehicle: %s", err.Error())
+	}
+
+	return err
+}
+
 //GetDriverCount - return count of all drivers
 func (store *dbStore) GetDriverCount() int {
 	var driverCount int
@@ -655,7 +706,7 @@ func (store *dbStore) GetDriverCount() int {
 	return driverCount
 }
 
-//GetDrivers - return all vans
+//GetDrivers - return all drivers
 func (store *dbStore) GetDrivers() []Drivers {
 
 	row, err := store.db.Query("select driverid, firstname, lastname " +
@@ -691,6 +742,21 @@ func (store *dbStore) GetDrivers() []Drivers {
 	}
 
 	return driverSlice
+}
+
+//AddDriver - add drivers
+func (store *dbStore) AddDriver(driver Drivers) error {
+
+	_, err := store.db.Exec("INSERT INTO drivers(firstname, lastname) "+
+		"VALUES (?,?)", driver.FirstName, driver.LastName)
+
+	if err != nil {
+		log.Printf("Error inserting vehicle: %s", err.Error())
+	} else {
+		log.Print("Driver added")
+	}
+
+	return err
 }
 
 //GetReports - return list of reports

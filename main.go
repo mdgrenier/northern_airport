@@ -36,9 +36,11 @@ type Client struct {
 
 // Venues - stores venues
 type Venues struct {
-	VenueID   int    `json:"venueid" db:"venueid"`
-	CityID    int    `json:"cityid" db:"cityid"`
+	VenueID   int `json:"venueid" db:"venueid"`
+	CityID    int `json:"cityid" db:"cityid"`
+	CityName  string
 	VenueName string `json:"venuename" db:"venuename"`
+	Active    int    `json:"active" db:"active"`
 	RoleID    int
 }
 
@@ -175,16 +177,22 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/reservation", ReservationHandler)
 	r.HandleFunc("/createreservation", CreateReservationHandler)
 	r.HandleFunc("/reservationcreated", ReservationCreatedHandler)
-	r.HandleFunc("/drivers", DriverHandler)
-	r.HandleFunc("/vehicles", VehicleHandler)
 	r.HandleFunc("/createuser", CreateUserHandler)
-	r.HandleFunc("/trips", TripHandler).Methods("GET")
-	r.HandleFunc("/venues", VenueHandler)
 	r.HandleFunc("/reports", ReportHandler)
+	//get method only
+	r.HandleFunc("/trips", TripHandler).Methods("GET")
+	r.HandleFunc("/vehicles", VehicleHandler).Methods("GET")
+	r.HandleFunc("/venues", VenueHandler).Methods("GET")
+	r.HandleFunc("/drivers", DriverHandler).Methods("GET")
+	r.HandleFunc("/cities", CityHandler).Methods("GET")
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
 	r.HandleFunc("/trips", UpdateTripHandler).Methods("POST")
+	r.HandleFunc("/vehicles", AddVehicleHandler).Methods("POST")
+	r.HandleFunc("/venues", AddVenueHandler).Methods("POST")
+	r.HandleFunc("/drivers", AddDriverHandler).Methods("POST")
+	r.HandleFunc("/cities", CityHandler).Methods("POST")
 
 	//r.HandleFunc("/trips", UpdateTripHandler).Methods("POST")
 	//put method only

@@ -39,16 +39,19 @@
                                 </li>
                                 {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
                                     <li>
-                                        <a href="/drivers">Add Driver</a>
-                                    </li>
-                                    <li>
-                                        <a href="/vehicles">Add Vehicle</a>
-                                    </li>
-                                    <li>
                                         <a href="/trips">Update Trip</a>
                                     </li>
                                     <li>
-                                        <a href="/venues">Add/Change Venue</a>
+                                        <a href="/drivers">Add/Change/Remove Driver</a>
+                                    </li>
+                                    <li>
+                                        <a href="/vehicles">Add/Change/Remove Vehicle</a>
+                                    </li>
+                                    <li>
+                                        <a href="/venues">Add/Change/Remove Venue</a>
+                                    </li>
+                                    <li>
+                                        <a href="/cities">Add/Change/Remove Cities</a>
                                     </li>
                                 {{ end }}
                             </ul>

@@ -252,6 +252,45 @@ func DriverHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//AddDriverHandler - add driver to database
+func AddDriverHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+
+		err := r.ParseForm()
+
+		driver := Drivers{}
+
+		driver.FirstName = r.FormValue("firstname")
+		driver.LastName = r.FormValue("lastname")
+
+		err = store.AddDriver(driver)
+
+		if err != nil {
+			log.Printf("Error adding driver: %s", err.Error())
+		} else {
+			log.Print("Drivers added")
+		}
+
+		drivers := store.GetDrivers()
+
+		drivers[0].RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "driver.gohtml", drivers)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+}
+
 //VehicleHandler - display van admin page
 func VehicleHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -275,7 +314,46 @@ func VehicleHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		tpl.ExecuteTemplate(w, "index.gohtml", r)
 	}
+}
 
+//AddVehicleHandler - add vehicle to database
+func AddVehicleHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+
+		err := r.ParseForm()
+
+		vehicle := Vehicles{}
+
+		vehicle.LicensePlate = r.FormValue("license-plate")
+		vehicle.NumSeats, err = strconv.Atoi(r.FormValue("num-seats"))
+		vehicle.Make = r.FormValue("make")
+
+		err = store.AddVehicle(vehicle)
+
+		if err != nil {
+			log.Printf("Error adding vehicle: %s", err.Error())
+		} else {
+			log.Print("Vehicles added")
+		}
+
+		vehicles := store.GetVehicles()
+
+		vehicles[0].RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehicles)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
 }
 
 //CreateUserHandler - display create user page
@@ -369,6 +447,114 @@ func VenueHandler(w http.ResponseWriter, r *http.Request) {
 
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		venues := store.GetVenues()
+
+		venues[0].RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "venue.gohtml", venues)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+}
+
+//AddVenueHandler - add venue to database
+func AddVenueHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+
+		err := r.ParseForm()
+
+		venue := Venues{}
+
+		cityname := r.FormValue("cityname")
+
+		venue.CityID = store.GetCityID(cityname)
+		venue.VenueName = r.FormValue("venuename")
+		venue.Active, err = strconv.Atoi(r.FormValue("active"))
+
+		err = store.AddVenue(venue)
+
+		if err != nil {
+			log.Printf("Error adding venue: %s", err.Error())
+		} else {
+			log.Print("Venues added")
+		}
+
+		venues := store.GetVenues()
+
+		venues[0].RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "venue.gohtml", venues)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+}
+
+//CityHandler - display city admin page
+func CityHandler(w http.ResponseWriter, r *http.Request) {
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		cities := store.GetCities()
+
+		cities[0].RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "city.gohtml", cities)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+}
+
+//AddCityHandler - add city to database
+func AddCityHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+
+		err := r.ParseForm()
+
+		venue := Venues{}
+
+		cityname := r.FormValue("cityname")
+
+		venue.CityID = store.GetCityID(cityname)
+		venue.VenueName = r.FormValue("venuename")
+		venue.Active, err = strconv.Atoi(r.FormValue("active"))
+
+		err = store.AddVenue(venue)
+
+		if err != nil {
+			log.Printf("Error adding venue: %s", err.Error())
+		} else {
+			log.Print("Venues added")
+		}
+
 		venues := store.GetVenues()
 
 		venues[0].RoleID = client.RoleID

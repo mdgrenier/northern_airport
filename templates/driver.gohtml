@@ -39,16 +39,19 @@
                                 </li>
                                 {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
                                     <li>
-                                        <a href="/drivers">Add Driver</a>
-                                    </li>
-                                    <li>
-                                        <a href="/vehicles">Add Vehicle</a>
-                                    </li>
-                                    <li>
                                         <a href="/trips">Update Trip</a>
                                     </li>
                                     <li>
-                                        <a href="/venues">Add/Change Venue</a>
+                                        <a href="/drivers">Add/Change/Remove Driver</a>
+                                    </li>
+                                    <li>
+                                        <a href="/vehicles">Add/Change/Remove Vehicle</a>
+                                    </li>
+                                    <li>
+                                        <a href="/venues">Add/Change/Remove Venue</a>
+                                    </li>
+                                    <li>
+                                        <a href="/cities">Add/Change/Remove Cities</a>
                                     </li>
                                 {{ end }}
                             </ul>
@@ -67,9 +70,20 @@
             </div>
             <div class="driver-wrapper">
                 {{ range . }}
-                    <div class="box driver-row" id="firstname-">{{ .FirstName }}</div>
-                    <div class="box driver-row" id="lastname-">{{ .LastName }}</div>
+                    <div class="box driver-row" id="firstname-{{ .DriverID }}">{{ .FirstName }}</div>
+                    <div class="box driver-row" id="lastname-{{ .DriverID }}">{{ .LastName }}</div>
                 {{ end }}
+            </div>
+            <div class="driver-wrapper">
+                <form id="add-driver" method="post" action="/drivers" onsubmit="submit.disabled = true; return true;">
+                    <div class="box driver-row" id="firstname-add">
+                        <input type="text" class="form-control" id="firstname" name="firstname" required>
+                    </div>
+                    <div class="box driver-row" id="lastname-add">
+                        <input type="text" class="form-control" id="lastname" name="lastname" required>
+                    </div>
+                    <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+                </div>
             </div>
         </div>
     </main>
