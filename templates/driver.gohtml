@@ -60,8 +60,8 @@
                     <div class="box driver-row" id="lastname-{{ .DriverID }}">{{ .LastName }}</div>
                 {{ end }}
             </div>
-            <div class="driver-wrapper">
-                <form id="add-driver" method="post" action="/drivers" onsubmit="submit.disabled = true; return true;">
+            <form id="add-driver" method="post" action="/drivers" onsubmit="submit.disabled = true; return true;">
+                <div class="driver-wrapper">
                     <div class="box driver-row" id="firstname-add">
                         <input type="text" class="form-control" id="firstname" name="firstname" required>
                     </div>

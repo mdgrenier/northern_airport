@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Northern Airport Van Admin</title>
+    <title>Northern Airport Vehicle Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
@@ -62,8 +62,8 @@
                     <div class="box vehicle-row" id="make-{{ .VehicleID }}">{{ .Make }}</div>
                 {{ end }}
             </div>
-            <div class="vehicle-wrapper">
-                <form id="add-vehicle" method="post" action="/vehicles" onsubmit="submit.disabled = true; return true;">
+            <form id="add-vehicle" method="post" action="/vehicles" onsubmit="submit.disabled = true; return true;">
+                <div class="vehicle-wrapper">
                     <div class="box vehicle-row" id="license-plate-add">
                         <input type="text" class="form-control" id="license-plate" name="license-plate" required>
                     </div>

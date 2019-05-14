@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Northern Airport Driver Admin</title>
+    <title>Northern Airport Venue Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/main.css">
@@ -62,8 +62,8 @@
                     <div class="box venue-row" id="active-{{ .VenueID }}">{{ .Active }}</div>
                 {{ end }}
             </div>
-            <div class="venue-wrapper">
-                <form id="add-venue" method="post" action="/venues" onsubmit="submit.disabled = true; return true;">
+            <form id="add-venue" method="post" action="/venues" onsubmit="submit.disabled = true; return true;">
+                <div class="venue-wrapper">
                     <div class="box venue-row" id="cityname-add">
                         <input type="text" class="form-control" id="cityname" name="cityname" required>
                     </div>
