@@ -57,9 +57,21 @@
             </div>
             <div class="vehicle-wrapper">
                 {{ range . }}
-                    <div class="box vehicle-row" id="license-plate-{{ .VehicleID }}">{{ .LicensePlate }}</div>
-                    <div class="box vehicle-row" id="num-seats-{{ .VehicleID }}">{{ .NumSeats }}</div>
-                    <div class="box vehicle-row" id="make-{{ .VehicleID }}">{{ .Make }}</div>
+                    <div class="box vehicle-row">
+                        <input type="text" class="form-control" id="license-plate-{{ .VehicleID }}" name="license-plate" value="{{ .LicensePlate }}" required>
+                    </div>
+                    <div class="box vehicle-row">
+                        <input type="text" class="form-control" id="num-seats-{{ .VehicleID }}" name="num-seats" value="{{ .NumSeats }}" required>
+                    </div>
+                    <div class="box vehicle-row">
+                        <input type="text" class="form-control" id="make-{{ .VehicleID }}" name="make" value="{{ .Make }}" required>
+                    </div>
+                    <div class="box vehicle-row">
+                        <button id="update-{{ .VehicleID }}" type="button" name="update" class="btn btn-primary">Update</button>
+                    </div>
+                    <div class="box vehicle-row">
+                        <button id="remove-{{ .VehicleID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
+                    </div>
                 {{ end }}
             </div>
             <form id="add-vehicle" method="post" action="/vehicles" onsubmit="submit.disabled = true; return true;">
@@ -74,8 +86,8 @@
                         <input type="text" class="form-control" id="make" name="make" required>
                     </div>
                     <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </main>
     
@@ -83,4 +95,57 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" >
+        
+        {{ range . }} 
+        
+            var update = document.getElementById("update-{{ .VehicleID }}");
+            update.onclick = function(){
+                
+                var vehicleid = {{ .VehicleID }}
+                var licenseplate = document.getElementById("license-plate-{{ .VehicleID }}").value;
+                var numseats = document.getElementById("num-seats-{{ .VehicleID }}").value;
+                var make = document.getElementById("make-{{ .VehicleID }}").value;
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('PUT', '/vehicles?vehicleid='+vehicleid+'&licenseplate='+licenseplate+'&numseats=' +
+                    ''+ numseats+'&make='+make);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status != 200) {
+                        alert('failed:' + xhr.status);
+                    }
+                };
+
+                try {
+                    xhr.send();
+                } catch (err) {
+                    alert("Error sending request: " + err);
+                }
+            };
+
+            var remove = document.getElementById("remove-{{ .VehicleID }}");
+            remove.onclick = function(){
+                var vehicleid = {{ .VehicleID }}
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('DELETE', '/vehicles?vehicleid='+vehicleid);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status != 200) {
+                        alert('failed:' + xhr.status);
+                    }
+                };
+
+                try {
+                    xhr.send();
+                } catch (err) {
+                    alert("Error sending request: " + err)
+                }
+            };
+
+        {{ end }}
+    </script>
 </body>
+</html>

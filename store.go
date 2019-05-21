@@ -19,18 +19,27 @@ type Store interface {
 	GetVenues() []Venues
 	GetVenueCount() int
 	AddVenue(venue Venues) error
+	UpdateVenue(venue *Venues) error
+	DeleteVenue(venue int) error
 	GetCities() []Cities
 	GetCityCount() int
 	GetCityID(string) int
+	AddCity(city Cities) error
+	UpdateCity(city *Cities) error
+	DeleteCity(city int) error
 	GetDepartureTimesCount() int
 	GetDepartureTimes() []DepartureTimes
 	GetOrAddTrip(reservation *Reservation) error
 	GetTrips() []Trips
+	UpdateTrip(trip *Trips) error
 	GetDrivers() []Drivers
 	AddDriver(driver Drivers) error
+	UpdateDriver(driver *Drivers) error
+	DeleteDriver(driver int) error
 	GetVehicles() []Vehicles
 	AddVehicle(vehicle Vehicles) error
-	UpdateTrip(trip *Trips) error
+	UpdateVehicle(vehicle *Vehicles) error
+	DeleteVehicle(vehicle int) error
 }
 
 //The `dbStore` struct will implement the `Store` interface it also takes the sql
@@ -171,7 +180,7 @@ func (store *dbStore) GetVenues() []Venues {
 	//Get venue count
 	venueCount := store.GetVenueCount()
 
-	row, err := store.db.Query("SELECT venueid, c.cityid, c.name, v.name, v.active FROM venues v " +
+	row, err := store.db.Query("SELECT venueid, c.cityid, c.name, v.name, v.extracost, v.active, v.extratime FROM venues v " +
 		"INNER JOIN cities c ON v.cityid = c.cityid")
 
 	// We return in case of an error, and defer the closing of the row structure
@@ -191,7 +200,8 @@ func (store *dbStore) GetVenues() []Venues {
 		err = row.Scan(
 			&venueSlice[indx].VenueID, &venueSlice[indx].CityID,
 			&venueSlice[indx].CityName, &venueSlice[indx].VenueName,
-			&venueSlice[indx].Active,
+			&venueSlice[indx].ExtraCost, &venueSlice[indx].Active,
+			&venueSlice[indx].ExtraTime,
 		)
 		if err != nil {
 			//if error print to console
@@ -237,14 +247,43 @@ func (store *dbStore) GetVenueCount() int {
 //AddVenue - add venue
 func (store *dbStore) AddVenue(venue Venues) error {
 
-	_, err := store.db.Exec("INSERT INTO venues(cityid, name, active) "+
-		"VALUES (?,?,?)", venue.CityID, venue.VenueName, 1)
+	_, err := store.db.Exec("INSERT INTO venues(cityid, name, extracost, active, extratime) "+
+		"VALUES (?,?,?,?,?)", venue.CityID, venue.VenueName, venue.ExtraCost, venue.Active, venue.ExtraTime)
 
 	if err != nil {
-		log.Printf("Error inserting venues: %s", err.Error())
+		log.Printf("Error inserting venue: %s", err.Error())
 	}
 
 	return err
+}
+
+//UpdateVenue - update venue details
+func (store *dbStore) UpdateVenue(venue *Venues) error {
+	log.Printf("update %s in database", venue.VenueName)
+
+	_, updateerr := store.db.Exec("UPDATE venues SET name = ?, extracost = ?, active = ?, extratime = ? "+
+		" WHERE venueid = ?", venue.VenueName, venue.ExtraCost, venue.Active, venue.ExtraTime, venue.VenueID)
+
+	if updateerr != nil {
+		log.Printf("Error updating venue: %s", updateerr.Error())
+	} else {
+		log.Printf("Update Venue: %d", venue.VenueID)
+	}
+
+	return updateerr
+}
+
+//DeleteVenue - delete venue record
+func (store *dbStore) DeleteVenue(venueid int) error {
+	_, updateerr := store.db.Exec("DELETE FROM venues WHERE venueid = ?", venueid)
+
+	if updateerr != nil {
+		log.Printf("Error deleting venue: %s", updateerr.Error())
+	} else {
+		log.Printf("Delete Venue: %d", venueid)
+	}
+
+	return updateerr
 }
 
 //GetCities - return all cities in database
@@ -291,7 +330,7 @@ func (store *dbStore) GetCities() []Cities {
 //GetCities - return all cities in database
 func (store *dbStore) GetCityID(cityname string) int {
 
-	row := store.db.QueryRow("SELECT c.cityid from cities where name = ?",
+	row := store.db.QueryRow("SELECT cityid from cities where name = ?",
 		cityname)
 
 	var cityid int
@@ -328,6 +367,63 @@ func (store *dbStore) GetCityCount() int {
 	}
 
 	return cityCount
+}
+
+//AddCity - add city
+func (store *dbStore) AddCity(city Cities) error {
+
+	result, err := store.db.Exec("INSERT INTO cities(name) "+
+		"VALUES (?)", city.CityName)
+
+	if err != nil {
+		log.Printf("Error inserting city: %s", err.Error())
+	}
+
+	//get id from client insertion transaction
+	id, _ := result.LastInsertId()
+
+	//create account details record linked to client record
+	result, err = store.db.Exec("INSERT INTO cityoffsets(cityid, northoffset, southoffset) "+
+		"VALUES (?, ?, ?)", id, city.NorthOffset, city.SouthOffset)
+
+	return err
+}
+
+//UpdateCity - update city details
+func (store *dbStore) UpdateCity(city *Cities) error {
+	log.Printf("update %s in database", city.CityName)
+
+	_, updateerr := store.db.Exec("UPDATE cities SET name = ? WHERE cityid = ?", city.CityName, city.CityID)
+
+	if updateerr != nil {
+		log.Printf("Error updating city: %s", updateerr.Error())
+	} else {
+		log.Printf("Update City: %d", city.CityID)
+	}
+
+	_, updateerr = store.db.Exec("UPDATE cityoffsets SET northoffset = ?, southoffset = ? "+
+		"WHERE cityid = ?", city.NorthOffset, city.SouthOffset, city.CityID)
+
+	if updateerr != nil {
+		log.Printf("Error updating city offset: %s", updateerr.Error())
+	} else {
+		log.Printf("Update City Offset: %d", city.CityID)
+	}
+
+	return updateerr
+}
+
+//DeleteCity - delete city record
+func (store *dbStore) DeleteCity(cityid int) error {
+	_, updateerr := store.db.Exec("DELETE FROM cities WHERE cityid = ?", cityid)
+
+	if updateerr != nil {
+		log.Printf("Error deleting city: %s", updateerr.Error())
+	} else {
+		log.Printf("Delete City: %d", cityid)
+	}
+
+	return updateerr
 }
 
 //GetDepartureTimes - return all departuretimes in database
@@ -682,6 +778,35 @@ func (store *dbStore) AddVehicle(vehicle Vehicles) error {
 	return err
 }
 
+//UpdateVehicle - update vehicle details
+func (store *dbStore) UpdateVehicle(vehicle *Vehicles) error {
+	log.Printf("update %s in database", vehicle.LicensePlate)
+
+	_, updateerr := store.db.Exec("UPDATE vehicles SET licenseplate = ?, numseats = ?, make = ?"+
+		" WHERE vehicleid = ?", vehicle.LicensePlate, vehicle.NumSeats, vehicle.Make, vehicle.VehicleID)
+
+	if updateerr != nil {
+		log.Printf("Error updating vehicle: %s", updateerr.Error())
+	} else {
+		log.Printf("Update Vehicle: %d", vehicle.VehicleID)
+	}
+
+	return updateerr
+}
+
+//DeleteVenue - delete venue record
+func (store *dbStore) DeleteVehicle(vehicleid int) error {
+	_, updateerr := store.db.Exec("DELETE FROM vehicles WHERE vehicleid = ?", vehicleid)
+
+	if updateerr != nil {
+		log.Printf("Error deleting vehicle: %s", updateerr.Error())
+	} else {
+		log.Printf("Delete Vehicle: %d", vehicleid)
+	}
+
+	return updateerr
+}
+
 //GetDriverCount - return count of all drivers
 func (store *dbStore) GetDriverCount() int {
 	var driverCount int
@@ -757,6 +882,35 @@ func (store *dbStore) AddDriver(driver Drivers) error {
 	}
 
 	return err
+}
+
+//UpdateDriver - update driver details
+func (store *dbStore) UpdateDriver(driver *Drivers) error {
+	log.Printf("update %d in database", driver.DriverID)
+
+	_, updateerr := store.db.Exec("UPDATE drivers SET firstname = ?, lastname = ?"+
+		" WHERE driverid = ?", driver.FirstName, driver.LastName, driver.DriverID)
+
+	if updateerr != nil {
+		log.Printf("Error updating driver: %s", updateerr.Error())
+	} else {
+		log.Printf("Update Driver: %d", driver.DriverID)
+	}
+
+	return updateerr
+}
+
+//DeleteDriver - delete driver record
+func (store *dbStore) DeleteDriver(driverid int) error {
+	_, updateerr := store.db.Exec("DELETE FROM drivers WHERE driverid = ?", driverid)
+
+	if updateerr != nil {
+		log.Printf("Error deleting driver: %s", updateerr.Error())
+	} else {
+		log.Printf("Delete Driver: %d", driverid)
+	}
+
+	return updateerr
 }
 
 //GetReports - return list of reports

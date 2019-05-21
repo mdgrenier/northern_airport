@@ -53,13 +53,31 @@
             <div class="venue-wrapper">
                 <div class="box header" id="cityid-header">City Name</div>
                 <div class="box header" id="name-header">Venue Name</div>
+                <div class="box header" id="extracost-header">Extra Cost</div>
                 <div class="box header" id="active-header">Active</div>
+                <div class="box header" id="extratime-header">Extra Time</div>
             </div>
             <div class="venue-wrapper">
                 {{ range . }}
                     <div class="box venue-row" id="cityname-{{ .VenueID }}">{{ .CityName }}</div>
-                    <div class="box venue-row" id="venuename-{{ .VenueID }}">{{ .VenueName }}</div>
-                    <div class="box venue-row" id="active-{{ .VenueID }}">{{ .Active }}</div>
+                    <div class="box city-row">
+                        <input type="text" class="form-control" id="venuename-{{ .VenueID }}" name="venuename" value="{{ .VenueName }}" required>
+                    </div>
+                    <div class="box city-row">
+                        <input type="text" class="form-control" id="extracost-{{ .VenueID }}" name="extracost" value="{{ .ExtraCost }}" required>
+                    </div>
+                    <div class="box city-row">
+                        <input type="text" class="form-control" id="active-{{ .VenueID }}" name="active" value="{{ .Active }}" required>
+                    </div>
+                    <div class="box city-row">
+                        <input type="text" class="form-control" id="extratime-{{ .VenueID }}" name="extratime" value="{{ .ExtraTime }}" required>
+                    </div>
+                    <div class="box city-row">
+                        <button id="update-{{ .VenueID }}" type="button" name="update" class="btn btn-primary">Update</button>
+                    </div>
+                    <div class="box city-row">
+                        <button id="remove-{{ .VenueID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
+                    </div>
                 {{ end }}
             </div>
             <form id="add-venue" method="post" action="/venues" onsubmit="submit.disabled = true; return true;">
@@ -70,8 +88,14 @@
                     <div class="box venue-row" id="venuename-add">
                         <input type="text" class="form-control" id="venuename" name="venuename" required>
                     </div>
+                    <div class="box venue-row" id="extracost-add">
+                        <input type="text" class="form-control" id="extracost" name="extracost" required>
+                    </div>
                     <div class="box venue-row" id="active-add">
                         <input type="text" class="form-control" id="active" name="active" required>
+                    </div>
+                    <div class="box venue-row" id="extratime-add">
+                        <input type="text" class="form-control" id="extratime" name="extratime" required>
                     </div>
                     <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
                 </form>
@@ -83,4 +107,58 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" >
+        
+        {{ range . }} 
+        
+            var update = document.getElementById("update-{{ .VenueID }}");
+            update.onclick = function(){
+                
+                var venueid = {{ .VenueID }}
+                var venuename = document.getElementById("venuename-{{ .VenueID }}").value;
+                var extracost = document.getElementById("extracost-{{ .VenueID }}").value;
+                var active = document.getElementById("active-{{ .VenueID }}").value;
+                var extratime = document.getElementById("extratime-{{ .VenueID }}").value;
+        
+                var xhr = new XMLHttpRequest();
+                xhr.open('PUT', '/venues?venueid='+venueid+'&venuename='+venuename+'&extracost='+extracost+
+                    '&active='+active+'&extratime='+extratime);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status != 200) {
+                        alert('failed:' + xhr.status);
+                    }
+                };
+
+                try {
+                    xhr.send();
+                } catch (err) {
+                    alert("Error sending request: " + err);
+                }
+            };
+
+            var remove = document.getElementById("remove-{{ .VenueID }}");
+            remove.onclick = function(){
+                var venueid = {{ .VenueID }}
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('DELETE', '/venues?venueid='+venueid);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status != 200) {
+                        alert('failed:' + xhr.status);
+                    }
+                };
+
+                try {
+                    xhr.send();
+                } catch (err) {
+                    alert("Error sending request: " + err)
+                }
+            };
+
+        {{ end }}
+    </script>
 </body>
+</html>

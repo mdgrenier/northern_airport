@@ -34,7 +34,7 @@
 
 .driver-wrapper {
     display: grid;
-    grid-template-columns: 12% 12%;
+    grid-template-columns: 12% 12% 8% 8%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;
@@ -42,7 +42,7 @@
 
 .vehicle-wrapper {
     display: grid;
-    grid-template-columns: 12% 12% 12%;
+    grid-template-columns: 12% 12% 12% 8% 8%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;
@@ -50,7 +50,7 @@
 
 .venue-wrapper {
     display: grid;
-    grid-template-columns: 12% 30% 12%;
+    grid-template-columns: 12% 30% 8% 8% 8% 8% 8%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;
@@ -58,7 +58,7 @@
 
 .city-wrapper {
     display: grid;
-    grid-template-columns: 12% 20% 20%;
+    grid-template-columns: 12% 20% 20% 8% 8%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;

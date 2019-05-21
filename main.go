@@ -40,7 +40,9 @@ type Venues struct {
 	CityID    int `json:"cityid" db:"cityid"`
 	CityName  string
 	VenueName string `json:"venuename" db:"venuename"`
+	ExtraCost int    `json:"extracost" db:"extracost"`
 	Active    int    `json:"active" db:"active"`
+	ExtraTime int    `json:"extratime" db:"extratime"`
 	RoleID    int
 }
 
@@ -188,14 +190,22 @@ func newRouter() *mux.Router {
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
-	r.HandleFunc("/trips", UpdateTripHandler).Methods("POST")
+	//r.HandleFunc("/trips", UpdateTripHandler).Methods("POST")
 	r.HandleFunc("/vehicles", AddVehicleHandler).Methods("POST")
 	r.HandleFunc("/venues", AddVenueHandler).Methods("POST")
 	r.HandleFunc("/drivers", AddDriverHandler).Methods("POST")
-	r.HandleFunc("/cities", CityHandler).Methods("POST")
-
-	//r.HandleFunc("/trips", UpdateTripHandler).Methods("POST")
+	r.HandleFunc("/cities", AddCityHandler).Methods("POST")
 	//put method only
+	r.HandleFunc("/trips", UpdateTripHandler).Methods("PUT")
+	r.HandleFunc("/cities", UpdateCityHandler).Methods("PUT")
+	r.HandleFunc("/venues", UpdateVenueHandler).Methods("PUT")
+	r.HandleFunc("/vehicles", UpdateVehicleHandler).Methods("PUT")
+	r.HandleFunc("/drivers", UpdateDriverHandler).Methods("PUT")
+	//delete method only
+	r.HandleFunc("/cities", DeleteCityHandler).Methods("DELETE")
+	r.HandleFunc("/venues", DeleteVenueHandler).Methods("DELETE")
+	r.HandleFunc("/vehicles", DeleteVehicleHandler).Methods("DELETE")
+	r.HandleFunc("/drivers", DeleteDriverHandler).Methods("DELETE")
 
 	return r
 }

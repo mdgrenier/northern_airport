@@ -103,10 +103,11 @@ DROP TABLE IF EXISTS `cityoffsets`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `cityoffsets` (
-  `CityOffsetID` int(11) NOT NULL,
+  `CityOffsetID` int(11) NOT NULL AUTO_INCREMENT,
   `CityID` int(11) NOT NULL,
   `NorthOffset` int(11) NOT NULL,
-  `SouthOffset` int(11) NOT NULL
+  `SouthOffset` int(11) NOT NULL,
+  PRIMARY KEY (`CityOffsetID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -116,7 +117,7 @@ CREATE TABLE `cityoffsets` (
 
 LOCK TABLES `cityoffsets` WRITE;
 /*!40000 ALTER TABLE `cityoffsets` DISABLE KEYS */;
-INSERT INTO `cityoffsets` VALUES (1,1,0,240),(2,2,240,0),(3,3,115,125),(4,4,55,185),(5,5,10,230),(6,7,65,175),(7,8,135,105),(8,10,85,155),(9,11,60,180),(10,14,75,165),(11,15,90,150),(12,16,25,215),(13,17,40,200),(14,18,45,195),(15,20,30,210);
+INSERT INTO `cityoffsets` VALUES (1,1,0,240),(2,2,240,0),(3,3,115,125),(4,4,55,185),(5,5,10,230),(6,7,65,175),(7,8,135,105),(8,10,85,155),(9,11,60,180),(10,14,75,165),(11,15,90,150),(12,16,25,215),(13,17,40,200),(14,18,45,195),(15,20,30,210),(16,9,85,155);
 /*!40000 ALTER TABLE `cityoffsets` ENABLE KEYS */;
 UNLOCK TABLES;
 

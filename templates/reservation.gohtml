@@ -372,7 +372,7 @@
                         </div>
                     </div>
                 </section>
-
+                <button id="calc-price" name="calc-price" class="btn btn-primary">Calculate Price</button>
                 <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
@@ -397,6 +397,9 @@
 
         var returndestinationvenue = document.getElementById("returndestinationvenue");
         var returndestinationcity = document.getElementById("returndestinationcity");
+
+        var price = document.getElementById("price");
+        var calcprice = document.getElementById("calc-price");
 
         var venuecount = {{ .VenueCount }};
         var venues = {{ .Venues }};
@@ -541,6 +544,17 @@
             }
         };
      
+        calcprice.onclick = function(){
+            //get departure city and venue
+
+            //get destination city and venue
+
+            //if return get departure and destination city and venue
+
+            //get price for trip (remember to add extra costs if any)
+
+            //populate price field
+        }
     </script>
 </body>
 </html>

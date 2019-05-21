@@ -291,6 +291,76 @@ func AddDriverHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//UpdateDriverHandler - update driver in database
+func UpdateDriverHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("execute update driver handler")
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		values := r.URL.Query()
+
+		driver := Drivers{}
+		var err error
+
+		driver.DriverID, err = strconv.Atoi(values["driverid"][0])
+
+		if err != nil {
+			log.Printf("Error converting driverid: %s", err.Error())
+		}
+
+		driver.FirstName = values["firstname"][0]
+		driver.LastName = values["lastname"][0]
+
+		store.UpdateDriver(&driver)
+
+		tpl.ExecuteTemplate(w, "driver.gohtml", driver)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+
+}
+
+//DeleteDriverHandler - delete driver from database
+func DeleteDriverHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		values := r.URL.Query()
+
+		driverid, err := strconv.Atoi(values["driverid"][0])
+
+		store.DeleteDriver(driverid)
+
+		driver := store.GetDrivers()
+
+		if err != nil {
+			log.Printf("Error converting driverid: %s", err.Error())
+		}
+
+		tpl.ExecuteTemplate(w, "driver.gohtml", driver)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+
+}
+
 //VehicleHandler - display van admin page
 func VehicleHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -356,6 +426,83 @@ func AddVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//UpdateVehicleHandler - update vehicle in database
+func UpdateVehicleHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("execute update vehicle handler")
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		values := r.URL.Query()
+
+		vehicle := Vehicles{}
+		var err error
+
+		vehicle.VehicleID, err = strconv.Atoi(values["vehicleid"][0])
+
+		if err != nil {
+			log.Printf("Error converting vehicleid: %s", err.Error())
+		}
+
+		vehicle.LicensePlate = values["licenseplate"][0]
+		vehicle.NumSeats, err = strconv.Atoi(values["numseats"][0])
+
+		if err != nil {
+			log.Printf("Error converting numseats: %s", err.Error())
+		}
+
+		vehicle.Make = values["make"][0]
+
+		store.UpdateVehicle(&vehicle)
+
+		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehicle)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+
+}
+
+//DeleteVehicleHandler - delete vehicle from database
+func DeleteVehicleHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		values := r.URL.Query()
+
+		vehicleid, err := strconv.Atoi(values["vehicleid"][0])
+
+		store.DeleteVehicle(vehicleid)
+
+		//get data need to populate dropdowns in reservation form
+		vehicle := store.GetVehicles()
+
+		if err != nil {
+			log.Printf("Error converting vehicleid: %s", err.Error())
+		}
+
+		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehicle)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+
+}
+
 //CreateUserHandler - display create user page
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -402,31 +549,30 @@ func UpdateTripHandler(w http.ResponseWriter, r *http.Request) {
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
 		values := r.URL.Query()
 
-		//get data need to populate dropdowns in reservation form
-		trips := store.GetTrips()
+		var err error
+		trip := Trips{}
 
-		for i := 0; i < len(trips); i++ {
-			tripid, err := strconv.Atoi(values["tripid"][0])
+		trip.TripID, err = strconv.Atoi(values["tripid"][0])
 
-			if err != nil {
-				log.Printf("Error converting tripid: %s", err.Error())
-			}
-
-			if trips[i].TripID == tripid {
-				log.Printf("Matched Trip ID: %d", trips[i].TripID)
-				trips[i].DriverID, err = strconv.Atoi(values["driverid"][0])
-				trips[i].VehicleID, err = strconv.Atoi(values["vehicleid"][0])
-
-				store.UpdateTrip(&trips[i])
-			}
-
-			if err != nil {
-				log.Printf("Error converting driverid or vehilceid: %s", err.Error())
-			}
-
+		if err != nil {
+			log.Printf("Error converting tripid: %s", err.Error())
 		}
 
-		tpl.ExecuteTemplate(w, "trip.gohtml", trips)
+		trip.DriverID, err = strconv.Atoi(values["driverid"][0])
+
+		if err != nil {
+			log.Printf("Error converting driverid: %s", err.Error())
+		}
+
+		trip.VehicleID, err = strconv.Atoi(values["vehicleid"][0])
+
+		if err != nil {
+			log.Printf("Error converting vehicleid: %s", err.Error())
+		}
+
+		store.UpdateTrip(&trip)
+
+		tpl.ExecuteTemplate(w, "trip.gohtml", trip)
 	} else {
 		tpl.ExecuteTemplate(w, "index.gohtml", r)
 	}
@@ -469,7 +615,7 @@ func AddVenueHandler(w http.ResponseWriter, r *http.Request) {
 	client := GetClient(session)
 
 	//if authenticated get all client info
-	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+	if client.Authenticated && (client.RoleID == 4) {
 
 		err := r.ParseForm()
 
@@ -497,6 +643,93 @@ func AddVenueHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		tpl.ExecuteTemplate(w, "index.gohtml", r)
 	}
+}
+
+//UpdateVenueHandler - update city in database
+func UpdateVenueHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("execute update venue handler")
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		values := r.URL.Query()
+
+		venue := Venues{}
+		var err error
+
+		venue.VenueID, err = strconv.Atoi(values["venueid"][0])
+
+		if err != nil {
+			log.Printf("Error converting venueid: %s", err.Error())
+		}
+
+		venue.VenueName = values["venuename"][0]
+		venue.ExtraCost, err = strconv.Atoi(values["extracost"][0])
+
+		if err != nil {
+			log.Printf("Error converting extracost: %s", err.Error())
+		}
+
+		venue.Active, err = strconv.Atoi(values["active"][0])
+
+		if err != nil {
+			log.Printf("Error converting active: %s", err.Error())
+		}
+
+		venue.ExtraTime, err = strconv.Atoi(values["extratime"][0])
+
+		if err != nil {
+			log.Printf("Error converting extratime: %s", err.Error())
+		}
+
+		store.UpdateVenue(&venue)
+
+		tpl.ExecuteTemplate(w, "venue.gohtml", venue)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+
+}
+
+//DeleteVenueHandler - delete venue from database
+func DeleteVenueHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		values := r.URL.Query()
+
+		venueid, err := strconv.Atoi(values["venueid"][0])
+
+		store.DeleteVenue(venueid)
+
+		//get data need to populate dropdowns in reservation form
+		venues := store.GetVenues()
+
+		if err != nil {
+			log.Printf("Error converting northoffset or southoffset: %s", err.Error())
+		}
+
+		tpl.ExecuteTemplate(w, "venue.gohtml", venues)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+
 }
 
 //CityHandler - display city admin page
@@ -535,34 +768,103 @@ func AddCityHandler(w http.ResponseWriter, r *http.Request) {
 	client := GetClient(session)
 
 	//if authenticated get all client info
-	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+	if client.Authenticated && (client.RoleID == 4) {
 
 		err := r.ParseForm()
 
-		venue := Venues{}
+		city := Cities{}
 
-		cityname := r.FormValue("cityname")
+		city.CityName = r.FormValue("cityname")
+		city.NorthOffset, err = strconv.Atoi(r.FormValue("northoffset"))
+		city.SouthOffset, err = strconv.Atoi(r.FormValue("southoffset"))
 
-		venue.CityID = store.GetCityID(cityname)
-		venue.VenueName = r.FormValue("venuename")
-		venue.Active, err = strconv.Atoi(r.FormValue("active"))
-
-		err = store.AddVenue(venue)
+		err = store.AddCity(city)
 
 		if err != nil {
-			log.Printf("Error adding venue: %s", err.Error())
+			log.Printf("Error adding city: %s", err.Error())
 		} else {
-			log.Print("Venues added")
+			log.Print("Cities added")
 		}
 
-		venues := store.GetVenues()
+		cities := store.GetCities()
 
-		venues[0].RoleID = client.RoleID
+		cities[0].RoleID = client.RoleID
 
-		tpl.ExecuteTemplate(w, "venue.gohtml", venues)
+		tpl.ExecuteTemplate(w, "city.gohtml", cities)
 	} else {
 		tpl.ExecuteTemplate(w, "index.gohtml", r)
 	}
+}
+
+//UpdateCityHandler - update city in database
+func UpdateCityHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("execute update city handler")
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		values := r.URL.Query()
+
+		city := Cities{}
+		var err error
+
+		city.CityID, err = strconv.Atoi(values["cityid"][0])
+		city.CityName = values["cityname"][0]
+		city.NorthOffset, err = strconv.Atoi(values["northoffset"][0])
+		city.SouthOffset, err = strconv.Atoi(values["southoffset"][0])
+
+		store.UpdateCity(&city)
+
+		if err != nil {
+			log.Printf("Error converting northoffset or southoffset: %s", err.Error())
+		}
+
+		tpl.ExecuteTemplate(w, "city.gohtml", city)
+	} else {
+		tpl.ExecuteTemplate(w, "city.gohtml", r)
+	}
+
+}
+
+//DeleteCityHandler - delete city from database
+func DeleteCityHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		values := r.URL.Query()
+
+		cityid, err := strconv.Atoi(values["cityid"][0])
+
+		store.DeleteCity(cityid)
+
+		if err != nil {
+			log.Printf("Error converting northoffset or southoffset: %s", err.Error())
+		}
+
+		//get data need to populate dropdowns in reservation form
+		cities := store.GetCities()
+
+		tpl.ExecuteTemplate(w, "city.gohtml", cities)
+	} else {
+		tpl.ExecuteTemplate(w, "city.gohtml", r)
+	}
+
 }
 
 //ReportHandler - display reports admin page

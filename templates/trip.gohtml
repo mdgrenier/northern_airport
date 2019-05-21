@@ -88,7 +88,7 @@
                         {{ .Cancelled }}
                     </div>
                     <div class="box trip-row" id="save-{{ .TripID }}">
-                        <button>Save</button>
+                        <button class="btn btn-primary">Save</button>
                     </div>
                 {{ end }}
             </div>
@@ -129,7 +129,7 @@
                 var driverid = document.getElementById("driver-{{ .TripID }}").value;    
 
                 var xhr = new XMLHttpRequest();
-                xhr.open('POST', '/trips?tripid='+tripid+'&driverid='+driverid+'&vehicleid='+vehicleid);
+                xhr.open('PUT', '/trips?tripid='+tripid+'&driverid='+driverid+'&vehicleid='+vehicleid);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.onload = function() {
                     if (xhr.status != 200) {
