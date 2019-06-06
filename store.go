@@ -40,6 +40,7 @@ type Store interface {
 	AddVehicle(vehicle Vehicles) error
 	UpdateVehicle(vehicle *Vehicles) error
 	DeleteVehicle(vehicle int) error
+	GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, reservationtypeid int) float32
 }
 
 //The `dbStore` struct will implement the `Store` interface it also takes the sql
@@ -911,6 +912,73 @@ func (store *dbStore) DeleteDriver(driverid int) error {
 	}
 
 	return updateerr
+}
+
+//GetPrice - return price for a trip
+func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, reservationtypeid int) float32 {
+	var err error
+
+	row := store.db.QueryRow("SELECT price FROM prices "+
+		"WHERE departurecityid = ? and destinationcityid = ? and customertypeid = ?",
+		departurecityid, destinationcityid, customertypeid)
+
+	if err != nil {
+		log.Printf("Error retrieving prices: %s", err.Error())
+		return 0
+	}
+
+	var price float32
+
+	err = row.Scan(
+		&price,
+	)
+
+	if err != nil {
+		// If an entry with the username does not exist, send an "Unauthorized"(401) status
+		if err == sql.ErrNoRows {
+			log.Print("No prices found")
+		} else {
+			log.Printf("Error retrieving prices: %s", err.Error())
+		}
+	}
+
+	log.Printf("Price 1: %f", price)
+
+	if (departurecityid != retdeparturecityid || destinationcityid != retdestinationcityid) && reservationtypeid == 2 {
+		row := store.db.QueryRow("SELECT price FROM prices "+
+			"WHERE departurecityid = ? and destinationcityid = ? and customertypeid = ?",
+			retdeparturecityid, retdestinationcityid, customertypeid)
+
+		if err != nil {
+			log.Printf("Error retrieving return prices: %s", err.Error())
+			return 0
+		}
+
+		var retprice float32
+
+		err = row.Scan(
+			&retprice,
+		)
+
+		if err != nil {
+			// If an entry with the username does not exist, send an "Unauthorized"(401) status
+			if err == sql.ErrNoRows {
+				log.Print("No return prices found")
+			} else {
+				log.Printf("Error retrieving return prices: %s", err.Error())
+			}
+		}
+
+		price = (price + retprice) * 0.9
+
+		log.Printf("Price 2: %f", price)
+	} else if reservationtypeid == 2 {
+		price = (price * 2) * 0.9
+
+		log.Printf("Price 3: %f", price)
+	}
+
+	return price
 }
 
 //GetReports - return list of reports

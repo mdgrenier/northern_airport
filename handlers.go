@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -865,6 +866,32 @@ func DeleteCityHandler(w http.ResponseWriter, r *http.Request) {
 		tpl.ExecuteTemplate(w, "city.gohtml", r)
 	}
 
+}
+
+//PriceHandler - return price given the departure, destination and customer type
+func PriceHandler(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+
+	reservationtypeid, err := strconv.Atoi(values["reservationtypeid"][0])
+	departurecityid, err := strconv.Atoi(values["departurecityid"][0])
+	destinationcityid, err := strconv.Atoi(values["destinationcityid"][0])
+	retdeparturecityid, err := strconv.Atoi(values["retdeparturecityid"][0])
+	retdestinationcityid, err := strconv.Atoi(values["retdestinationcityid"][0])
+	numpassengers, err := strconv.Atoi(values["numpassengers"][0])
+	customertypeid, err := strconv.Atoi(values["customertypeid"][0])
+
+	price := store.GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, customertypeid, reservationtypeid)
+
+	totalprice := price * float32(numpassengers)
+
+	log.Printf("Total Price in handler: %f", totalprice)
+
+	if err != nil {
+		log.Printf("Error converting northoffset or southoffset: %s", err.Error())
+	}
+
+	//tpl.ExecuteTemplate(w, "city.gohtml", city)
+	fmt.Fprintf(w, "%f", totalprice)
 }
 
 //ReportHandler - display reports admin page

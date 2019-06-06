@@ -247,22 +247,22 @@
                     </div>
                     
                     <p>Number of Passengers</p>  
-                    <div class="row justify-content-around">  
+                    <div class="row justify-content-around">
                         <div class="col-xs-2">
                             <label for="departurenumadults">Adults</label>
-                            <input type="text" class="form-control" id="numadults" name="numadults" value="0">
+                            <input type="text" class="form-control" id="departurenumadults" name="departurenumadults" value="0">
                         </div>
                         <div class="col-xs-2">
                             <label for="departurenumseniors">Seniors (65+)</label>
-                            <input type="text" class="form-control" id="numseniors" name="numseniors" value="0">
+                            <input type="text" class="form-control" id="departurenumseniors" name="departurenumseniors" value="0">
                         </div>
                         <div class="col-xs-2">
                             <label for="departurenumstudents">Students</label>
-                            <input type="text" class="form-control" id="numstudents" name="numstudents" value="0">
+                            <input type="text" class="form-control" id="departurenumstudents" name="departurenumstudents" value="0">
                         </div>
                         <div class="col-xs-2">
                             <label for="departurenumchildren">Children (under 12)</label>
-                            <input type="text" class="form-control" id="numchildren" name="numchildren" value="0">
+                            <input type="text" class="form-control" id="departurenumchildren" name="departurenumchildren" value="0">
                         </div>
                     </div>
                 </section>
@@ -321,22 +321,22 @@
                     </div>
 
                     <p>Number of Return Passengers</p>  
-                    <div class="row justify-content-around">  
+                    <div class="row justify-content-around">
                         <div class="col-xs-2">
-                            <label for="numadults">Adults</label>
-                            <input type="text" class="form-control" id="numadults" name="numadults" value="0">
+                            <label for="returnnumadults">Adults</label>
+                            <input type="text" class="form-control" id="returnnumadults" name="returnnumadults" value="0">
                         </div>
                         <div class="col-xs-2">
-                            <label for="numseniors">Seniors (65+)</label>
-                            <input type="text" class="form-control" id="numseniors" name="numseniors" value="0">
+                            <label for="returnnumseniors">Seniors (65+)</label>
+                            <input type="text" class="form-control" id="returnnumseniors" name="returnnumseniors" value="0">
                         </div>
                         <div class="col-xs-2">
-                            <label for="numstudents">Students</label>
-                            <input type="text" class="form-control" id="numstudents" name="numstudents" value="0">
+                            <label for="returnnumstudents">Students</label>
+                            <input type="text" class="form-control" id="returnnumstudents" name="returnnumstudents" value="0">
                         </div>
                         <div class="col-xs-2">
-                            <label for="numchildren">Children (under 12)</label>
-                            <input type="text" class="form-control" id="numchildren" name="numchildren" value="0">
+                            <label for="returnnumchildren">Children (under 12)</label>
+                            <input type="text" class="form-control" id="returnnumchildren" name="numchildren" value="0">
                         </div>
                     </div>
                 </section>
@@ -367,12 +367,12 @@
                             <input type="text" class="form-control" id="promocode" name="promocode">
                         </div>
                         <div class="col-xs-4">
-                            <label for="price">Price</label>
-                            <input type="text" class="form-control" id="price" name="price">
+                            <label for="tripprice">Price</label>
+                            <input type="text" class="form-control" id="tripprice" name="tripprice">
                         </div>
                     </div>
                 </section>
-                <button id="calc-price" name="calc-price" class="btn btn-primary">Calculate Price</button>
+                <button id="calc-price" type="button" name="calc-price" class="btn btn-primary">Calculate Price</button>
                 <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
@@ -384,6 +384,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     
     <script type="text/javascript" >
+
+        var reservationtype = document.getElementById("reservationtype")
+
         var departurevenue = document.getElementById("departurevenue");
         var departurecity = document.getElementById("departurecity");
         var departuretime = document.getElementById("departuretime");
@@ -398,15 +401,21 @@
         var returndestinationvenue = document.getElementById("returndestinationvenue");
         var returndestinationcity = document.getElementById("returndestinationcity");
 
-        var price = document.getElementById("price");
+        var promocode = document.getElementById("promocode");
+        var price = document.getElementById("tripprice");
         var calcprice = document.getElementById("calc-price");
 
         var venuecount = {{ .VenueCount }};
         var venues = {{ .Venues }};
 
-        document.getElementById("reservationtype").onchange = function() { 
-            if(document.getElementById('reservationtype').value == "2") {
-                document.getElementById('return-info').style.display = "inline-block";
+        var tempprice = 0.0;
+        var totalprice = 0.0;
+
+        reservationtype.onchange = function() { 
+            if(reservationtype.value == "2") {
+                document.getElementById('return-info').style.display = "block";
+            } else {
+                document.getElementById('return-info').style.display = "none";
             }
         };
 
@@ -438,8 +447,8 @@
                     if(cityselect.options[cityselect.selectedIndex].value == cityid)
                     {
                         var opt = document.createElement('option');
-                        var venuename = {{ .VenueName }}
                         var venueid = {{ .VenueID }}
+                        var venuename = {{ .VenueName }}
                         
                         opt.appendChild(document.createTextNode(venuename));
                         opt.value = venueid;
@@ -543,18 +552,141 @@
                 {{ end }}
             }
         };
-     
+
+        function GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, numpassengers, customertypeid, reservationtypeid, callback){
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', '/price?departurecityid='+departurecityid+'&destinationcityid='+
+                destinationcityid+'&retdeparturecityid='+retdeparturecityid+'&retdestinationcityid='+
+                retdestinationcityid+'&numpassengers='+numpassengers+'&customertypeid='+customertypeid+
+                '&reservationtypeid='+reservationtypeid);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                if (xhr.status != 200) {
+                    alert('failed:' + xhr.status);
+                } else {
+                    tempprice = callback(xhr.responseText);
+                }
+            }
+
+            try {
+                xhr.send();
+            } catch (err) {
+                alert("Error sending request: " + err)
+            }
+        };
+
+        function ReturnPrice(price) {
+            totalprice = parseFloat(totalprice) + parseFloat(price);
+            tripprice.value = parseFloat(totalprice).toFixed(2);
+        };
+
         calcprice.onclick = function(){
-            //get departure city and venue
+            
+            var departurenumadults = document.getElementById("departurenumadults").value;
+            var departurenumseniors = document.getElementById("departurenumseniors").value;
+            var departurenumstudents = document.getElementById("departurenumstudents").value;
+            var departurenumchildren = document.getElementById("departurenumchildren").value;
 
-            //get destination city and venue
+            var returnnumadults = document.getElementById("returnnumadults").value;
+            var returnnumseniors = document.getElementById("returnnumseniors").value;
+            var returnnumstudents = document.getElementById("returnnumstudents").value;
+            var returnnumchildren = document.getElementById("returnnumchildren").value;
 
-            //if return get departure and destination city and venue
+            var departurecityid = departurecity.options[departurecity.selectedIndex].value;
+            var destinationcityid = destinationcity.options[destinationcity.selectedIndex].value;
 
-            //get price for trip (remember to add extra costs if any)
+            var retdeparturecityid = 0;
+            var retdestinationcityid = 0;
 
-            //populate price field
-        }
+            if(reservationtype.value == "2")
+            {
+                retdeparturecityid = returndeparturecity.options[returndeparturecity.selectedIndex].value;
+                retdestinationcityid = returndestinationcity.options[returndestinationcity.selectedIndex].value;
+            }
+
+            totalprice = 0.0;
+       
+            //are there passengers?
+            if(departurecityid != 0 && destinationcityid != 0)
+            {
+                if((departurenumadults + departurenumseniors + departurenumstudents + departurenumchildren) > 0)
+                {
+                    var tempadults = departurenumadults;
+                    var tempseniors = departurenumseniors;
+                    var tempstudents = departurenumstudents;
+                    var tempchildren = departurenumchildren;
+
+                    //is this a return trip
+                    if(reservationtype.value == "2")
+                    {
+                        if((returnnumadults + returnnumseniors + returnnumstudents + returnnumchildren) > 0)
+                        {
+                            //if return adult passengers exist get prices
+                            if(returnnumadults > 0)
+                            {
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumadults, 1, 2, ReturnPrice);
+                                tempadults = tempadults - returnnumadults
+                            }
+
+                            //if return senior passengers exist get prices
+                            if(returnnumseniors > 0)
+                            {
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumseniors, 2, 2, ReturnPrice);
+                                tempseniors = tempseniors - returnnumseniors
+                            }
+
+                            //if return student passengers exist get prices
+                            if(returnnumstudents > 0)
+                            {
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumstudents, 3, 2, ReturnPrice);
+                                tempstudents = tempstudents - returnnumstudents
+                            }
+
+                            //if return children passengers exist get prices
+                            if(returnnumchildren > 0)
+                            {
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumchildren, 4, 2, ReturnPrice);
+                                tempchildren = tempchildren - returnnumchildren
+                            }
+                        } else {
+                            alert("Reservation type is return, but there are no return passengers");
+                        }
+
+                    }
+
+                    //if return adult passengers exist get prices
+                    if(tempadults > 0)
+                    {
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumadults, 1, 1, ReturnPrice);
+                    }
+
+                    //if return senior passengers exist get prices
+                    if(tempseniors > 0)
+                    {
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumseniors, 2, 1, ReturnPrice);
+                    }
+
+                    //if return student passengers exist get prices
+                    if(tempstudents > 0)
+                    {
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumstudents, 3, 1, ReturnPrice);
+                    }
+
+                    //if return children passengers exist get prices
+                    if(tempchildren > 0)
+                    { 
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumchildren, 4, 1, ReturnPrice);
+                    }
+
+                } else {
+                    alert("No passengers");
+                }
+            } else {
+                alert("Missing departure and/or destination cities");
+            }
+        };
+
     </script>
 </body>
 </html>

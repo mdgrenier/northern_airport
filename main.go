@@ -187,6 +187,7 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/venues", VenueHandler).Methods("GET")
 	r.HandleFunc("/drivers", DriverHandler).Methods("GET")
 	r.HandleFunc("/cities", CityHandler).Methods("GET")
+	r.HandleFunc("/price", PriceHandler).Methods("GET")
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
