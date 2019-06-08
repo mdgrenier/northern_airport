@@ -64,7 +64,7 @@
     
     <main>
         <div class="container">
-            <form id="reservation" method="post" action="/createreservation" onsubmit="submit.disabled = true; return true;">
+            <form id="reservation" method="post" action="/createreservation">
                 <section class="client-info">
                     <header>
                         <h3>Client Information</h3>
@@ -78,7 +78,7 @@
 
                         <div class="row justify-content-around">
                             <div class="col-xs-4">
-                                <label for="firstname">Firstname</label>
+                                <label for="firstname">Firstname*</label>
                                 {{ if .Authenticated }}
                                     <input type="text" class="form-control" id="firstname" name="firstname" value={{.Firstname}} required autofocus>
                                 {{else}}
@@ -87,7 +87,7 @@
                             </div>
                         
                             <div class="col-xs-4">
-                                <label for="lastname">Lastname</label>
+                                <label for="lastname">Lastname*</label>
                                 {{ if .Authenticated }}
                                     <input type="lastname" class="form-control" id="lastname" name="lastname" value={{.Lastname}} required>
                                 {{else}}
@@ -98,7 +98,7 @@
 
                         <div class="row justify-content-around">
                             <div class="col-xs-4">
-                                <label for="email">Email</label>
+                                <label for="email">Email*</label>
                                 {{ if .Authenticated }}
                                     <input type="email" class="form-control" id="email" name="email" value={{.Email}} required>
                                 {{else}}
@@ -106,7 +106,7 @@
                                 {{end}}
                             </div>
                             <div class="col-xs-4">
-                                <label for="phone">Phone Number</label>
+                                <label for="phone">Phone Number*</label>
                                 {{ if .Authenticated }}
                                     <input type="tel" class="form-control" id="phone" name="phone" value={{.Phone}} required>
                                 {{else}}
@@ -373,7 +373,8 @@
                     </div>
                 </section>
                 <button id="calc-price" type="button" name="calc-price" class="btn btn-primary">Calculate Price</button>
-                <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+                <!--<button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>-->
+                <button id="submit-res" type="button" class="btn btn-primary" onclick="return Validate()">Submit Reservation</button>
             </form>
         </div>
     </main>
@@ -385,6 +386,11 @@
     
     <script type="text/javascript" >
 
+        var firstname = document.getElementById("firstname");
+        var lastname = document.getElementById("lastname");
+        var email = document.getElementById("email");
+        var phone = document.getElementById("phone");
+        
         var reservationtype = document.getElementById("reservationtype")
 
         var departurevenue = document.getElementById("departurevenue");
@@ -581,8 +587,7 @@
             tripprice.value = parseFloat(totalprice).toFixed(2);
         };
 
-        calcprice.onclick = function(){
-            
+        function CalcPrice(){
             var departurenumadults = document.getElementById("departurenumadults").value;
             var departurenumseniors = document.getElementById("departurenumseniors").value;
             var departurenumstudents = document.getElementById("departurenumstudents").value;
@@ -679,13 +684,111 @@
                         GetPrice(departurecityid, destinationcityid, 0, 0, departurenumchildren, 4, 1, ReturnPrice);
                     }
 
+                    return true;
+
                 } else {
                     alert("No passengers");
+
+                    return false;
                 }
             } else {
                 alert("Missing departure and/or destination cities");
+
+                return false;
             }
         };
+
+        function Validate(){
+            var formvalid = true;
+            
+            if(firstname.value == "" && formvalid == true)
+            {
+                alert("Please enter first name");
+                formvalid = false;
+            }
+
+            if(lastname.value == "" && formvalid == true)
+            {
+                alert("Please enter last name");
+                formvalid = false;
+            }
+
+            if(email.value == "" && formvalid == true)
+            {
+                //improve this to look for correct email format
+                alert("Please enter email");
+                formvalid = false;
+
+            }
+
+            if(phone.value == "" && formvalid == true)
+            {
+                //improve this to look for correct phone number format
+                alert("Please enter phone number");
+                formvalid = false;
+            }
+            
+            if (departurevenue.value == 0 && formvalid == true)
+            {
+                alert("Please select departure venue");
+                formvalid = false;
+            }
+
+            if (destinationvenue.value == 0 && formvalid == true)
+            {
+                alert("Please select destination venue");
+                formvalid = false;
+            }
+
+            if (departuretime.value == 0 && formvalid == true)
+            {
+                alert("Please select departure time");
+                formvalid = false;
+            }
+
+            if(reservationtype.value == 2 && formvalid == true)
+            {
+                if (returndeparturevenue.value == 0 && formvalid == true)
+                {
+                    alert("Please select return departure venue");
+                    formvalid = false;
+                }
+
+                if (returndestinationvenue.value == 0 && formvalid == true)
+                {
+                    alert("Please select return destination venue");
+                    formvalid = false;
+                }
+
+                if (returndeparturetime.value == 0 && formvalid == true)
+                {
+                    alert("Please select return departure time");
+                    formvalid = false;
+                }    
+            }
+
+            //ensure price isn't empty
+            if (tripprice.value == "" && formvalid == true) 
+            {
+                if (!CalcPrice())
+                {
+                    alert("Problem calculating price");
+                    formvalid = false;
+                }
+            }
+
+            if (formvalid)
+            {
+                alert("submit form");
+                document.getElementById("reservation").submit();
+                alert("method 1");
+                document.reservation.submit();
+                alert("method 2");
+            }
+            
+        }
+
+        calcprice.onclick = CalcPrice;
 
     </script>
 </body>
