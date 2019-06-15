@@ -870,6 +870,7 @@ func DeleteCityHandler(w http.ResponseWriter, r *http.Request) {
 
 //PriceHandler - return price given the departure, destination and customer type
 func PriceHandler(w http.ResponseWriter, r *http.Request) {
+
 	values := r.URL.Query()
 
 	reservationtypeid, err := strconv.Atoi(values["reservationtypeid"][0])

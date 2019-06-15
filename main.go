@@ -66,6 +66,7 @@ type ResFormData struct {
 
 // Reservation - store reservation information
 type Reservation struct {
+	ReservationID            int       `json:"reservationid" db:"reservationtid"`
 	ClientID                 int       `json:"clientid" db:"clientid"`
 	DepartureCityID          int       `json:"departurecityid" db:"departurecityid"`
 	DepartureVenueID         int       `json:"departurevenueid" db:"departurevenueid"`

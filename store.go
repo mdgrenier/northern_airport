@@ -4,6 +4,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -17,6 +18,7 @@ type Store interface {
 	CreateReservation(reservation *Reservation) error
 	GetClientInfo(client *Client) error
 	GetVenues() []Venues
+	GetVenueName(int) string
 	GetVenueCount() int
 	AddVenue(venue Venues) error
 	UpdateVenue(venue *Venues) error
@@ -24,6 +26,7 @@ type Store interface {
 	GetCities() []Cities
 	GetCityCount() int
 	GetCityID(string) int
+	GetCityName(int) string
 	AddCity(city Cities) error
 	UpdateCity(city *Cities) error
 	DeleteCity(city int) error
@@ -83,6 +86,12 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 	reservation.Hash = ""
 	reservation.ElavonTransactionID = 0
 
+	var departuredetails string
+	var returndetails string
+
+	departuredetails = ""
+	returndetails = ""
+
 	log.Print("Inserting reservation into DB")
 
 	log.Printf("TripID: %d", reservation.TripID)
@@ -118,6 +127,22 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 		insertError = err
 
 		id, _ = result.LastInsertId()
+		reservation.ReservationID = int(id)
+
+		returndeparturecity := store.GetCityName(reservation.ReturnDepartureCityID)
+		returndeparturevenue := store.GetVenueName(reservation.ReturnDepartureVenueID)
+		returndeparturedate := reservation.ReturnDate.Format("2006-01-02")
+		returndeparturetime := strconv.Itoa(store.GetDepartureTime(reservation.ReturnDepartureTimeID))
+		returndestinationcity := store.GetCityName(reservation.ReturnDestinationCityID)
+		returndestinationvenue := store.GetCityName(reservation.ReturnDestinationVenueID)
+		returnnumadults := strconv.Itoa(reservation.ReturnNumAdults)
+		returnnumseniors := strconv.Itoa(reservation.ReturnNumSeniors)
+		returnnumstudents := strconv.Itoa(reservation.ReturnNumStudents)
+		returnnumchildren := strconv.Itoa(reservation.ReturnNumChildren)
+
+		returndetails = FormatTripDetails(returndeparturecity, returndeparturevenue, returndeparturedate, returndeparturetime,
+			returndestinationcity, returndestinationvenue, returnnumadults, returnnumseniors, returnnumstudents, returnnumchildren)
+
 	} else {
 		result, err := store.db.Exec("INSERT INTO reservations("+
 			"clientid, departurecityid, departurevenueid, departuretimeid, "+
@@ -141,9 +166,31 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 		insertError = err
 
 		id, _ = result.LastInsertId()
+		reservation.ReservationID = int(id)
 	}
 
-	log.Printf("New Reservation ID: %d", id)
+	log.Printf("New Reservation ID: %d", reservation.ReservationID)
+
+	departurecity := store.GetCityName(reservation.DepartureCityID)
+	departurevenue := store.GetVenueName(reservation.DepartureVenueID)
+	departuredate := reservation.DepartureDate.Format("2006-01-02")
+	departuretime := strconv.Itoa(store.GetDepartureTime(reservation.DepartureTimeID))
+	destinationcity := store.GetCityName(reservation.DestinationCityID)
+	destinationvenue := store.GetCityName(reservation.DestinationVenueID)
+	numadults := strconv.Itoa(reservation.DepartureNumAdults)
+	numseniors := strconv.Itoa(reservation.DepartureNumSeniors)
+	numstudents := strconv.Itoa(reservation.DepartureNumStudents)
+	numchildren := strconv.Itoa(reservation.DepartureNumChildren)
+
+	departuredetails = FormatTripDetails(departurecity, departurevenue, departuredate, departuretime,
+		destinationcity, destinationvenue, numadults, numseniors, numstudents, numchildren)
+
+	var client Client
+	client.ClientID = reservation.ClientID
+
+	store.GetClientInfo(&client)
+
+	SendEmail(client.Email, departuredetails, returndetails, reservation.ReservationID)
 
 	return insertError
 }
@@ -217,6 +264,27 @@ func (store *dbStore) GetVenues() []Venues {
 	}
 
 	return venueSlice
+}
+
+//GetVenueName - return venue name given id
+func (store *dbStore) GetVenueName(venueid int) string {
+
+	row := store.db.QueryRow("SELECT name from venues where venueid = ?",
+		venueid)
+
+	var venuename string
+
+	err := row.Scan(&venuename)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No vanue matches the id")
+		} else {
+			log.Printf("Error retrieving venue name from id: %s", err.Error())
+		}
+	}
+
+	return venuename
 }
 
 //GetVenueCount - return number of venues
@@ -328,7 +396,7 @@ func (store *dbStore) GetCities() []Cities {
 	return citySlice
 }
 
-//GetCities - return all cities in database
+//GetCityID - return city id given the name
 func (store *dbStore) GetCityID(cityname string) int {
 
 	row := store.db.QueryRow("SELECT cityid from cities where name = ?",
@@ -347,6 +415,27 @@ func (store *dbStore) GetCityID(cityname string) int {
 	}
 
 	return cityid
+}
+
+//GetCityName - return city name given the id
+func (store *dbStore) GetCityName(cityid int) string {
+
+	row := store.db.QueryRow("SELECT name from cities where cityid = ?",
+		cityid)
+
+	var name string
+
+	err := row.Scan(&name)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No city matches the id")
+		} else {
+			log.Printf("Error retrieving city name from id: %s", err.Error())
+		}
+	}
+
+	return name
 }
 
 //GetCityCount  - return number of cities
@@ -484,6 +573,26 @@ func (store *dbStore) GetDepartureTimes() []DepartureTimes {
 	return departureTimesSlice
 }
 
+//GetDepartureTime - return departuretime name given the id
+func (store *dbStore) GetDepartureTime(departuretimeid int) int {
+	row := store.db.QueryRow("SELECT departuretime from departuretimes where departuretimeid = ?",
+		departuretimeid)
+
+	var departuretime int
+
+	err := row.Scan(&departuretime)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No departuretime matches the id")
+		} else {
+			log.Printf("Error retrieving departuretime from id: %s", err.Error())
+		}
+	}
+
+	return departuretime
+}
+
 //GetDepartureTimesCount - return count of all departure times
 func (store *dbStore) GetDepartureTimesCount() int {
 	var departuretimeCount int
@@ -508,11 +617,23 @@ func (store *dbStore) GetDepartureTimesCount() int {
 //GetClientInfo - from client username return all client info
 func (store *dbStore) GetClientInfo(client *Client) error {
 
-	row, err := store.db.Query(
-		"select c.clientid, a.roleid, firstname, lastname, phone, email, streetaddress, "+
-			"city, province, postalcode, country from clients c inner join "+
-			"accountdetails a on c.clientid = a.clientid "+
-			"where a.username=?", client.Username)
+	var row *sql.Rows
+	var err error
+
+	if client.ClientID > 0 {
+		row, err = store.db.Query(
+			"select c.clientid, a.roleid, firstname, lastname, phone, email, streetaddress, "+
+				"city, province, postalcode, country from clients c inner join "+
+				"accountdetails a on c.clientid = a.clientid "+
+				"where c.clientid=?", client.ClientID)
+	} else {
+		row, err = store.db.Query(
+			"select c.clientid, a.roleid, firstname, lastname, phone, email, streetaddress, "+
+				"city, province, postalcode, country from clients c inner join "+
+				"accountdetails a on c.clientid = a.clientid "+
+				"where a.username=?", client.Username)
+	}
+
 	// We return in case of an error, and defer the closing of the row structure
 	if err != nil {
 		log.Printf("Error retrieving client: %s", err.Error())
@@ -941,8 +1062,6 @@ func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retde
 			log.Printf("Error retrieving prices: %s", err.Error())
 		}
 	}
-
-	log.Printf("Price 1: %f", price)
 
 	if (departurecityid != retdeparturecityid || destinationcityid != retdestinationcityid) && reservationtypeid == 2 {
 		row := store.db.QueryRow("SELECT price FROM prices "+

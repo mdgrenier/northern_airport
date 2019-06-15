@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"net/smtp"
 	"strconv"
 	"time"
 
@@ -114,4 +116,54 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 		*/
 	}
 	return reservation
+}
+
+//SendEmail - given the recipient and email body, send a email
+func SendEmail(to string, departuredetails string, returndetails string, reservationid int) {
+	log.Print("Attempt to send email")
+
+	from := "mdgrenier@gmail.com"
+	pass := "Dh76nm6m*"
+	//to := "matt@mgrenier.ca"
+	body := fmt.Sprintf("Northern Airport Passenger Service Confirmation\n\n"+
+		"Your Confirmation ID is #%d\n\nDeparture information:\n%s\n\n", reservationid, departuredetails)
+
+	if returndetails != "" {
+		body += "Return information:\n" + returndetails + "\n\n\n"
+	}
+
+	body += "For any concerns please contact us at (705) 474-7942\n\n" +
+		"Thank you for booking with Northern Airport Passenger Service."
+
+	msg := "From: " + from + "\n" +
+		"To: " + to + "; mdgrenier@gmail.com\n" +
+		"Subject: Northern Airport Reservation Confirmation\n\n" +
+		body
+
+	err := smtp.SendMail("smtp.gmail.com:587",
+		smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
+		from, []string{to}, []byte(msg))
+
+	if err != nil {
+		log.Printf("smtp error: %s", err)
+		return
+	}
+
+	log.Print("sent, visit http://reserve.northernairport.ca")
+}
+
+//FormatTripDetails - given trip details return a string for use in confirmation emails
+func FormatTripDetails(departurecity string, departurevenue string, departuredate string, departuretime string,
+	destinationcity string, destinationvenue string, numadults string, numseniors string, numstudents string,
+	numchildren string) string {
+
+	departureinfo := "Departing from " + departurevenue + " in " + departurecity + "\n" +
+		"Departing on " + departuredate + " at " + departuretime + "\n"
+
+	destinationinfo := "Arriving at " + destinationvenue + " in " + destinationcity + "\n"
+
+	passengers := "Trip will include:\n" + numadults + " Adults, " + numseniors + " Seniors, " +
+		numstudents + " Students, and " + numchildren + " Children"
+
+	return departureinfo + destinationinfo + passengers
 }

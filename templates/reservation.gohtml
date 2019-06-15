@@ -408,7 +408,7 @@
         var returndestinationcity = document.getElementById("returndestinationcity");
 
         var promocode = document.getElementById("promocode");
-        var price = document.getElementById("tripprice");
+        var tripprice = document.getElementById("tripprice");
         var calcprice = document.getElementById("calc-price");
 
         var venuecount = {{ .VenueCount }};
@@ -621,7 +621,7 @@
                     var tempseniors = departurenumseniors;
                     var tempstudents = departurenumstudents;
                     var tempchildren = departurenumchildren;
-
+     
                     //is this a return trip
                     if(reservationtype.value == "2")
                     {
@@ -698,6 +698,8 @@
             }
         };
 
+        calcprice.onclick = CalcPrice;
+
         function Validate(){
             var formvalid = true;
             
@@ -746,6 +748,12 @@
                 formvalid = false;
             }
 
+            if (departuredate.value == "" && formvalid == true)
+            {
+                alert("Please select departure date");
+                formvalid = false;
+            }
+
             if(reservationtype.value == 2 && formvalid == true)
             {
                 if (returndeparturevenue.value == 0 && formvalid == true)
@@ -767,28 +775,18 @@
                 }    
             }
 
-            //ensure price isn't empty
-            if (tripprice.value == "" && formvalid == true) 
+            if (!CalcPrice())
             {
-                if (!CalcPrice())
-                {
-                    alert("Problem calculating price");
-                    formvalid = false;
-                }
+                alert("Problem calculating price");
+                formvalid = false;
             }
 
             if (formvalid)
             {
-                alert("submit form");
                 document.getElementById("reservation").submit();
-                alert("method 1");
-                document.reservation.submit();
-                alert("method 2");
             }
             
         }
-
-        calcprice.onclick = CalcPrice;
 
     </script>
 </body>
