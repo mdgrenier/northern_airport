@@ -155,7 +155,7 @@ func SendEmail(to string, departuredetails string, returndetails string, reserva
 //FormatTripDetails - given trip details return a string for use in confirmation emails
 func FormatTripDetails(departurecity string, departurevenue string, departuredate string, departuretime string,
 	destinationcity string, destinationvenue string, numadults string, numseniors string, numstudents string,
-	numchildren string) string {
+	numchildren string, price string) string {
 
 	departureinfo := "Departing from " + departurevenue + " in " + departurecity + "\n" +
 		"Departing on " + departuredate + " at " + departuretime + "\n"
@@ -165,5 +165,7 @@ func FormatTripDetails(departurecity string, departurevenue string, departuredat
 	passengers := "Trip will include:\n" + numadults + " Adults, " + numseniors + " Seniors, " +
 		numstudents + " Students, and " + numchildren + " Children"
 
-	return departureinfo + destinationinfo + passengers
+	cost := "Total Cost of the trip is $" + price + "\n"
+
+	return departureinfo + destinationinfo + passengers + cost
 }

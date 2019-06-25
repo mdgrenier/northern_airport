@@ -215,6 +215,13 @@
                         </div>
                     </div>
 
+                     <div id="pickupaddress-div" class="row justify-content-around">    
+                        <div class="col-xs-4">
+                            <label for="pickupaddress">Pickup Address</label>
+                            <input type="text" class="form-control" id="pickupaddress" name="pickupaddress" placeholder="Pickup Address">
+                        </div>
+                    </div>
+
                     <div class="row justify-content-around">    
                         <div class="col-xs-4">
                             <label for="destinationcity">Destination City</label>
@@ -230,6 +237,13 @@
                             <select class="form-control" id="destinationvenue" name="destinationvenue" placeholder="Destination Venue">
                                 <option value="0">First Select a City</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div id="dropoffaddress-div" class="row justify-content-around">    
+                        <div class="col-xs-4">
+                            <label for="dropoffaddress">Dropoff Address</label>
+                            <input type="text" class="form-control" id="dropoffaddress" name="dropoffaddress" placeholder="Dropoff Address">
                         </div>
                     </div>
 
@@ -289,6 +303,13 @@
                         <div class="form-group col-3"></div>
                     </div>
 
+                    <div id="return-pickupaddress-div" class="row justify-content-around">    
+                        <div class="col-xs-4">
+                            <label for="return-pickupaddress">Return Pickup Address</label>
+                            <input type="text" class="form-control" id="return-pickupaddress" name="return-pickupaddress" placeholder="Return Pickup Address">
+                        </div>
+                    </div>
+
                     <div class="row justify-content-around">    
                         <div class="col-xs-4">
                             <label for="returndestinationcity">Return Destination City</label>
@@ -304,6 +325,13 @@
                             <select class="form-control" id="returndestinationvenue" name="returndestinationvenue" placeholder="Destination Venue">
                                 <option value="0">First Select a City</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div id="return-dropoffaddress-div" class="row justify-content-around">    
+                        <div class="col-xs-4">
+                            <label for="return-dropoffaddress">Return Dropoff Address</label>
+                            <input type="text" class="form-control" id="return-dropoffaddress" name="return-dropoffaddress" placeholder="Return Dropoff Address">
                         </div>
                     </div>
 
@@ -407,6 +435,11 @@
         var returndestinationvenue = document.getElementById("returndestinationvenue");
         var returndestinationcity = document.getElementById("returndestinationcity");
 
+        var pickupaddress = document.getElementById('pickupaddress-div');
+        var dropoffaddress = document.getElementById('dropoffaddress-div');
+        var returnpickupaddress = document.getElementById('return-pickupaddress-div');
+        var returndropoffaddress = document.getElementById('return-dropoffaddress-div');
+
         var promocode = document.getElementById("promocode");
         var tripprice = document.getElementById("tripprice");
         var calcprice = document.getElementById("calc-price");
@@ -430,9 +463,24 @@
         returndeparturecity.onchange = UpdateVenue(returndeparturecity, returndeparturevenue);
         returndestinationcity.onchange = UpdateVenue(returndestinationcity, returndestinationvenue);
 
+        departurevenue.onchange = ShowAddress(departurevenue, pickupaddress);
+        destinationvenue.onchange = ShowAddress(destinationvenue, dropoffaddress);
+        returndeparturevenue.onchange = ShowAddress(returndeparturevenue, returnpickupaddress);
+        returndestinationvenue.onchange = ShowAddress(returndestinationvenue, returndropoffaddress);
+
         departuretime.onclick = UpdateTime(departurecity, destinationcity, departuretime);
         returndeparturetime.onclick = UpdateTime(returndeparturecity, returndestinationcity, returndeparturetime);
         
+        function ShowAddress(venuechanged, addresstoshow) {
+            return function() {
+                if(venuechanged.value == "100") {
+                    addresstoshow.style.display = "block";
+                } else {
+                    addresstoshow.style.display = "none";
+                }
+            };
+        };
+
         function UpdateVenue(cityselect, venueselect) {
             return function() {
                 var selectvenuecount = venueselect.options.length;
@@ -559,13 +607,17 @@
             }
         };
 
-        function GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, numpassengers, customertypeid, reservationtypeid, callback){
+        function GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, 
+            numpassengers, customertypeid, reservationtypeid, departurevenueid, destinationvenueid,
+            retdeparturevenueid, retdestinationvenueid, callback){
             var xhr = new XMLHttpRequest();
 
             xhr.open('GET', '/price?departurecityid='+departurecityid+'&destinationcityid='+
                 destinationcityid+'&retdeparturecityid='+retdeparturecityid+'&retdestinationcityid='+
                 retdestinationcityid+'&numpassengers='+numpassengers+'&customertypeid='+customertypeid+
-                '&reservationtypeid='+reservationtypeid);
+                '&reservationtypeid='+reservationtypeid+'&departurevenueid='+departurevenueid+
+                '&destinationvenueid='+destinationvenueid+'&retdeparturevenueid='+retdeparturevenueid+
+                '&retdestinationvenueid='+retdestinationvenueid);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onload = function() {
                 if (xhr.status != 200) {
@@ -600,18 +652,24 @@
 
             var departurecityid = departurecity.options[departurecity.selectedIndex].value;
             var destinationcityid = destinationcity.options[destinationcity.selectedIndex].value;
+            var departurevenueid = departurevenue.options[departurevenue.selectedIndex].value;
+            var destinationvenueid = destinationvenue.options[destinationvenue.selectedIndex].value;
 
             var retdeparturecityid = 0;
             var retdestinationcityid = 0;
+            var retdeparturevenueid = 0;
+            var retdestinationvenueid = 0;
 
             if(reservationtype.value == "2")
             {
                 retdeparturecityid = returndeparturecity.options[returndeparturecity.selectedIndex].value;
                 retdestinationcityid = returndestinationcity.options[returndestinationcity.selectedIndex].value;
+                retdeparturevenueid = returndeparturevenue.options[returndeparturevenue.selectedIndex].value;
+                retdestinationvenueid = returndestinationvenue.options[returndestinationvenue.selectedIndex].value;
             }
 
             totalprice = 0.0;
-       
+
             //are there passengers?
             if(departurecityid != 0 && destinationcityid != 0)
             {
@@ -630,58 +688,57 @@
                             //if return adult passengers exist get prices
                             if(returnnumadults > 0)
                             {
-                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumadults, 1, 2, ReturnPrice);
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumadults, 1, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
                                 tempadults = tempadults - returnnumadults
                             }
 
                             //if return senior passengers exist get prices
                             if(returnnumseniors > 0)
                             {
-                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumseniors, 2, 2, ReturnPrice);
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumseniors, 2, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
                                 tempseniors = tempseniors - returnnumseniors
                             }
 
                             //if return student passengers exist get prices
                             if(returnnumstudents > 0)
                             {
-                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumstudents, 3, 2, ReturnPrice);
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumstudents, 3, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
                                 tempstudents = tempstudents - returnnumstudents
                             }
 
                             //if return children passengers exist get prices
                             if(returnnumchildren > 0)
                             {
-                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumchildren, 4, 2, ReturnPrice);
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumchildren, 4, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
                                 tempchildren = tempchildren - returnnumchildren
                             }
                         } else {
                             alert("Reservation type is return, but there are no return passengers");
                         }
-
                     }
 
                     //if return adult passengers exist get prices
                     if(tempadults > 0)
                     {
-                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumadults, 1, 1, ReturnPrice);
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumadults, 1, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
                     }
 
                     //if return senior passengers exist get prices
                     if(tempseniors > 0)
                     {
-                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumseniors, 2, 1, ReturnPrice);
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumseniors, 2, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
                     }
 
                     //if return student passengers exist get prices
                     if(tempstudents > 0)
                     {
-                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumstudents, 3, 1, ReturnPrice);
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumstudents, 3, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
                     }
 
                     //if return children passengers exist get prices
                     if(tempchildren > 0)
                     { 
-                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumchildren, 4, 1, ReturnPrice);
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumchildren, 4, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
                     }
 
                     return true;
@@ -697,7 +754,7 @@
                 return false;
             }
         };
-
+        
         calcprice.onclick = CalcPrice;
 
         function Validate(){

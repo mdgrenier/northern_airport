@@ -3,6 +3,7 @@ package main
 // The sql go library is needed to interact with the database
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -44,6 +45,7 @@ type Store interface {
 	UpdateVehicle(vehicle *Vehicles) error
 	DeleteVehicle(vehicle int) error
 	GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, reservationtypeid int) float32
+	AddVenueFee(departurevenueid int, destinationvenueid int, retdeparturevenueid int, retdestinationvenueid int) float32
 }
 
 //The `dbStore` struct will implement the `Store` interface it also takes the sql
@@ -139,9 +141,11 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 		returnnumseniors := strconv.Itoa(reservation.ReturnNumSeniors)
 		returnnumstudents := strconv.Itoa(reservation.ReturnNumStudents)
 		returnnumchildren := strconv.Itoa(reservation.ReturnNumChildren)
+		returnprice := fmt.Sprintf("%f", reservation.Price)
 
-		returndetails = FormatTripDetails(returndeparturecity, returndeparturevenue, returndeparturedate, returndeparturetime,
-			returndestinationcity, returndestinationvenue, returnnumadults, returnnumseniors, returnnumstudents, returnnumchildren)
+		returndetails = FormatTripDetails(returndeparturecity, returndeparturevenue, returndeparturedate,
+			returndeparturetime, returndestinationcity, returndestinationvenue, returnnumadults, returnnumseniors,
+			returnnumstudents, returnnumchildren, returnprice)
 
 	} else {
 		result, err := store.db.Exec("INSERT INTO reservations("+
@@ -181,9 +185,10 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 	numseniors := strconv.Itoa(reservation.DepartureNumSeniors)
 	numstudents := strconv.Itoa(reservation.DepartureNumStudents)
 	numchildren := strconv.Itoa(reservation.DepartureNumChildren)
+	price := fmt.Sprintf("%f", reservation.Price)
 
 	departuredetails = FormatTripDetails(departurecity, departurevenue, departuredate, departuretime,
-		destinationcity, destinationvenue, numadults, numseniors, numstudents, numchildren)
+		destinationcity, destinationvenue, numadults, numseniors, numstudents, numchildren, price)
 
 	var client Client
 	client.ClientID = reservation.ClientID
@@ -1098,6 +1103,51 @@ func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retde
 	}
 
 	return price
+}
+
+//AddVenueFee - return addition venue charge (only for certain venues)
+func (store *dbStore) AddVenueFee(departurevenueid int, destinationvenueid int, retdeparturevenueid int, retdestinationvenueid int) float32 {
+
+	var totalcosts float32
+	totalcosts = 0.0
+
+	venueids := [4]int{departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid}
+
+	for i := 0; i < len(venueids); i++ {
+		row, err := store.db.Query("SELECT extracost FROM venues "+
+			"WHERE venueid = ?", venueids[i])
+
+		if err != nil {
+			log.Printf("Error retrieving extra costs: %s", err.Error())
+			return 0
+		}
+		defer row.Close()
+
+		//slices to store extra costs, can only have a max of 4
+		var extracost float32
+
+		for row.Next() {
+			err = row.Scan(
+				&extracost,
+			)
+
+			if err != nil {
+				// If an entry with the username does not exist, send an "Unauthorized"(401) status
+				if err == sql.ErrNoRows {
+					log.Print("No extra costs found")
+				} else {
+					log.Printf("Error retrieving extra costs: %s", err.Error())
+				}
+			} else {
+				totalcosts += extracost
+
+				log.Printf("extra cost %f added totalcost %f", extracost, totalcosts)
+			}
+		}
+	}
+
+	return totalcosts
+
 }
 
 //GetReports - return list of reports

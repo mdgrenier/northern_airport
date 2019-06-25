@@ -31,10 +31,13 @@
                                     <a class="dropdown-toggle" href="/reports">Reports</a>
                                     {{- /* if user is staff or admin */ -}}
                                     <ul class="dropdown-menu">
-                                        {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
-                                            <li class="nav-link" href="/">Test Report</li>
+                                        {{ if (eq .RoleID 3) }}
+                                            {{ template "adminreportnavbar" }}
+                                        {{ else if (eq .RoleID 4) }}
+                                            {{ template "staffnavbar" }}
+                                        {{ else if (eq .RoleID 5) }}
+                                            {{ template "drivernavbar" }}
                                         {{ end }}
-                                        <li class="nav-link" href="/driver-report">Driver Report</li>
                                     </ul>
                                 </li>
                                 {{ if or (eq .RoleID 3) (eq .RoleID 4) }}

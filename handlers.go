@@ -883,7 +883,14 @@ func PriceHandler(w http.ResponseWriter, r *http.Request) {
 
 	price := store.GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, customertypeid, reservationtypeid)
 
-	totalprice := price * float32(numpassengers)
+	departurevenueid, err := strconv.Atoi(values["departurevenueid"][0])
+	destinationvenueid, err := strconv.Atoi(values["destinationvenueid"][0])
+	retdeparturevenueid, err := strconv.Atoi(values["retdeparturevenueid"][0])
+	retdestinationvenueid, err := strconv.Atoi(values["retdestinationvenueid"][0])
+
+	extracost := store.AddVenueFee(departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid)
+
+	totalprice := price*float32(numpassengers) + extracost
 
 	log.Printf("Total Price in handler: %f", totalprice)
 
