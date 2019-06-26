@@ -733,7 +733,7 @@ func (store *dbStore) GetTrips() []Trips {
 	}
 
 	row, err = store.db.Query("select tripid, departuredate, t.departuretimeid, " +
-		"numpassengers, driverid, vehicleid, " +
+		"numpassengers, driverid, vehicleid, capacity, " +
 		"omittrip, postpone, cancelled from trips t inner join " +
 		"departuretimes dt on t.departuretimeid = dt.departuretimeid ")
 
@@ -755,8 +755,8 @@ func (store *dbStore) GetTrips() []Trips {
 			&tripSlice[indx].TripID, &departuredate,
 			&tripSlice[indx].DepartureTimeID, &tripSlice[indx].NumPassengers,
 			&tripSlice[indx].DriverID, &tripSlice[indx].VehicleID,
-			&tripSlice[indx].OmitTrip, &tripSlice[indx].Postpone,
-			&tripSlice[indx].Cancelled,
+			&tripSlice[indx].Capacity, &tripSlice[indx].OmitTrip,
+			&tripSlice[indx].Postpone, &tripSlice[indx].Cancelled,
 		)
 
 		if err != nil {
