@@ -592,6 +592,7 @@ CREATE TABLE `trips` (
   `NumPassengers` int(11) DEFAULT '0',
   `DriverID` int(11) DEFAULT '0',
   `VehicleID` int(11) DEFAULT '0',
+  `Capacity` int(11) DEFAULT '11',
   `OmitTrip` int(11) DEFAULT '0',
   `Postpone` int(11) DEFAULT '0',
   `RescheduleDate` date DEFAULT NULL,
@@ -611,7 +612,7 @@ CREATE TABLE `trips` (
 
 LOCK TABLES `trips` WRITE;
 /*!40000 ALTER TABLE `trips` DISABLE KEYS */;
-INSERT INTO `trips` VALUES (1,'2019-04-30',1,1,1,1,0,0,NULL,0,0),(2,'2019-05-09',1,2,0,0,0,0,NULL,0,0);
+INSERT INTO `trips` VALUES (1,'2019-04-30',1,1,1,1,11,0,0,NULL,0,0),(2,'2019-05-09',1,2,0,0,11,0,0,NULL,0,0);
 /*!40000 ALTER TABLE `trips` ENABLE KEYS */;
 UNLOCK TABLES;
 

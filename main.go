@@ -126,6 +126,7 @@ type Trips struct {
 	DriverList      []Drivers
 	VehicleID       int `json:"vehicleid" db:"vehicleid"`
 	VehicleList     []Vehicles
+	Capacity        int       `json:"capacity" db:"capacity"`
 	OmitTrip        bool      `json:"omittrip" db:"omittrip"`
 	Postpone        bool      `json:"postpone" db:"postpone"`
 	RescheduleDate  time.Time `json:"rescheduledate" db:"rescheduledate"`

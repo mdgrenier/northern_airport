@@ -818,8 +818,23 @@ func (store *dbStore) GetTrips() []Trips {
 
 //UpdateTrip - update driver and vehicle associated with trip
 func (store *dbStore) UpdateTrip(trip *Trips) error {
+
+	row := store.db.QueryRow("SELECT numseats from vehicles where vehicleid = ?",
+		trip.VehicleID)
+
+	var capacity int
+
+	err := row.Scan(&capacity)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No capacity matches the vehicle id")
+		} else {
+			log.Printf("Error retrieving capacity from vehicle id: %s", err.Error())
+		}
+	}
 	_, updateerr := store.db.Exec("UPDATE trips SET driverid = ?, "+
-		" vehicleid = ? WHERE tripid = ?", trip.DriverID, trip.VehicleID, trip.TripID)
+		" vehicleid = ?, capacity = ? WHERE tripid = ?", trip.DriverID, trip.VehicleID, capacity, trip.TripID)
 
 	if updateerr != nil {
 		log.Printf("Error updating trip: %s", updateerr.Error())

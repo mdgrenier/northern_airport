@@ -424,6 +424,7 @@
         var departurevenue = document.getElementById("departurevenue");
         var departurecity = document.getElementById("departurecity");
         var departuretime = document.getElementById("departuretime");
+        var departuredate = document.getElementById("departuredate");
 
         var destinationvenue = document.getElementById("destinationvenue");
         var destinationcity = document.getElementById("destinationcity");
@@ -431,6 +432,7 @@
         var returndeparturevenue = document.getElementById("returndeparturevenue");
         var returndeparturecity = document.getElementById("returndeparturecity");
         var returndeparturetime = document.getElementById("returndeparturetime");
+        var returndeparturedate = document.getElementById("returndeparturedate");
 
         var returndestinationvenue = document.getElementById("returndestinationvenue");
         var returndestinationcity = document.getElementById("returndestinationcity");
@@ -451,7 +453,7 @@
         var totalprice = 0.0;
 
         reservationtype.onchange = function() { 
-            if(reservationtype.value == "2") {
+            if(reservationtype.value == 2) {
                 document.getElementById('return-info').style.display = "block";
             } else {
                 document.getElementById('return-info').style.display = "none";
@@ -473,7 +475,7 @@
         
         function ShowAddress(venuechanged, addresstoshow) {
             return function() {
-                if(venuechanged.value == "100") {
+                if(venuechanged.value == 100) {
                     addresstoshow.style.display = "block";
                 } else {
                     addresstoshow.style.display = "none";
@@ -787,9 +789,9 @@
                 formvalid = false;
             }
             
-            if (departurevenue.value == 0 && formvalid == true)
+            if (departurecity.value != 2 && destinationcity.value != 2 && formvalid == true)
             {
-                alert("Please select departure venue");
+                alert("Trips must either depart from or be destined to 'Toronto Pearson and Hotels'");
                 formvalid = false;
             }
 
@@ -805,14 +807,54 @@
                 formvalid = false;
             }
 
+            today = new Date();
+            tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            var datearray = departuredate.value.split("-");
+            jsdeparturedate = new Date();
+            jsdeparturedate.setYear(datearray[0]);
+            jsdeparturedate.setMonth(datearray[1]-1);
+            jsdeparturedate.setDate(datearray[2]);
+
             if (departuredate.value == "" && formvalid == true)
             {
                 alert("Please select departure date");
                 formvalid = false;
             }
 
+            if (jsdeparturedate < today && formvalid == true) 
+            {
+                alert("Cannot select a departure date in the past");
+                formvalid = false;
+            }
+            
+            if (jsdeparturedate < tomorrow && formvalid == true) 
+            {
+                alert("Cannot select a departure date within 24 hours");
+                formvalid = false;
+            }
+            
             if(reservationtype.value == 2 && formvalid == true)
             {
+                datearray = returndeparturedate.value.split("-");
+                jsreturndeparturedate = new Date();
+                jsreturndeparturedate.setYear(datearray[0]);
+                jsreturndeparturedate.setMonth(datearray[1]-1);
+                jsreturndeparturedate.setDate(datearray[2]);
+            
+                if (jsreturndeparturedate < jsdeparturedate && formvalid == true)
+                {
+                    alert("Return date cannot precede departure date");
+                    formvalid = false;
+                }
+
+                if (returndeparturecity.value != 2 && returndestinationcity.value != 2 && formvalid == true)
+                {
+                    alert("Trips must either depart from or be destined to 'Toronto Pearson and Hotels'");
+                    formvalid = false;
+                }
+
                 if (returndeparturevenue.value == 0 && formvalid == true)
                 {
                     alert("Please select return departure venue");
@@ -832,11 +874,15 @@
                 }    
             }
 
-            if (!CalcPrice())
+            if(formvalid == true)
             {
-                alert("Problem calculating price");
-                formvalid = false;
+                if (!CalcPrice())
+                {
+                    alert("Problem calculating price");
+                    formvalid = false;
+                }
             }
+            
 
             if (formvalid)
             {

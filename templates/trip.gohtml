@@ -56,6 +56,7 @@
                 <div class="box header" id="numpassengers-header">Num Passengers</div>
                 <div class="box header" id="driver-header">Driver</div>
                 <div class="box header" id="vehicle-header">Vehicle</div>
+                <div class="box header" id="capacity-header">Capacity</div>
                 <div class="box header" id="omitted-header">Omitted</div>
                 <div class="box header" id="postponed-header">Postponed</div>
                 <div class="box header" id="cancelled-header">Cancelled</div>
@@ -78,6 +79,9 @@
                             <option value="{{ .VehicleID }}">{{ .LicensePlate }}</option>
                         {{ end }}
                     </select>
+                    <div class="box trip-row" id="capacity-{{ .TripID }}">
+                        {{ .Capacity }}
+                    </div>
                     <div class="box trip-row" id="omit-{{ .TripID }}">
                         {{ .OmitTrip }}
                     </div>
