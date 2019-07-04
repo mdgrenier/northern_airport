@@ -274,10 +274,10 @@ DROP TABLE IF EXISTS `discountcodes`;
 CREATE TABLE `discountcodes` (
   `DiscountCodeID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` varchar(25) NOT NULL,
-  `Percentage` int(11) NOT NULL,
-  `Amount` int(11) NOT NULL,
-  `StartDate` date NOT NULL,
-  `EndDate` date NOT NULL,
+  `Percentage` int(11) DEFAULT '0',
+  `Amount` int(11) DEFAULT '0',
+  `StartDate` date,
+  `EndDate` date,
   PRIMARY KEY (`DiscountCodeID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

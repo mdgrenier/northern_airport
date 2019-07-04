@@ -44,7 +44,8 @@ type Store interface {
 	AddVehicle(vehicle Vehicles) error
 	UpdateVehicle(vehicle *Vehicles) error
 	DeleteVehicle(vehicle int) error
-	GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, reservationtypeid int) float32
+	GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, reservationtypeid int, discountcode string) float32
+	GetDiscount(discountcode *DiscountCode) error
 	AddVenueFee(departurevenueid int, destinationvenueid int, retdeparturevenueid int, retdestinationvenueid int) float32
 }
 
@@ -81,7 +82,6 @@ func (store *dbStore) CreateUser(client *Client) error {
 func (store *dbStore) CreateReservation(reservation *Reservation) error {
 
 	//temporarily hardcoding some values until they are either implemented or removed
-	reservation.DiscountCodeID = 1
 	reservation.DepartureAirlineID = 1
 	reservation.ReturnAirlineID = 1
 	reservation.Status = ""
@@ -186,6 +186,8 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 	numstudents := strconv.Itoa(reservation.DepartureNumStudents)
 	numchildren := strconv.Itoa(reservation.DepartureNumChildren)
 	price := fmt.Sprintf("%f", reservation.Price)
+
+	log.Printf("Total Reservation Cost: $%s", price)
 
 	departuredetails = FormatTripDetails(departurecity, departurevenue, departuredate, departuretime,
 		destinationcity, destinationvenue, numadults, numseniors, numstudents, numchildren, price)
@@ -1056,7 +1058,7 @@ func (store *dbStore) DeleteDriver(driverid int) error {
 }
 
 //GetPrice - return price for a trip
-func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, reservationtypeid int) float32 {
+func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, reservationtypeid int, discountcode string) float32 {
 	var err error
 
 	row := store.db.QueryRow("SELECT price FROM prices "+
@@ -1110,14 +1112,85 @@ func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retde
 
 		price = (price + retprice) * 0.9
 
-		log.Printf("Price 2: %f", price)
 	} else if reservationtypeid == 2 {
 		price = (price * 2) * 0.9
-
-		log.Printf("Price 3: %f", price)
 	}
 
+	log.Printf("1 Price in GetPrice(): %f", price)
+
+	if discountcode != "" {
+		discount := DiscountCode{}
+
+		discount.Name = discountcode
+
+		err = store.GetDiscount(&discount)
+
+		if err != nil {
+			log.Printf("Error retrieving discount code: %s", err.Error())
+		} else {
+
+			log.Printf("Name: %s", discount.Name)
+			log.Printf("Percentage: %d", discount.Percentage)
+			log.Printf("1 Price: %f", price)
+
+			if discount.Percentage > 0 {
+				price *= (float32)(100-discount.Percentage) / 100.0
+				log.Printf("2 Price: %f", price)
+			} else if discount.Amount > 0 {
+				price -= (float32)(discount.Amount)
+			} else {
+				log.Print("Invalid discount code, both percentage and amount are zero")
+			}
+		}
+	}
+
+	log.Printf("2 Price in GetPrice(): %f", price)
+
 	return price
+}
+
+//GetDiscount - populate discount if applicable discount code found
+func (store *dbStore) GetDiscount(discountcode *DiscountCode) error {
+	row := store.db.QueryRow("SELECT discountcodeid, percentage, amount, startdate, enddate from discountcodes where name = ?",
+		discountcode.Name)
+
+	var startdate mysql.NullTime
+	var enddate mysql.NullTime
+
+	err := row.Scan(&discountcode.DiscountCodeID, &discountcode.Percentage, &discountcode.Amount, &startdate, &enddate)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No discount code matches the name")
+		} else {
+			log.Printf("Error retrieving discount code from name: %s", err.Error())
+		}
+	} else {
+
+		today := time.Now()
+
+		log.Printf("found discount code: %s", discountcode.Name)
+
+		//ensure discount code is valid, if so get type and value
+		if today.After(startdate.Time) && today.Before(enddate.Time) {
+			discountcode.StartDate = startdate.Time
+			discountcode.EndDate = enddate.Time
+
+			if discountcode.Percentage > 0 {
+				//mark type as percentage
+				discountcode.Type = 1
+			} else if discountcode.Amount > 0 {
+				//mark type as amount
+				discountcode.Type = 2
+			} else {
+				log.Print("Both percentage and amount of discount code is zero, no discount provided")
+			}
+		} else {
+			log.Print("Discount code is not currently valid")
+		}
+	}
+
+	return err
 }
 
 //AddVenueFee - return addition venue charge (only for certain venues)

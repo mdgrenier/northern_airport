@@ -442,7 +442,7 @@
         var returnpickupaddress = document.getElementById('return-pickupaddress-div');
         var returndropoffaddress = document.getElementById('return-dropoffaddress-div');
 
-        var promocode = document.getElementById("promocode");
+        var discountcode = document.getElementById("promocode");
         var tripprice = document.getElementById("tripprice");
         var calcprice = document.getElementById("calc-price");
 
@@ -611,15 +611,17 @@
 
         function GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, 
             numpassengers, customertypeid, reservationtypeid, departurevenueid, destinationvenueid,
-            retdeparturevenueid, retdestinationvenueid, callback){
+            retdeparturevenueid, retdestinationvenueid, discount, callback){
             var xhr = new XMLHttpRequest();
+
+            alert("discount code: "+discount);
 
             xhr.open('GET', '/price?departurecityid='+departurecityid+'&destinationcityid='+
                 destinationcityid+'&retdeparturecityid='+retdeparturecityid+'&retdestinationcityid='+
                 retdestinationcityid+'&numpassengers='+numpassengers+'&customertypeid='+customertypeid+
                 '&reservationtypeid='+reservationtypeid+'&departurevenueid='+departurevenueid+
                 '&destinationvenueid='+destinationvenueid+'&retdeparturevenueid='+retdeparturevenueid+
-                '&retdestinationvenueid='+retdestinationvenueid);
+                '&retdestinationvenueid='+retdestinationvenueid+'&discount='+discount);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onload = function() {
                 if (xhr.status != 200) {
@@ -690,28 +692,28 @@
                             //if return adult passengers exist get prices
                             if(returnnumadults > 0)
                             {
-                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumadults, 1, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumadults, 1, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, discountcode.value, ReturnPrice);
                                 tempadults = tempadults - returnnumadults
                             }
 
                             //if return senior passengers exist get prices
                             if(returnnumseniors > 0)
                             {
-                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumseniors, 2, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumseniors, 2, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, discountcode.value, ReturnPrice);
                                 tempseniors = tempseniors - returnnumseniors
                             }
 
                             //if return student passengers exist get prices
                             if(returnnumstudents > 0)
                             {
-                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumstudents, 3, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumstudents, 3, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, discountcode.value, ReturnPrice);
                                 tempstudents = tempstudents - returnnumstudents
                             }
 
                             //if return children passengers exist get prices
                             if(returnnumchildren > 0)
                             {
-                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumchildren, 4, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
+                                GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, returnnumchildren, 4, 2, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, discountcode.value, ReturnPrice);
                                 tempchildren = tempchildren - returnnumchildren
                             }
                         } else {
@@ -722,25 +724,25 @@
                     //if return adult passengers exist get prices
                     if(tempadults > 0)
                     {
-                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumadults, 1, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumadults, 1, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, discountcode.value, ReturnPrice);
                     }
 
                     //if return senior passengers exist get prices
                     if(tempseniors > 0)
                     {
-                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumseniors, 2, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumseniors, 2, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, discountcode.value, ReturnPrice);
                     }
 
                     //if return student passengers exist get prices
                     if(tempstudents > 0)
                     {
-                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumstudents, 3, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumstudents, 3, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, discountcode.value, ReturnPrice);
                     }
 
                     //if return children passengers exist get prices
                     if(tempchildren > 0)
                     { 
-                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumchildren, 4, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, ReturnPrice);
+                        GetPrice(departurecityid, destinationcityid, 0, 0, departurenumchildren, 4, 1, departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid, discountcode.value, ReturnPrice);
                     }
 
                     return true;

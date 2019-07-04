@@ -195,13 +195,7 @@ func ReservationHandler(w http.ResponseWriter, r *http.Request) {
 
 //CreateReservationHandler - store reservation in database
 func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
-	//session, err := sessionStore.Get(r, "northern-airport")
-	//if err != nil {
-	//	http.Error(w, err.Error(), http.StatusInternalServerError)
-	//	return
-	//}
 
-	//resformdata := ResFormData{}
 	reservation := Reservation{}
 
 	//get reservation data from form
@@ -880,8 +874,11 @@ func PriceHandler(w http.ResponseWriter, r *http.Request) {
 	retdestinationcityid, err := strconv.Atoi(values["retdestinationcityid"][0])
 	numpassengers, err := strconv.Atoi(values["numpassengers"][0])
 	customertypeid, err := strconv.Atoi(values["customertypeid"][0])
+	discountcode := values["discount"][0]
 
-	price := store.GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, customertypeid, reservationtypeid)
+	price := store.GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, customertypeid, reservationtypeid, discountcode)
+
+	log.Printf("Price: %f", price)
 
 	departurevenueid, err := strconv.Atoi(values["departurevenueid"][0])
 	destinationvenueid, err := strconv.Atoi(values["destinationvenueid"][0])
@@ -889,6 +886,10 @@ func PriceHandler(w http.ResponseWriter, r *http.Request) {
 	retdestinationvenueid, err := strconv.Atoi(values["retdestinationvenueid"][0])
 
 	extracost := store.AddVenueFee(departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid)
+
+	log.Printf("Price: %f", price)
+	log.Printf("Num Passengers: %d", numpassengers)
+	log.Printf("Extra Cost: %f", extracost)
 
 	totalprice := price*float32(numpassengers) + extracost
 

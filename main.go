@@ -66,42 +66,55 @@ type ResFormData struct {
 
 // Reservation - store reservation information
 type Reservation struct {
-	ReservationID            int       `json:"reservationid" db:"reservationtid"`
-	ClientID                 int       `json:"clientid" db:"clientid"`
-	DepartureCityID          int       `json:"departurecityid" db:"departurecityid"`
-	DepartureVenueID         int       `json:"departurevenueid" db:"departurevenueid"`
-	DepartureTimeID          int       `json:"departuretimeid" db:"departuretimeid"`
-	DestinationCityID        int       `json:"destinationcityid" db:"destinationcityid"`
-	DestinationVenueID       int       `json:"destinationvenueid" db:"destinationvenueid"`
-	ReturnDepartureCityID    int       `json:"returndeparturecityid" db:"returndeparturecityid"`
-	ReturnDepartureVenueID   int       `json:"returndeparturevenueid" db:"returndeparturevenueid"`
-	ReturnDepartureTimeID    int       `json:"returndeparturetimeid" db:"returndeparturetimeid"`
-	ReturnDestinationCityID  int       `json:"returndestinationcityid" db:"returndestinationcityid"`
-	ReturnDestinationVenueID int       `json:"returndestinationvenueid" db:"returndestinationvenueid"`
+	ReservationID            int `json:"reservationid" db:"reservationtid"`
+	ClientID                 int `json:"clientid" db:"clientid"`
+	DepartureCityID          int `json:"departurecityid" db:"departurecityid"`
+	DepartureVenueID         int `json:"departurevenueid" db:"departurevenueid"`
+	DepartureTimeID          int `json:"departuretimeid" db:"departuretimeid"`
+	DestinationCityID        int `json:"destinationcityid" db:"destinationcityid"`
+	DestinationVenueID       int `json:"destinationvenueid" db:"destinationvenueid"`
+	ReturnDepartureCityID    int `json:"returndeparturecityid" db:"returndeparturecityid"`
+	ReturnDepartureVenueID   int `json:"returndeparturevenueid" db:"returndeparturevenueid"`
+	ReturnDepartureTimeID    int `json:"returndeparturetimeid" db:"returndeparturetimeid"`
+	ReturnDestinationCityID  int `json:"returndestinationcityid" db:"returndestinationcityid"`
+	ReturnDestinationVenueID int `json:"returndestinationvenueid" db:"returndestinationvenueid"`
 	DiscountCodeID           int       `json:"discountcodeid" db:"discountcodeid"`
-	DepartureAirlineID       int       `json:"departureairlineid" db:"departureairlineid"`
-	ReturnAirlineID          int       `json:"returnairlineid" db:"returnairlineid"`
-	DriverNotes              string    `json:"drivernotes" db:"drivernotes"`
-	InternalNotes            string    `json:"internalnotes" db:"internalnotes"`
-	DepartureNumAdults       int       `json:"departurenumadults" db:"departurenumadults"`
-	DepartureNumStudents     int       `json:"departurenumstudents" db:"departurenumstudent"`
-	DepartureNumSeniors      int       `json:"departurenumseniors" db:"departurenumseniors"`
-	DepartureNumChildren     int       `json:"departurenumchildren" db:"departurenumchildren"`
-	ReturnNumAdults          int       `json:"returnnumadults" db:"returnnumadults"`
-	ReturnNumStudents        int       `json:"returnnumstudents" db:"returnnumstudent"`
-	ReturnNumSeniors         int       `json:"returnnumseniors" db:"returnnumseniors"`
-	ReturnNumChildren        int       `json:"returnnumchildren" db:"returnnumchildren"`
-	Price                    float32   `json:"price" db:"price"`
-	Status                   string    `json:"status" db:"status"`
-	Hash                     string    `json:"hash" db:"hash"`
-	CustomDepartureID        int       `json:"customdepartureid" db:"customdepartureid"`
-	CustomDestinationID      int       `json:"customdestinationid" db:"customdestinationid"`
-	DepartureDate            time.Time `json:"departuredate" db:"departuredate"`
-	ReturnDate               time.Time `json:"returndate" db:"returndate"`
-	TripTypeID               int       `json:"triptypeid" db:"triptypeid"`
-	TripID                   int       `json:"tripid" db:"tripid"`
-	BalanceOwing             float32   `json:"balanceowing" db:"balanceowing"`
-	ElavonTransactionID      int       `json:"elavontranscationid" db:"elavontransactionid"`
+	//DiscountCode         DiscountCode
+	DepartureAirlineID   int       `json:"departureairlineid" db:"departureairlineid"`
+	ReturnAirlineID      int       `json:"returnairlineid" db:"returnairlineid"`
+	DriverNotes          string    `json:"drivernotes" db:"drivernotes"`
+	InternalNotes        string    `json:"internalnotes" db:"internalnotes"`
+	DepartureNumAdults   int       `json:"departurenumadults" db:"departurenumadults"`
+	DepartureNumStudents int       `json:"departurenumstudents" db:"departurenumstudent"`
+	DepartureNumSeniors  int       `json:"departurenumseniors" db:"departurenumseniors"`
+	DepartureNumChildren int       `json:"departurenumchildren" db:"departurenumchildren"`
+	ReturnNumAdults      int       `json:"returnnumadults" db:"returnnumadults"`
+	ReturnNumStudents    int       `json:"returnnumstudents" db:"returnnumstudent"`
+	ReturnNumSeniors     int       `json:"returnnumseniors" db:"returnnumseniors"`
+	ReturnNumChildren    int       `json:"returnnumchildren" db:"returnnumchildren"`
+	Price                float32   `json:"price" db:"price"`
+	Status               string    `json:"status" db:"status"`
+	Hash                 string    `json:"hash" db:"hash"`
+	CustomDepartureID    int       `json:"customdepartureid" db:"customdepartureid"`
+	CustomDestinationID  int       `json:"customdestinationid" db:"customdestinationid"`
+	DepartureDate        time.Time `json:"departuredate" db:"departuredate"`
+	ReturnDate           time.Time `json:"returndate" db:"returndate"`
+	TripTypeID           int       `json:"triptypeid" db:"triptypeid"`
+	TripID               int       `json:"tripid" db:"tripid"`
+	BalanceOwing         float32   `json:"balanceowing" db:"balanceowing"`
+	ElavonTransactionID  int       `json:"elavontranscationid" db:"elavontransactionid"`
+}
+
+// DiscountCode - store discount code
+type DiscountCode struct {
+	DiscountCodeID int       `json:"discountcodeid" db:"discountcodeid"`
+	Name           string    `json:"name" db:"name"`
+	Percentage     int       `json:"percentage" db:"percentage"`
+	Amount         int       `json:"amount" db:"amount"`
+	StartDate      time.Time `json:"startdate" db:"startdate"`
+	EndDate        time.Time `json:"enddate" db:"enddate"`
+	//Whether percentage or amount, 1 = percentage, 2 = amount
+	Type int
 }
 
 // DepartureTimes - store departure times

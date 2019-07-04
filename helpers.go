@@ -26,7 +26,6 @@ func GetClient(s *sessions.Session) Client {
 //GetReservationFormValues - get the field values from the reservation form
 func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 
-	//resform := ResFormData{}
 	reservation := Reservation{}
 
 	//populate Form structure of the http request
@@ -98,7 +97,22 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 		reservation.DriverNotes = r.Form.Get("drivernotes")
 
 		//must map discount code to discountcodeid
-		reservation.DiscountCodeID, err = strconv.Atoi(r.FormValue("discountcode"))
+		//reservation.DiscountCodeID, err = strconv.Atoi(r.FormValue("discountcode"))
+
+		var discountCode *DiscountCode
+
+		discountCode.Name = r.Form.Get("discountcode")
+		err := store.GetDiscount(discountCode)
+
+		if err != nil {
+			reservation.DiscountCodeID = discountCode.DiscountCodeID
+
+			log.Printf("Discount Code Name: %s", discountCode.Name)
+			log.Printf("Discount Code ID: %d", reservation.DiscountCodeID)
+		} else {
+			log.Printf("Error retrieving discount code: %s", err.Error())
+		}
+
 		var price float64
 		price, err = strconv.ParseFloat(r.FormValue("price"), 32)
 		reservation.Price = float32(price)
