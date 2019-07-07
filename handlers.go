@@ -198,20 +198,31 @@ func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 
 	reservation := Reservation{}
 
+	log.Printf("Retrieve form data")
+
 	//get reservation data from form
 	reservation = GetReservationFormValues(r, true)
+
+	log.Printf("Form information retrieved")
 
 	//check if trip exists, if not create one
 	err := store.GetOrAddTrip(&reservation)
 
+	if err != nil {
+		log.Fatal("Error getting/adding trip: ", err)
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		log.Printf("Trip retrieved/added")
+	}
+
 	err = store.CreateReservation(&reservation)
 
 	if err != nil {
-		log.Fatal("Error Creating User: ", err)
+		log.Fatal("Error creating reservation: ", err)
 		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		log.Print("reservation created")
 	}
-
-	log.Print("reservation created")
 
 	http.Redirect(w, r, "/reservationcreated", http.StatusFound)
 }
@@ -878,18 +889,12 @@ func PriceHandler(w http.ResponseWriter, r *http.Request) {
 
 	price := store.GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, customertypeid, reservationtypeid, discountcode)
 
-	log.Printf("Price: %f", price)
-
 	departurevenueid, err := strconv.Atoi(values["departurevenueid"][0])
 	destinationvenueid, err := strconv.Atoi(values["destinationvenueid"][0])
 	retdeparturevenueid, err := strconv.Atoi(values["retdeparturevenueid"][0])
 	retdestinationvenueid, err := strconv.Atoi(values["retdestinationvenueid"][0])
 
 	extracost := store.AddVenueFee(departurevenueid, destinationvenueid, retdeparturevenueid, retdestinationvenueid)
-
-	log.Printf("Price: %f", price)
-	log.Printf("Num Passengers: %d", numpassengers)
-	log.Printf("Extra Cost: %f", extracost)
 
 	totalprice := price*float32(numpassengers) + extracost
 

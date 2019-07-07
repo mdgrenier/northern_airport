@@ -614,8 +614,6 @@
             retdeparturevenueid, retdestinationvenueid, discount, callback){
             var xhr = new XMLHttpRequest();
 
-            alert("discount code: "+discount);
-
             xhr.open('GET', '/price?departurecityid='+departurecityid+'&destinationcityid='+
                 destinationcityid+'&retdeparturecityid='+retdeparturecityid+'&retdestinationcityid='+
                 retdestinationcityid+'&numpassengers='+numpassengers+'&customertypeid='+customertypeid+
@@ -888,6 +886,7 @@
 
             if (formvalid)
             {
+                alert("submitting form");
                 document.getElementById("reservation").submit();
             }
             

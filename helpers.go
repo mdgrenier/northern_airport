@@ -99,18 +99,22 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 		//must map discount code to discountcodeid
 		//reservation.DiscountCodeID, err = strconv.Atoi(r.FormValue("discountcode"))
 
-		var discountCode *DiscountCode
+		discount := DiscountCode{}
 
-		discountCode.Name = r.Form.Get("discountcode")
-		err := store.GetDiscount(discountCode)
+		discount.Name = r.Form.Get("promocode")
+
+		log.Printf("1 Discount Code Name: %s", discount.Name)
+
+		err := store.GetDiscount(&discount)
+
+		log.Printf("2 Discount Code Name: %s", discount.Name)
+
+		log.Printf("we've got this far!")
 
 		if err != nil {
-			reservation.DiscountCodeID = discountCode.DiscountCodeID
-
-			log.Printf("Discount Code Name: %s", discountCode.Name)
-			log.Printf("Discount Code ID: %d", reservation.DiscountCodeID)
-		} else {
 			log.Printf("Error retrieving discount code: %s", err.Error())
+		} else {
+			reservation.DiscountCodeID = discount.DiscountCodeID
 		}
 
 		var price float64
@@ -132,9 +136,8 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 	return reservation
 }
 
-//SendEmail - given the recipient and email body, send a email
-func SendEmail(to string, departuredetails string, returndetails string, reservationid int) {
-	log.Print("Attempt to send email")
+//SendConfirmationEmail - given the recipient and email body, send a email
+func SendConfirmationEmail(to string, departuredetails string, returndetails string, reservationid int, price float32) {
 
 	from := "mdgrenier@gmail.com"
 	pass := "Dh76nm6m*"
@@ -143,8 +146,10 @@ func SendEmail(to string, departuredetails string, returndetails string, reserva
 		"Your Confirmation ID is #%d\n\nDeparture information:\n%s\n\n", reservationid, departuredetails)
 
 	if returndetails != "" {
-		body += "Return information:\n" + returndetails + "\n\n\n"
+		body += "Return information:\n" + returndetails + "\n\n"
 	}
+
+	body += "Total Cost of the trip is $" + fmt.Sprintf("%f", price) + "\n\n\n"
 
 	body += "For any concerns please contact us at (705) 474-7942\n\n" +
 		"Thank you for booking with Northern Airport Passenger Service."
@@ -169,7 +174,7 @@ func SendEmail(to string, departuredetails string, returndetails string, reserva
 //FormatTripDetails - given trip details return a string for use in confirmation emails
 func FormatTripDetails(departurecity string, departurevenue string, departuredate string, departuretime string,
 	destinationcity string, destinationvenue string, numadults string, numseniors string, numstudents string,
-	numchildren string, price string) string {
+	numchildren string) string {
 
 	departureinfo := "Departing from " + departurevenue + " in " + departurecity + "\n" +
 		"Departing on " + departuredate + " at " + departuretime + "\n"
@@ -179,7 +184,49 @@ func FormatTripDetails(departurecity string, departurevenue string, departuredat
 	passengers := "Trip will include:\n" + numadults + " Adults, " + numseniors + " Seniors, " +
 		numstudents + " Students, and " + numchildren + " Children"
 
-	cost := "Total Cost of the trip is $" + price + "\n"
+	return departureinfo + destinationinfo + passengers
+}
 
-	return departureinfo + destinationinfo + passengers + cost
+//SendCapacityEmail - given trip create capacity email
+func SendCapacityEmail(trip Trips) {
+	from := "mdgrenier@gmail.com"
+	pass := "Dh76nm6m*"
+	to := "matt@mgrenier.ca"
+
+	body := fmt.Sprintf("Northern Airport Passenger Service Capacity Alert\n\n"+
+		"TripID #%d has reached 75%% capacity.\n\n\n", trip.TripID)
+
+	var drivername string
+
+	for _, driver := range trip.DriverList {
+		if driver.DriverID == trip.DriverID {
+			drivername = driver.FirstName + " " + driver.LastName
+		}
+	}
+
+	var vehicleplate string
+
+	for _, vehicle := range trip.VehicleList {
+		if vehicle.VehicleID == trip.VehicleID {
+			vehicleplate = vehicle.LicensePlate
+		}
+	}
+
+	body += fmt.Sprintf("Trip Details:\nDeparture Date: %s\nDeparture Time: %d\n"+
+		"Number of Passengers: %d\nDriver: %s\nVehicle: %s\nCapacity: %d\n",
+		trip.DepartureDate, trip.DepartureTime, trip.NumPassengers, drivername, vehicleplate, trip.Capacity)
+
+	msg := "From: " + from + "\n" +
+		"To: " + to + "; mdgrenier@gmail.com\n" +
+		"Subject: Northern Airport Reservation Confirmation\n\n" +
+		body
+
+	err := smtp.SendMail("smtp.gmail.com:587",
+		smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
+		from, []string{to}, []byte(msg))
+
+	if err != nil {
+		log.Printf("smtp error: %s", err)
+		return
+	}
 }

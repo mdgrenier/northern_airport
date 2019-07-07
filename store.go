@@ -3,7 +3,6 @@ package main
 // The sql go library is needed to interact with the database
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -141,11 +140,10 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 		returnnumseniors := strconv.Itoa(reservation.ReturnNumSeniors)
 		returnnumstudents := strconv.Itoa(reservation.ReturnNumStudents)
 		returnnumchildren := strconv.Itoa(reservation.ReturnNumChildren)
-		returnprice := fmt.Sprintf("%f", reservation.Price)
 
 		returndetails = FormatTripDetails(returndeparturecity, returndeparturevenue, returndeparturedate,
 			returndeparturetime, returndestinationcity, returndestinationvenue, returnnumadults, returnnumseniors,
-			returnnumstudents, returnnumchildren, returnprice)
+			returnnumstudents, returnnumchildren)
 
 	} else {
 		result, err := store.db.Exec("INSERT INTO reservations("+
@@ -185,19 +183,18 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 	numseniors := strconv.Itoa(reservation.DepartureNumSeniors)
 	numstudents := strconv.Itoa(reservation.DepartureNumStudents)
 	numchildren := strconv.Itoa(reservation.DepartureNumChildren)
-	price := fmt.Sprintf("%f", reservation.Price)
 
-	log.Printf("Total Reservation Cost: $%s", price)
+	log.Printf("Total Reservation Cost: $%f", reservation.Price)
 
 	departuredetails = FormatTripDetails(departurecity, departurevenue, departuredate, departuretime,
-		destinationcity, destinationvenue, numadults, numseniors, numstudents, numchildren, price)
+		destinationcity, destinationvenue, numadults, numseniors, numstudents, numchildren)
 
 	var client Client
 	client.ClientID = reservation.ClientID
 
 	store.GetClientInfo(&client)
 
-	SendEmail(client.Email, departuredetails, returndetails, reservation.ReservationID)
+	SendConfirmationEmail(client.Email, departuredetails, returndetails, reservation.ReservationID, reservation.Price)
 
 	return insertError
 }
@@ -689,6 +686,7 @@ func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 			} else {
 				tripid, _ = result.LastInsertId()
 				log.Printf("TripID: %d", tripid)
+				err = nil
 			}
 		} else {
 			log.Printf("Error retrieving trip: %s", err.Error())
@@ -1116,8 +1114,6 @@ func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retde
 		price = (price * 2) * 0.9
 	}
 
-	log.Printf("1 Price in GetPrice(): %f", price)
-
 	if discountcode != "" {
 		discount := DiscountCode{}
 
@@ -1128,11 +1124,6 @@ func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retde
 		if err != nil {
 			log.Printf("Error retrieving discount code: %s", err.Error())
 		} else {
-
-			log.Printf("Name: %s", discount.Name)
-			log.Printf("Percentage: %d", discount.Percentage)
-			log.Printf("1 Price: %f", price)
-
 			if discount.Percentage > 0 {
 				price *= (float32)(100-discount.Percentage) / 100.0
 				log.Printf("2 Price: %f", price)
@@ -1143,8 +1134,6 @@ func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retde
 			}
 		}
 	}
-
-	log.Printf("2 Price in GetPrice(): %f", price)
 
 	return price
 }
@@ -1169,8 +1158,6 @@ func (store *dbStore) GetDiscount(discountcode *DiscountCode) error {
 
 		today := time.Now()
 
-		log.Printf("found discount code: %s", discountcode.Name)
-
 		//ensure discount code is valid, if so get type and value
 		if today.After(startdate.Time) && today.Before(enddate.Time) {
 			discountcode.StartDate = startdate.Time
@@ -1185,6 +1172,7 @@ func (store *dbStore) GetDiscount(discountcode *DiscountCode) error {
 			} else {
 				log.Print("Both percentage and amount of discount code is zero, no discount provided")
 			}
+
 		} else {
 			log.Print("Discount code is not currently valid")
 		}
