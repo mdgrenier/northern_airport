@@ -103,13 +103,7 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 
 		discount.Name = r.Form.Get("promocode")
 
-		log.Printf("1 Discount Code Name: %s", discount.Name)
-
 		err := store.GetDiscount(&discount)
-
-		log.Printf("2 Discount Code Name: %s", discount.Name)
-
-		log.Printf("we've got this far!")
 
 		if err != nil {
 			log.Printf("Error retrieving discount code: %s", err.Error())
@@ -117,9 +111,19 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 			reservation.DiscountCodeID = discount.DiscountCodeID
 		}
 
-		var price float64
-		price, err = strconv.ParseFloat(r.FormValue("price"), 32)
-		reservation.Price = float32(price)
+		var tripprice float64
+
+		log.Printf("Trip price string value: %s", r.Form.Get("tripprice"))
+
+		tripprice, err = strconv.ParseFloat(r.Form.Get("tripprice"), 32)
+
+		if err != nil {
+			log.Printf("Error converting trip price to float: %s", err.Error())
+		}
+
+		reservation.Price = float32(tripprice)
+
+		log.Printf("reservation price: %f", reservation.Price)
 
 		log.Printf("Reservation values retrieved from form")
 

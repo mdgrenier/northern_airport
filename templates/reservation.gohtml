@@ -641,7 +641,12 @@
             tripprice.value = parseFloat(totalprice).toFixed(2);
         };
 
-        function CalcPrice(){
+         function SubmitForm() {
+            alert("price: " + document.getElementById("tripprice").value);
+            document.getElementById("reservation").submit();
+        };
+
+        function CalcPrice(callback){
             var departurenumadults = document.getElementById("departurenumadults").value;
             var departurenumseniors = document.getElementById("departurenumseniors").value;
             var departurenumstudents = document.getElementById("departurenumstudents").value;
@@ -651,6 +656,8 @@
             var returnnumseniors = document.getElementById("returnnumseniors").value;
             var returnnumstudents = document.getElementById("returnnumstudents").value;
             var returnnumchildren = document.getElementById("returnnumchildren").value;
+
+            document.getElementById("tripprice").value = "";
 
             var departurecityid = departurecity.options[departurecity.selectedIndex].value;
             var destinationcityid = destinationcity.options[destinationcity.selectedIndex].value;
@@ -681,7 +688,7 @@
                     var tempseniors = departurenumseniors;
                     var tempstudents = departurenumstudents;
                     var tempchildren = departurenumchildren;
-     
+    
                     //is this a return trip
                     if(reservationtype.value == "2")
                     {
@@ -747,12 +754,10 @@
 
                 } else {
                     alert("No passengers");
-
                     return false;
                 }
             } else {
                 alert("Missing departure and/or destination cities");
-
                 return false;
             }
         };
@@ -876,20 +881,15 @@
 
             if(formvalid == true)
             {
-                if (!CalcPrice())
-                {
-                    alert("Problem calculating price");
-                    formvalid = false;
-                }
-            }
-            
+                CalcPrice();
 
-            if (formvalid)
-            {
-                alert("submitting form");
-                document.getElementById("reservation").submit();
+                var checkExist = setInterval(function() {
+                    if (tripprice.value.length) {
+                        SubmitForm();
+                        clearInterval(checkExist);
+                    }
+                }, 100); // check every 100ms
             }
-            
         }
 
     </script>
