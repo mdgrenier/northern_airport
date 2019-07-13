@@ -470,8 +470,8 @@
         returndeparturevenue.onchange = ShowAddress(returndeparturevenue, returnpickupaddress);
         returndestinationvenue.onchange = ShowAddress(returndestinationvenue, returndropoffaddress);
 
-        departuretime.onclick = UpdateTime(departurecity, destinationcity, departuretime);
-        returndeparturetime.onclick = UpdateTime(returndeparturecity, returndestinationcity, returndeparturetime);
+        departuredate.onclick = UpdateTime(departurecity, destinationcity, departuretime);
+        returndeparturedate.onclick = UpdateTime(returndeparturecity, returndestinationcity, returndeparturetime);
         
         function ShowAddress(venuechanged, addresstoshow) {
             return function() {
@@ -517,6 +517,31 @@
 
         function UpdateTime(departurecityselect, destinationcityselect, timeselect) {
             return function() {
+
+                var datearray = departuredate.value.split("-");
+                jsdeparturedate = new Date();
+                jsdeparturedate.setYear(datearray[0]);
+                jsdeparturedate.setMonth(datearray[1]-1);
+                jsdeparturedate.setDate(datearray[2]);
+
+                if (jsdeparturedate === "[object Date]") 
+                {
+                    if (isNaN(jsdeparturedate.getTime())) 
+                    {
+                        alert("invalid date");    
+                        return;
+                    } 
+                } else {
+                    alert("invalid date");    
+                    return;
+                }
+
+                if(departurevenueid <= 0 || destinationvenueid <= 0)
+                {
+                    alert("select departure and destination venues");
+                    return;
+                }
+
                 var departurenorthoffset = -1;
                 var departuresouthoffset = -1;
                 var destinationnorthoffset = -1;
@@ -530,6 +555,11 @@
                 {
                     timeselect.remove(timeselect.options[i]);
                 }
+
+                var defaultopt = document.createElement('option');
+                defaultopt.appendChild(document.createTextNode('select value'));
+                defaultopt.value = 0;
+                timeselect.appendChild(defaultopt);
 
                 {{ range .Cities }}
 
