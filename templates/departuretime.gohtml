@@ -49,55 +49,46 @@
     </header>
     <main>
         <div class="container">
-            <h1>Trips</h1>
-            <div class="trip-wrapper">
-                <div class="box header" id="departuredate-header">Departure Date</div>
+            <h1>Departure Times</h1>
+            <div class="time-wrapper">
+                <div class="box header" id="cityname-header">City</div>
                 <div class="box header" id="departuretime-header">Departure Time</div>
-                <div class="box header" id="numpassengers-header">Num Passengers</div>
-                <div class="box header" id="driver-header">Driver</div>
-                <div class="box header" id="vehicle-header">Vehicle</div>
-                <div class="box header" id="capacity-header">Capacity</div>
-                <div class="box header" id="omitted-header">Omitted</div>
-                <div class="box header" id="postponed-header">Postponed</div>
-                <div class="box header" id="cancelled-header">Cancelled</div>
+                <div class="box header" id="recurring-header">Recurring</div>
+                <div class="box header" id="startdate-header">Start Date</div>
+                <div class="box header" id="enddate-header">End Date</div>
                 <div class="box header" id="save-header">Save Row</div>
+                <div class="box header" id="delete-header">Delete Row</div>
             </div>
-            <div class="trip-wrapper">
+            <div class="time-wrapper">
                 {{ range . }}
-                    <div class="box trip-row" id="departuredate-{{ .TripID }}">{{ .DepartureDate.Format "2006-01-02" }}</div>
-                    <div class="box trip-row" id="departuretime-{{ .TripID }}">{{ .DepartureTime }}</div>
-                    <div class="box trip-row" id="numpassengers-{{ .TripID }}">{{ .NumPassengers }}</div>
-                    <select class="form-control" id="driver-{{ .TripID }}" name="driverid">
-                        <option value="0">No Driver</option>
-                        {{ range .DriverList }}
-                            <option value="{{ .DriverID }}">{{ .FirstName }} {{ .LastName }}</option>
+                    <select class="form-control" id="city-{{ .DepartureTimeID }}" name="departuretimeid">
+                        {{ range .CityList }}
+                            <option value="{{ .CityID }}">{{ .CityName }}</option>
                         {{ end }}
                     </select>
-                    <select class="form-control" id="vehicle-{{ .TripID }}" name="vehicleid">
-                        <option value="0">No Vehicle</option>
-                        {{ range .VehicleList }}
-                            <option value="{{ .VehicleID }}">{{ .LicensePlate }}</option>
-                        {{ end }}
-                    </select>
-                    <div class="box trip-row" id="capacity-{{ .TripID }}">
-                        {{ .Capacity }}
+                    <div class="box time-row">
+                        <input type="text" class="form-control" id="departuretime-{{ .DepartureTimeID }}" name="departuretime-{{ .DepartureTimeID }}" value="{{ .DepartureTime }}">
                     </div>
-                    <div class="box trip-row" id="omit-{{ .TripID }}">
-                        {{ .OmitTrip }}
+                    <div class="box time-row">
+                        <input type="text" class="form-control" id="recurring-{{ .DepartureTimeID }}" name="recurring-{{ .DepartureTimeID }}" value="{{ .Recurring }}">
                     </div>
-                    <div class="box trip-row" id="postponed-{{ .TripID }}">
-                        {{ .Postpone }}
-                    </div>
-                    <div class="box trip-row" id="cancel-{{ .TripID }}">
-                        {{ .Cancelled }}
-                    </div>
-                    <div class="box trip-row" id="save-{{ .TripID }}">
+                    {{ if .StartDate.After .Epoch }}
+                        <input type="date" class="form-control" id="startdate-{{ .DepartureTimeID }}" name="startdate-{{ .DepartureTimeID }}" value='{{ .StartDate.Format "2006-01-02" }}' required>
+                    {{ else }}
+                        <input type="date" class="form-control" id="startdate-{{ .DepartureTimeID }}" name="startdate-{{ .DepartureTimeID }}" value="" required>
+                    {{ end }}
+                    {{ if .EndDate.After .Epoch }}
+                        <input type="date" class="form-control" id="enddate-{{ .DepartureTimeID }}" name="enddate-{{ .DepartureTimeID }}" value='{{ .EndDate.Format "2006-01-02" }}' required>
+                    {{ else }}
+                        <input type="date" class="form-control" id="enddate-{{ .DepartureTimeID }}" name="enddate-{{ .DepartureTimeID }}" value="" required>
+                    {{ end }}
+                    <div class="box time-row" id="save-{{ .DepartureTimeID }}">
                         <button class="btn btn-primary">Save</button>
                     </div>
+                    <div class="box time-row" id="delete-{{ .DepartureTimeID }}">
+                        <button class="btn btn-primary">Delete</button>
+                    </div>
                 {{ end }}
-            </div>
-            <div class="trip-button">
-                <button class="btn btn-primary" id="depaturetimes" onclick="location.href='/times'">Departure Times</button>
             </div>
         </div>
     </main>
@@ -110,33 +101,29 @@
     <script type="text/javascript" >
         
         {{ range . }} 
-            //set driver list to correct one by driverid
-            var driverid = {{ .DriverID }}
-            var driver = document.getElementById("driver-{{ .TripID }}");
-        
-            if (driverid != 0)
-            {
-                driver.value = driverid;
-            }
 
-            //set vehicle list to correct one by vehicleid
-            var vehicleid = {{ .VehicleID }}
-            var vehicle = document.getElementById("vehicle-{{ .TripID }}");
+            //set city list to correct one by cityid
+            var cityid = {{ .CityID }}
+            var city = document.getElementById("city-{{ .DepartureTimeID }}");
+        
+            if (cityid != 0)
+            {
+                city.value = cityid;
+
+            }
             
-        
-            if (vehicleid != 0)
-            {
-                vehicle.value = vehicleid;
-            }
-
-            var save = document.getElementById("save-{{ .TripID }}");
+            var save = document.getElementById("save-{{ .DepartureTimeID }}");
             save.onclick = function(){
-                var tripid = {{ .TripID }}
-                var vehicleid = document.getElementById("vehicle-{{ .TripID }}").value;
-                var driverid = document.getElementById("driver-{{ .TripID }}").value;    
-
+                var departuretimeid = {{ .DepartureTimeID }}
+                var cityid = document.getElementById("city-{{ .DepartureTimeID }}").value;
+                var departuretime = document.getElementById("departuretime-{{ .DepartureTimeID }}").value;
+                var recurring = document.getElementById("recurring-{{ .DepartureTimeID }}").value;
+                var startdate = document.getElementById("startdate-{{ .DepartureTimeID }}").value;
+                var enddate = document.getElementById("enddate-{{ .DepartureTimeID }}").value;
+                
                 var xhr = new XMLHttpRequest();
-                xhr.open('PUT', '/trips?tripid='+tripid+'&driverid='+driverid+'&vehicleid='+vehicleid);
+                xhr.open('PUT', '/times?departuretimeid='+departuretimeid+'&cityid='+cityid+'&departuretime='+departuretime+
+                    '&recurring='+recurring+'&startdate='+startdate+'&enddate='+enddate);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.onload = function() {
                     if (xhr.status != 200) {
@@ -151,7 +138,6 @@
                 }
             }
         {{ end }}
-
     </script>
 </body>
 </html>

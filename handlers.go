@@ -1,10 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -85,9 +87,16 @@ func SigninHandler(w http.ResponseWriter, r *http.Request) {
 
 	//validate user credentials
 	err = store.SignInUser(client)
-	if err != nil {
+
+	if err == sql.ErrNoRows {
+		log.Print("Error: ", err)
+		w.WriteHeader(http.StatusUnauthorized)
+		http.Redirect(w, r, "/badsignin", http.StatusFound)
+	} else if err != nil {
+		//this should go somewhere else, not just a bad sign in attempt if this happens
 		log.Print("Error: ", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		http.Redirect(w, r, "/badsignin", http.StatusFound)
 	}
 
 	client.Authenticated = true
@@ -126,6 +135,11 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+//BadSignInHandler - display homepage
+func BadSignInHandler(w http.ResponseWriter, r *http.Request) {
+	tpl.ExecuteTemplate(w, "badsignin.gohtml", nil)
 }
 
 //IndexHandler - display homepage
@@ -906,6 +920,88 @@ func PriceHandler(w http.ResponseWriter, r *http.Request) {
 
 	//tpl.ExecuteTemplate(w, "city.gohtml", city)
 	fmt.Fprintf(w, "%f", totalprice)
+}
+
+//DepartureTimeHandler - display time add/update/change page
+func DepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		//get data need to populate dropdowns in reservation form
+		times := store.GetDepartureTimes()
+
+		//trips[0].RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "departuretime.gohtml", times)
+	} else {
+		tpl.ExecuteTemplate(w, "index.gohtml", r)
+	}
+}
+
+//UpdateDepartureTimeHandler - update departuretime in database
+func UpdateDepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("execute update departure time handler")
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		values := r.URL.Query()
+
+		departuretime := DepartureTimes{}
+		var err error
+
+		departuretime.DepartureTimeID, err = strconv.Atoi(values["departuretimeid"][0])
+		departuretime.CityID, err = strconv.Atoi(values["cityid"][0])
+		departuretime.DepartureTime, err = strconv.Atoi(values["departuretime"][0])
+		departuretime.Recurring, err = strconv.Atoi(values["recurring"][0])
+
+		if values["startdate"][0] == "" {
+			departuretime.StartDate = time.Time{}
+
+			log.Printf("StartDate: %s", departuretime.StartDate)
+		} else {
+			departuretime.StartDate, err = time.Parse("2006-01-02", values["startdate"][0])
+
+			if err != nil {
+				log.Printf("Error converting StartDate to time.Time: %s", err.Error())
+			}
+		}
+
+		if values["enddate"][0] == "" {
+			departuretime.EndDate = time.Time{}
+
+			log.Printf("EndDate: %s", departuretime.EndDate)
+		} else {
+			departuretime.EndDate, err = time.Parse("2006-01-02", values["enddate"][0])
+
+			if err != nil {
+				log.Printf("Error converting EndDate to time.Time: %s", err.Error())
+			}
+		}
+
+		store.UpdateDepartureTime(&departuretime)
+
+		tpl.ExecuteTemplate(w, "departuretime.gohtml", departuretime)
+	} else {
+		tpl.ExecuteTemplate(w, "departuretime.gohtml", r)
+	}
+
 }
 
 //ReportHandler - display reports admin page

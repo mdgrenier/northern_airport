@@ -32,6 +32,7 @@ type Store interface {
 	DeleteCity(city int) error
 	GetDepartureTimesCount() int
 	GetDepartureTimes() []DepartureTimes
+	UpdateDepartureTime(departuretime *DepartureTimes) error
 	GetOrAddTrip(reservation *Reservation) error
 	GetTrips() []Trips
 	UpdateTrip(trip *Trips) error
@@ -569,7 +570,11 @@ func (store *dbStore) GetDepartureTimes() []DepartureTimes {
 			} else {
 				departureTimesSlice[indx].EndDate = time.Time{}
 			}
+
+			departureTimesSlice[indx].Epoch = time.Time{}
 		}
+
+		departureTimesSlice[indx].CityList = store.GetCities()
 
 		indx++
 	}
@@ -616,6 +621,53 @@ func (store *dbStore) GetDepartureTimesCount() int {
 	}
 
 	return departuretimeCount
+}
+
+//UpdateDepartureTime - update departure time
+func (store *dbStore) UpdateDepartureTime(departuretime *DepartureTimes) error {
+
+	var epoch = time.Time{}
+	var err error
+
+	log.Printf("cityid: %d", departuretime.CityID)
+	log.Printf("departuretime: %d", departuretime.DepartureTime)
+	log.Printf("recurring: %d", departuretime.Recurring)
+	log.Printf("startdate: %s", departuretime.StartDate)
+	log.Printf("enddate: %s", departuretime.EndDate)
+
+	if departuretime.StartDate.After(epoch) && departuretime.EndDate.After(epoch) {
+		log.Printf("start and end date present")
+		_, err = store.db.Exec("UPDATE departuretimes SET cityid = ?, departuretime = ?,"+
+			" recurring = ?, startdate = ?, enddate = ? WHERE departuretimeid = ?",
+			departuretime.CityID, departuretime.DepartureTime, departuretime.Recurring,
+			departuretime.StartDate, departuretime.EndDate, departuretime.DepartureTimeID)
+	} else if departuretime.StartDate.After(epoch) {
+		log.Printf("start date present")
+		_, err = store.db.Exec("UPDATE departuretimes SET cityid = ?, departuretime = ?,"+
+			" recurring = ?, startdate = ? WHERE departuretimeid = ?",
+			departuretime.CityID, departuretime.DepartureTime, departuretime.Recurring,
+			departuretime.StartDate, departuretime.DepartureTimeID)
+	} else if departuretime.EndDate.After(epoch) {
+		log.Printf("end date present")
+		_, err = store.db.Exec("UPDATE departuretimes SET cityid = ?, departuretime = ?,"+
+			" recurring = ?, enddate = ? WHERE departuretimeid = ?",
+			departuretime.CityID, departuretime.DepartureTime, departuretime.Recurring,
+			departuretime.EndDate, departuretime.DepartureTimeID)
+	} else {
+		log.Printf("neither start or end date present")
+		_, err = store.db.Exec("UPDATE departuretimes SET cityid = ?, departuretime = ?,"+
+			" recurring = ? WHERE departuretimeid = ?",
+			departuretime.CityID, departuretime.DepartureTime, departuretime.Recurring,
+			departuretime.DepartureTimeID)
+	}
+
+	if err != nil {
+		log.Printf("Error updating departure time: %s", err.Error())
+	} else {
+		log.Printf("Update Departure Time: %d", departuretime.DepartureTimeID)
+	}
+
+	return err
 }
 
 //GetClientInfo - from client username return all client info

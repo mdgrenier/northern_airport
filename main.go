@@ -78,7 +78,7 @@ type Reservation struct {
 	ReturnDepartureTimeID    int `json:"returndeparturetimeid" db:"returndeparturetimeid"`
 	ReturnDestinationCityID  int `json:"returndestinationcityid" db:"returndestinationcityid"`
 	ReturnDestinationVenueID int `json:"returndestinationvenueid" db:"returndestinationvenueid"`
-	DiscountCodeID           int       `json:"discountcodeid" db:"discountcodeid"`
+	DiscountCodeID           int `json:"discountcodeid" db:"discountcodeid"`
 	//DiscountCode         DiscountCode
 	DepartureAirlineID   int       `json:"departureairlineid" db:"departureairlineid"`
 	ReturnAirlineID      int       `json:"returnairlineid" db:"returnairlineid"`
@@ -119,12 +119,14 @@ type DiscountCode struct {
 
 // DepartureTimes - store departure times
 type DepartureTimes struct {
-	DepartureTimeID int       `json:"departuretimeid" db:"departuretimeid"`
-	CityID          int       `json:"cityid" db:"cityid"`
+	DepartureTimeID int `json:"departuretimeid" db:"departuretimeid"`
+	CityID          int `json:"cityid" db:"cityid"`
+	CityList        []Cities
 	DepartureTime   int       `json:"departuretime" db:"departuretime"`
 	Recurring       int       `json:"recurring" db:"recurring"`
 	StartDate       time.Time `json:"startdate" db:"startdate"`
 	EndDate         time.Time `json:"enddate" db:"enddate"`
+	Epoch           time.Time
 	RoleID          int
 }
 
@@ -203,10 +205,11 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/drivers", DriverHandler).Methods("GET")
 	r.HandleFunc("/cities", CityHandler).Methods("GET")
 	r.HandleFunc("/price", PriceHandler).Methods("GET")
+	r.HandleFunc("/times", DepartureTimeHandler).Methods("GET")
+	r.HandleFunc("/badsignin", BadSignInHandler).Methods("GET")
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
-	//r.HandleFunc("/trips", UpdateTripHandler).Methods("POST")
 	r.HandleFunc("/vehicles", AddVehicleHandler).Methods("POST")
 	r.HandleFunc("/venues", AddVenueHandler).Methods("POST")
 	r.HandleFunc("/drivers", AddDriverHandler).Methods("POST")
@@ -217,6 +220,7 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/venues", UpdateVenueHandler).Methods("PUT")
 	r.HandleFunc("/vehicles", UpdateVehicleHandler).Methods("PUT")
 	r.HandleFunc("/drivers", UpdateDriverHandler).Methods("PUT")
+	r.HandleFunc("/times", UpdateDepartureTimeHandler).Methods("PUT")
 	//delete method only
 	r.HandleFunc("/cities", DeleteCityHandler).Methods("DELETE")
 	r.HandleFunc("/venues", DeleteVenueHandler).Methods("DELETE")

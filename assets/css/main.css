@@ -36,6 +36,14 @@
     color: #444;
 }
 
+.time-wrapper {
+    display: grid;
+    grid-template-columns: 20% 10% 7% 20% 20% 8% 8%;
+    grid-gap: 2px;
+    background-color: #fff;
+    color: #444;
+}
+
 .driver-wrapper {
     display: grid;
     grid-template-columns: 12% 12% 8% 8%;
