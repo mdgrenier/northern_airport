@@ -88,15 +88,21 @@ func SigninHandler(w http.ResponseWriter, r *http.Request) {
 	//validate user credentials
 	err = store.SignInUser(client)
 
-	if err == sql.ErrNoRows {
-		log.Print("Error: ", err)
-		w.WriteHeader(http.StatusUnauthorized)
-		http.Redirect(w, r, "/badsignin", http.StatusFound)
-	} else if err != nil {
-		//this should go somewhere else, not just a bad sign in attempt if this happens
-		log.Print("Error: ", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		http.Redirect(w, r, "/badsignin", http.StatusFound)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("Error: ", err)
+			//w.WriteHeader(http.StatusUnauthorized)
+			http.Redirect(w, r, "/badsignin", http.StatusFound)
+		} else if err.Error() == "Incorrect Password" {
+			log.Print("Error: ", err)
+			//w.WriteHeader(http.StatusUnauthorized)
+			http.Redirect(w, r, "/badsignin", http.StatusFound)
+		} else {
+			//this should go somewhere else, not just a bad sign in attempt if this happens
+			log.Print("Error: ", err)
+			//w.WriteHeader(http.StatusInternalServerError)
+			http.Redirect(w, r, "/badsignin", http.StatusFound)
+		}
 	}
 
 	client.Authenticated = true
@@ -267,7 +273,7 @@ func DriverHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "driver.gohtml", drivers)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 
 }
@@ -307,7 +313,7 @@ func AddDriverHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "driver.gohtml", drivers)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 }
 
@@ -344,7 +350,7 @@ func UpdateDriverHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "driver.gohtml", driver)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 
 }
@@ -376,7 +382,7 @@ func DeleteDriverHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "driver.gohtml", driver)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 
 }
@@ -402,7 +408,7 @@ func VehicleHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehicles)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 }
 
@@ -442,7 +448,7 @@ func AddVehicleHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehicles)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 }
 
@@ -485,7 +491,7 @@ func UpdateVehicleHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehicle)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 
 }
@@ -518,7 +524,7 @@ func DeleteVehicleHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehicle)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 
 }
@@ -549,7 +555,7 @@ func TripHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "trip.gohtml", trips)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 
 }
@@ -594,7 +600,7 @@ func UpdateTripHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "trip.gohtml", trip)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 
 }
@@ -619,7 +625,7 @@ func VenueHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "venue.gohtml", venues)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 }
 
@@ -661,7 +667,7 @@ func AddVenueHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "venue.gohtml", venues)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 }
 
@@ -714,7 +720,7 @@ func UpdateVenueHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "venue.gohtml", venue)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 
 }
@@ -747,7 +753,7 @@ func DeleteVenueHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "venue.gohtml", venues)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 
 }
@@ -772,7 +778,7 @@ func CityHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "city.gohtml", cities)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 }
 
@@ -812,7 +818,7 @@ func AddCityHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "city.gohtml", cities)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 }
 
@@ -942,7 +948,7 @@ func DepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
 
 		tpl.ExecuteTemplate(w, "departuretime.gohtml", times)
 	} else {
-		tpl.ExecuteTemplate(w, "index.gohtml", r)
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 }
 

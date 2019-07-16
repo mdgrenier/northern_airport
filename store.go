@@ -3,6 +3,7 @@ package main
 // The sql go library is needed to interact with the database
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"strconv"
 	"time"
@@ -216,12 +217,17 @@ func (store *dbStore) SignInUser(client *Client) error {
 		} else {
 			log.Printf("Sign In Error: %s", err.Error())
 		}
-	}
 
-	// Compare the stored hashed password, with the hashed version of the password that was received
-	if err = bcrypt.CompareHashAndPassword([]byte(storedClient.Password), []byte(client.Password)); err != nil {
-		// If the two passwords don't match, return a 401 status
-		log.Print("Incorrect Password")
+	} else {
+		// Compare the stored hashed password, with the hashed version of the password that was received
+		if err = bcrypt.CompareHashAndPassword([]byte(storedClient.Password), []byte(client.Password)); err != nil {
+			// If the two passwords don't match, return a 401 status
+			log.Print("Incorrect Password")
+			err = errors.New("Incorrect Password")
+		} else {
+			log.Print("Success!")
+			err = nil
+		}
 	}
 
 	return err
