@@ -33,6 +33,7 @@ type Store interface {
 	DeleteCity(city int) error
 	GetDepartureTimesCount() int
 	GetDepartureTimes() []DepartureTimes
+	AddDepartureTime(departuretime *DepartureTimes) error
 	UpdateDepartureTime(departuretime *DepartureTimes) error
 	GetOrAddTrip(reservation *Reservation) error
 	GetTrips() []Trips
@@ -666,6 +667,56 @@ func (store *dbStore) UpdateDepartureTime(departuretime *DepartureTimes) error {
 			departuretime.CityID, departuretime.DepartureTime, departuretime.Recurring,
 			departuretime.DepartureTimeID)
 	}
+
+	if err != nil {
+		log.Printf("Error updating departure time: %s", err.Error())
+	} else {
+		log.Printf("Update Departure Time: %d", departuretime.DepartureTimeID)
+	}
+
+	return err
+}
+
+//AddDepartureTime - add departure time
+func (store *dbStore) AddDepartureTime(departuretime *DepartureTimes) error {
+
+	var epoch = time.Time{}
+	var err error
+	var result sql.Result
+
+	log.Printf("cityid: %d", departuretime.CityID)
+	log.Printf("departuretime: %d", departuretime.DepartureTime)
+	log.Printf("recurring: %d", departuretime.Recurring)
+	log.Printf("startdate: %s", departuretime.StartDate)
+	log.Printf("enddate: %s", departuretime.EndDate)
+
+	if departuretime.StartDate.After(epoch) && departuretime.EndDate.After(epoch) {
+		log.Printf("start and end date present")
+		result, err = store.db.Exec("INSERT INTO departuretimes("+
+			"cityid, departuretime, recurring, startdate, enddate) VALUES (?, ?, ?, ?, ?)",
+			departuretime.CityID, departuretime.DepartureTime, departuretime.Recurring,
+			departuretime.StartDate, departuretime.EndDate)
+	} else if departuretime.StartDate.After(epoch) {
+		log.Printf("start date present")
+		result, err = store.db.Exec("INSERT INTO departuretimes("+
+			"cityid, departuretime, recurring, enddate) VALUES (?, ?, ?, ?)",
+			departuretime.CityID, departuretime.DepartureTime, departuretime.Recurring,
+			departuretime.EndDate)
+	} else if departuretime.EndDate.After(epoch) {
+		log.Printf("end date present")
+		result, err = store.db.Exec("INSERT INTO departuretimes("+
+			"cityid, departuretime, recurring, startdate) VALUES (?, ?, ?, ?)",
+			departuretime.CityID, departuretime.DepartureTime, departuretime.Recurring,
+			departuretime.StartDate)
+	} else {
+		log.Printf("neither start or end date present")
+		result, err = store.db.Exec("INSERT INTO departuretimes("+
+			"cityid, departuretime, recurring) VALUES (?, ?, ?)",
+			departuretime.CityID, departuretime.DepartureTime, departuretime.Recurring)
+	}
+
+	id, _ := result.LastInsertId()
+	departuretime.DepartureTimeID = int(id)
 
 	if err != nil {
 		log.Printf("Error updating departure time: %s", err.Error())

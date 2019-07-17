@@ -89,6 +89,30 @@
                         <button class="btn btn-primary">Delete</button>
                     </div>
                 {{ end }}
+                
+                {{ with index . 0 }}
+                    <select class="form-control" id="city" name="departuretimeid">
+                        {{ range .CityList }}
+                            <option value="{{ .CityID }}">{{ .CityName }}</option>
+                        {{ end }}
+                    </select>
+                    
+                {{ end }}
+                <div class="box time-row">
+                    <input type="text" class="form-control" id="departuretime" name="departuretime">
+                </div>
+                <div class="box time-row">
+                    <input type="text" class="form-control" id="recurring" name="recurring">
+                </div>
+                <div class="box time-row">
+                    <input type="date" class="form-control" id="startdate" name="startdate">
+                </div>
+                <div class="box time-row">
+                    <input type="date" class="form-control" id="enddate" name="enddate">
+                </div>
+                <div class="box time-row" id="add">
+                    <button class="btn btn-primary">Add</button>
+                </div>
             </div>
         </div>
     </main>
@@ -138,6 +162,31 @@
                 }
             }
         {{ end }}
+
+        var add = document.getElementById("add");
+        add.onclick = function(){
+            var cityid = document.getElementById("city").value;
+            var departuretime = document.getElementById("departuretime").value;
+            var recurring = document.getElementById("recurring").value;
+            var startdate = document.getElementById("startdate").value;
+            var enddate = document.getElementById("enddate").value;
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/times?cityid='+cityid+'&departuretime='+departuretime+
+                '&recurring='+recurring+'&startdate='+startdate+'&enddate='+enddate);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                if (xhr.status != 200) {
+                    alert('failed:' + xhr.status);
+                }
+            }
+
+            try {
+                xhr.send();
+            } catch (err) {
+                alert("Error sending request: " + err)
+            }
+        }
     </script>
 </body>
 </html>

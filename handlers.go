@@ -1010,6 +1010,64 @@ func UpdateDepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//AddDepartureTimeHandler - update departuretime in database
+func AddDepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("execute add departure time handler")
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+
+		values := r.URL.Query()
+
+		departuretime := DepartureTimes{}
+		var err error
+
+		departuretime.CityID, err = strconv.Atoi(values["cityid"][0])
+		departuretime.DepartureTime, err = strconv.Atoi(values["departuretime"][0])
+		departuretime.Recurring, err = strconv.Atoi(values["recurring"][0])
+
+		if values["startdate"][0] == "" {
+			departuretime.StartDate = time.Time{}
+
+			log.Printf("StartDate: %s", departuretime.StartDate)
+		} else {
+			departuretime.StartDate, err = time.Parse("2006-01-02", values["startdate"][0])
+
+			if err != nil {
+				log.Printf("Error converting StartDate to time.Time: %s", err.Error())
+			}
+		}
+
+		if values["enddate"][0] == "" {
+			departuretime.EndDate = time.Time{}
+
+			log.Printf("EndDate: %s", departuretime.EndDate)
+		} else {
+			departuretime.EndDate, err = time.Parse("2006-01-02", values["enddate"][0])
+
+			if err != nil {
+				log.Printf("Error converting EndDate to time.Time: %s", err.Error())
+			}
+		}
+
+		store.AddDepartureTime(&departuretime)
+
+		tpl.ExecuteTemplate(w, "departuretime.gohtml", departuretime)
+	} else {
+		tpl.ExecuteTemplate(w, "departuretime.gohtml", r)
+	}
+
+}
+
 //ReportHandler - display reports admin page
 func ReportHandler(w http.ResponseWriter, r *http.Request) {
 

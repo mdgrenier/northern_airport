@@ -214,6 +214,7 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/venues", AddVenueHandler).Methods("POST")
 	r.HandleFunc("/drivers", AddDriverHandler).Methods("POST")
 	r.HandleFunc("/cities", AddCityHandler).Methods("POST")
+	r.HandleFunc("/times", AddDepartureTimeHandler).Methods("POST")
 	//put method only
 	r.HandleFunc("/trips", UpdateTripHandler).Methods("PUT")
 	r.HandleFunc("/cities", UpdateCityHandler).Methods("PUT")
