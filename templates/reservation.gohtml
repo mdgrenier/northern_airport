@@ -470,8 +470,8 @@
         returndeparturevenue.onchange = ShowAddress(returndeparturevenue, returnpickupaddress);
         returndestinationvenue.onchange = ShowAddress(returndestinationvenue, returndropoffaddress);
 
-        departuredate.onclick = UpdateTime(departurecity, destinationcity, departuretime);
-        returndeparturedate.onclick = UpdateTime(returndeparturecity, returndestinationcity, returndeparturetime);
+        departuredate.onfocusout = UpdateTime(departurecity, destinationcity, departuretime);
+        returndeparturedate.onfocusout = UpdateTime(returndeparturecity, returndestinationcity, returndeparturetime);
         
         function ShowAddress(venuechanged, addresstoshow) {
             return function() {
@@ -518,23 +518,35 @@
         function UpdateTime(departurecityselect, destinationcityselect, timeselect) {
             return function() {
 
+                var departurevenueid = departurevenue.options[departurevenue.selectedIndex].value;
+                var destinationvenueid = destinationvenue.options[destinationvenue.selectedIndex].value;
+
+                var retdeparturevenueid = 0;
+
+                if(reservationtype.value == "2")
+                {
+                    retdeparturevenueid = returndeparturevenue.options[returndeparturevenue.selectedIndex].value;
+                    retdestinationvenueid = returndestinationvenue.options[returndestinationvenue.selectedIndex].value;
+                }
+
                 var datearray = departuredate.value.split("-");
                 jsdeparturedate = new Date();
                 jsdeparturedate.setYear(datearray[0]);
                 jsdeparturedate.setMonth(datearray[1]-1);
                 jsdeparturedate.setDate(datearray[2]);
+                jsdeparturedate = jsdeparturedate.getFullYear() + "-" + ("0" + (jsdeparturedate.getMonth() + 1)).slice(-2)  + "-" + ("0" + jsdeparturedate.getDate()).slice(-2);
 
-                if (jsdeparturedate === "[object Date]") 
-                {
-                    if (isNaN(jsdeparturedate.getTime())) 
-                    {
-                        alert("invalid date");    
-                        return;
-                    } 
-                } else {
-                    alert("invalid date");    
-                    return;
-                }
+                //if (jsdeparturedate === "[object Date]") 
+                //{
+                //    if (isNaN(jsdeparturedate.getTime())) 
+                //    {
+                //        alert("invalid date: " + jsdeparturedate.getTime());    
+                //        return;
+                //    } 
+                //} else {
+                //    alert("invalid date: " + jsdeparturedate);    
+                //    return;
+                //}
 
                 if(departurevenueid <= 0 || destinationvenueid <= 0)
                 {
@@ -588,9 +600,19 @@
                     {
                         if(departuretimecityid == 1)
                         {
-                            opt.appendChild(document.createTextNode(time));
-                            opt.value = departuretimeid;
-                            timeselect.appendChild(opt);
+                            var startdate = {{ .StartDate.Format "2006-01-02" }};
+                            var enddate = {{ .EndDate.Format "2006-01-02" }};
+                            var epoch = {{ .Epoch.Format "2006-01-02" }};
+
+                            //ensure departure time meets date and recurrence criteria
+                            if(((startdate > epoch && jsdeparturedate >= startdate) || (startdate == epoch)) &&
+                                ((enddate > epoch && jsdeparturedate <= enddate) || (enddate == epoch)) &&
+                                ({{ .Recurring }} || startdate == jsdeparturedate))
+                            {
+                                opt.appendChild(document.createTextNode(time));
+                                opt.value = departuretimeid;
+                                timeselect.appendChild(opt);
+                            }
                         }
                     } 
                     else if(departurecityid == 2) 
