@@ -42,6 +42,9 @@
                                         <a href="/trips">Update Trip</a>
                                     </li>
                                     <li>
+                                        <a href="/search">Search</a>
+                                    </li>
+                                    <li>
                                         <a href="/drivers">Add/Change/Remove Driver</a>
                                     </li>
                                     <li>
@@ -215,7 +218,21 @@
                         </div>
                     </div>
 
-                     <div id="pickupaddress-div" class="row justify-content-around">    
+                    <div id="show-departure-airline">
+                        <div class="row justify-content-around">    
+                            <div class="col-xs-4">
+                                <label for="departureairline">Departure Airline</label>
+                                <select class="form-control" id="departureairline" name="departureairline">
+                                    <option value="0">Select an Airline</option>
+                                    {{ range .Airlines }}
+                                        <option value="{{ .AirlineID }}">{{ .Name }}</option>
+                                    {{ end }}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="pickupaddress-div" class="row justify-content-around">    
                         <div class="col-xs-4">
                             <label for="pickupaddress">Pickup Address</label>
                             <input type="text" class="form-control" id="pickupaddress" name="pickupaddress" placeholder="Pickup Address">
@@ -237,6 +254,20 @@
                             <select class="form-control" id="destinationvenue" name="destinationvenue" placeholder="Destination Venue">
                                 <option value="0">First Select a City</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div id="show-destination-airline">
+                        <div class="row justify-content-around">    
+                            <div class="col-xs-4">
+                                <label for="destinationairline">Destination Airline</label>
+                                <select class="form-control" id="destinationairline" name="destinationairline">
+                                    <option value="0">Select an Airline</option>
+                                    {{ range .Airlines }}
+                                        <option value="{{ .AirlineID }}">{{ .Name }}</option>
+                                    {{ end }}
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -303,6 +334,20 @@
                         <div class="form-group col-3"></div>
                     </div>
 
+                    <div id="show-return-departure-airline">
+                        <div class="row justify-content-around">    
+                            <div class="col-xs-4">
+                                <label for="returndepartureairline">Return Airline</label>
+                                <select class="form-control" id="returndepatureairline" name="returndepartureairline">
+                                    <option value="0">Select an Airline</option>
+                                    {{ range .Airlines }}
+                                        <option value="{{ .AirlineID }}">{{ .Name }}</option>
+                                    {{ end }}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="return-pickupaddress-div" class="row justify-content-around">    
                         <div class="col-xs-4">
                             <label for="return-pickupaddress">Return Pickup Address</label>
@@ -325,6 +370,20 @@
                             <select class="form-control" id="returndestinationvenue" name="returndestinationvenue" placeholder="Destination Venue">
                                 <option value="0">First Select a City</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div id="show-return-destination-airline">
+                        <div class="row justify-content-around">    
+                            <div class="col-xs-4">
+                                <label for="returndestinationairline">Return Airline</label>
+                                <select class="form-control" id="returndestinationairline" name="returndestinationairline">
+                                    <option value="0">Select an Airline</option>
+                                    {{ range .Airlines }}
+                                        <option value="{{ .AirlineID }}">{{ .Name }}</option>
+                                    {{ end }}
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -425,17 +484,25 @@
         var departurecity = document.getElementById("departurecity");
         var departuretime = document.getElementById("departuretime");
         var departuredate = document.getElementById("departuredate");
+        var departureairline = document.getElementById("departureairline");
+        var showdepartureairline = document.getElementById("show-departure-airline");
 
         var destinationvenue = document.getElementById("destinationvenue");
         var destinationcity = document.getElementById("destinationcity");
+        var destinationairline = document.getElementById("destinationairline");
+        var showdestinationairline = document.getElementById("show-destination-airline");
 
         var returndeparturevenue = document.getElementById("returndeparturevenue");
         var returndeparturecity = document.getElementById("returndeparturecity");
         var returndeparturetime = document.getElementById("returndeparturetime");
         var returndeparturedate = document.getElementById("returndeparturedate");
+        var returndepartureairline = document.getElementById("returndepartureairline");
+        var showreturndepartureairline = document.getElementById("show-return-departure-airline");
 
         var returndestinationvenue = document.getElementById("returndestinationvenue");
         var returndestinationcity = document.getElementById("returndestinationcity");
+        var returndestinationairline = document.getElementById("returndestinationairline");
+        var showreturndestinationairline = document.getElementById("show-return-destination-airline");
 
         var pickupaddress = document.getElementById('pickupaddress-div');
         var dropoffaddress = document.getElementById('dropoffaddress-div');
@@ -448,6 +515,9 @@
 
         var venuecount = {{ .VenueCount }};
         var venues = {{ .Venues }};
+
+        var airlinecount = {{ .AirlineCount }};
+        var airlines = {{ .Airlines }};
 
         var tempprice = 0.0;
         var totalprice = 0.0;
@@ -465,20 +535,27 @@
         returndeparturecity.onchange = UpdateVenue(returndeparturecity, returndeparturevenue);
         returndestinationcity.onchange = UpdateVenue(returndestinationcity, returndestinationvenue);
 
-        departurevenue.onchange = ShowAddress(departurevenue, pickupaddress);
-        destinationvenue.onchange = ShowAddress(destinationvenue, dropoffaddress);
-        returndeparturevenue.onchange = ShowAddress(returndeparturevenue, returnpickupaddress);
-        returndestinationvenue.onchange = ShowAddress(returndestinationvenue, returndropoffaddress);
+        departurevenue.onchange = ShowSelects(departurevenue, pickupaddress, showdepartureairline);
+        destinationvenue.onchange = ShowSelects(destinationvenue, dropoffaddress, showdestinationairline);
+        returndeparturevenue.onchange = ShowSelects(returndeparturevenue, returnpickupaddress, showreturndepartureairline);
+        returndestinationvenue.onchange = ShowSelects(returndestinationvenue, returndropoffaddress, showreturndestinationairline);
 
         departuredate.onfocusout = UpdateTime(departurecity, destinationcity, departuretime);
         returndeparturedate.onfocusout = UpdateTime(returndeparturecity, returndestinationcity, returndeparturetime);
-        
-        function ShowAddress(venuechanged, addresstoshow) {
+
+        function ShowSelects(venuechanged, addresstoshow, airlinetoshow) {
             return function() {
+                alert("Venue Value:" + venuechanged.value);
                 if(venuechanged.value == 100) {
                     addresstoshow.style.display = "block";
                 } else {
                     addresstoshow.style.display = "none";
+                }
+
+                if(venuechanged.value == 99) {
+                    airlinetoshow.style.display = "block";
+                } else {
+                    airlinetoshow.style.display = "none";
                 }
             };
         };
@@ -693,7 +770,7 @@
             tripprice.value = parseFloat(totalprice).toFixed(2);
         };
 
-         function SubmitForm() {
+        function SubmitForm() {
             alert("price: " + document.getElementById("tripprice").value);
             document.getElementById("reservation").submit();
         };

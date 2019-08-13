@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Northern Airport Trip Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+        <header>
+        {{ template "navbar" }}
+
+        {{ with index . 0 }}
+            {{ if or (eq .RoleID 3) (eq .RoleID 4) (eq .RoleID 5) }}
+                <nav class="navbar navbar-inverse" role="navigation">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#admin-navbar-collapse">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        </div>
+
+                        <div class="collapse navbar-collapse" id="admin-navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown">
+                                    <a class="dropdown-toggle" href="/reports">Reports</a>
+                                    {{- /* if user is staff or admin */ -}}
+                                    <ul class="dropdown-menu">
+                                        {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
+                                            <li class="nav-link" href="/">Test Report</li>
+                                        {{ end }}
+                                        <li class="nav-link" href="/driver-report">Driver Report</li>
+                                    </ul>
+                                </li>
+                                {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
+                                    {{ template "adminnavbar" }}
+                                {{ end }}
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            {{ end }}
+        {{ end }}
+    </header>
+    <main>
+        <div class="container">
+            <h1>Reservation Search</h1>
+            <div class="row justify-content-around">
+                <div class="col-xs-4">
+                    <label for="search-name">Name</label>
+                    <input type="text" class="form-control" id="search-name" name="search-name">
+                </div>
+                <div class="col-xs-4">
+                    <label for="search-phone">Phone</label>
+                    <input type="text" class="form-control" id="search-phone" name="search-phone">
+                </div>
+                <div class="col-xs-4">
+                    <label for="search-name">Email</label>
+                    <input type="text" class="form-control" id="search-email" name="search-email">
+                </div>
+                <div class="col-xs-4">
+                    <button class="btn btn-primary" id="search">Search</button>
+                </div>
+            </div>
+            <hr/>
+            <div class="reservation-wrapper">
+                <div class="box header" id="clientname-header">Name</div>
+                <div class="box header" id="phone-header">Phone</div>
+                <div class="box header" id="email-header">Email</div>
+                <div class="box header" id="departurevenue-header">Dep. Venue</div>
+                <div class="box header" id="destinationvenue-header">Dest. Venue</div>
+                <div class="box header" id="return-header">Return</div>
+                <div class="box header" id="numpassengers-header">Num Pass.</div>
+                <div class="box header" id="departuredate-header">Dep. Date</div>
+                <div class="box header" id="departuretime-header">Dep. Time</div>
+                <div class="box header" id="postpone-header">Ppd</div>
+                <div class="box header" id="cancel-header">Can.</div>
+            </div>
+            <div class="reservation-wrapper">
+                {{ range . }}
+                    <div class="box reservation-row" id="clientname-{{ .ReservationID }}">{{ .ClientName }}</div>
+                    <div class="box reservation-row" id="phone-{{ .ReservationID }}">{{ .Phone }}</div>
+                    <div class="box reservation-row" id="email-{{ .ReservationID }}">{{ .Email }}</div>
+                    <div class="box reservation-row" id="departurevenue-{{ .ReservationID }}">{{ .DepartureVenue }}</div>
+                    <div class="box reservation-row" id="destinationvenue-{{ .ReservationID }}">{{ .DestinationVenue }}</div>
+                    <div class="box reservation-row" id="return-{{ .ReservationID }}">{{ .Return }}</div>
+                    <div class="box reservation-row" id="numpassengers-{{ .ReservationID }}">{{ .NumPassengers }}</div>
+                    <div class="box reservation-row" id="departuredate-{{ .ReservationID }}">{{ .DepartureDate.Format "2006-01-02" }}</div>
+                    <div class="box reservation-row" id="departuretime-{{ .ReservationID }}">{{ .DepartureTime }}</div>
+                    <div class="box reservation-row" id="postponed-{{ .ReservationID }}">{{ .Postponed }}</div>
+                    <div class="box reservation-row" id="cancelled-{{ .ReservationID }}">{{ .Cancelled }}</div>
+                    <div class="box reservation-row" id="postpone-{{ .ReservationID }}">
+                        <button class="btn btn-primary">Postpone</button>
+                    </div>
+                    <div class="box reservation-row" id="cancel-{{ .ReservationID }}">
+                        <button class="btn btn-primary">Cancel</button>
+                    </div>
+                {{ end }}
+            </div>
+        </div>
+    </main>
+    
+    {{ template "footer" }}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" >
+
+        {{ range . }} 
+            var postpone = document.getElementById("postpone-{{ .ReservationID }}"); 
+            postpone.onclick = function(){
+                var reservationid = {{ .ReservationID }}
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('PUT', '/postpone?reservationid='+reservationid);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status != 200) {
+                        alert('postpone failed:' + xhr.status);
+                    }
+                }
+
+                try {
+                    xhr.send();
+                } catch (err) {
+                    alert("Error sending request: " + err)
+                }
+            }
+
+            var cancel = document.getElementById("cancel-{{ .ReservationID }}");
+            cancel.onclick = function(){
+                var reservationid = {{ .ReservationID }}
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('PUT', '/cancel?reservationid='+reservationid);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status != 200) {
+                        alert('cancel failed:' + xhr.status);
+                    }
+                }
+
+                try {
+                    xhr.send();
+                } catch (err) {
+                    alert("Error sending request: " + err)
+                }
+            }
+
+            var search = document.getElementById("search");
+            search.onclick = function(){
+
+                var searchname = document.getElementById("search-name").value;
+                var searchphone = document.getElementById("search-phone").value;
+                var searchemail = document.getElementById("search-email").value;
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/search?searchname='+searchname+'&searchphone='+searchphone+'&searchemail='+searchemail);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status != 200) {
+                        alert('search failed:' + xhr.status);
+                    }
+                }
+
+                try {
+                    xhr.send();
+                } catch (err) {
+                    alert("Error sending request: " + err)
+                }
+            }
+
+        {{ end }}
+
+    </script>
+</body>

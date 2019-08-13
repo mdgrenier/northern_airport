@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -200,6 +202,7 @@ func ReservationHandler(w http.ResponseWriter, r *http.Request) {
 	venues := store.GetVenues()
 	cities := store.GetCities()
 	departuretimes := store.GetDepartureTimes()
+	airlines := store.GetAirlines()
 
 	//store retrieved data in reservation structure and pass to template
 	resform := ResFormData{}
@@ -209,6 +212,7 @@ func ReservationHandler(w http.ResponseWriter, r *http.Request) {
 	resform.VenueCount = len(venues)
 	resform.Cities = cities
 	resform.DepartureTimes = departuretimes
+	resform.Airlines = airlines
 
 	tpl.ExecuteTemplate(w, "reservation.gohtml", resform)
 }
@@ -229,22 +233,23 @@ func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 	err := store.GetOrAddTrip(&reservation)
 
 	if err != nil {
-		log.Fatal("Error getting/adding trip: ", err)
-		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("Error creating reservation: %s", err.Error())
+		//http.Redirect(w, r, "/reservationnotcreated", http.StatusFound)
+		tpl.ExecuteTemplate(w, "reservationnotcreated.gohtml", err.Error())
 	} else {
 		log.Printf("Trip retrieved/added")
+		err = store.CreateReservation(&reservation)
+
+		if err != nil {
+			log.Fatal("Error creating reservation: ", err)
+			w.WriteHeader(http.StatusInternalServerError)
+		} else {
+			log.Print("reservation created")
+		}
+
+		http.Redirect(w, r, "/reservationcreated", http.StatusFound)
 	}
 
-	err = store.CreateReservation(&reservation)
-
-	if err != nil {
-		log.Fatal("Error creating reservation: ", err)
-		w.WriteHeader(http.StatusInternalServerError)
-	} else {
-		log.Print("reservation created")
-	}
-
-	http.Redirect(w, r, "/reservationcreated", http.StatusFound)
 }
 
 //ReservationCreatedHandler - redirect to created page
@@ -557,7 +562,6 @@ func TripHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
-
 }
 
 //UpdateTripHandler - update trip
@@ -604,6 +608,216 @@ func UpdateTripHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+//SearchHandler - update trip
+func SearchHandler(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("retrieve where values from url")
+
+	var name string
+	var phone int
+	var email string
+
+	if values["searchname"] != nil {
+		name = values["searchname"][0]
+	} else {
+		name = ""
+	}
+
+	if values["searchphone"] != nil {
+		phone, err = strconv.Atoi(values["searchphone"][0])
+	} else {
+		phone = 0
+	}
+
+	if values["searchemail"] != nil {
+		email = values["searchemail"][0]
+	} else {
+		email = ""
+	}
+
+	log.Printf("get client info")
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		//get data need to populate dropdowns in reservation form
+		log.Printf("search reservations")
+
+		searchreservations := store.SearchReservations(name, phone, email)
+
+		log.Printf("assign role id")
+
+		if len(searchreservations) > 0 {
+			searchreservations[0].RoleID = client.RoleID
+
+			log.Printf("we've got some reservations!")
+		} else {
+			log.Printf("no reservations returned!")
+		}
+
+		log.Printf("redirect to searchreservation page")
+
+		var buf bytes.Buffer
+		if err := tpl.ExecuteTemplate(&buf, "searchreservations.gohtml", searchreservations); err != nil {
+			log.Printf("Error executing HTML template: %s", err.Error())
+			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		io.Copy(w, &buf)
+	} else {
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
+	}
+}
+
+//PostponeHandler - postpone reservation
+func PostponeHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		values := r.URL.Query()
+
+		var err error
+		searchreservations := SearchReservations{}
+
+		searchreservations.ReservationID, err = strconv.Atoi(values["reservationid"][0])
+
+		if err != nil {
+			log.Printf("Error converting reservationid: %s", err.Error())
+		}
+
+		store.PostponeReservation(&searchreservations)
+
+		newsearchreservations := store.SearchReservations("", 0, "")
+
+		newsearchreservations[0].RoleID = client.RoleID
+
+		for i, res := range newsearchreservations {
+			log.Printf("#%d ReservationID Returned: %d - Postponed: %t", i, res.ReservationID, res.Postponed)
+		}
+
+		if err := tpl.ExecuteTemplate(w, "searchreservations.gohtml", newsearchreservations); err != nil {
+			log.Printf("Error executing HTML template: %s", err.Error())
+			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
+	}
+
+}
+
+//CancelHandler - cancel reservation
+func CancelHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		values := r.URL.Query()
+
+		var err error
+		searchreservations := SearchReservations{}
+
+		searchreservations.ReservationID, err = strconv.Atoi(values["reservationid"][0])
+
+		if err != nil {
+			log.Printf("Error converting reservationid: %s", err.Error())
+		}
+
+		store.CancelReservation(&searchreservations)
+
+		newsearchreservations := store.SearchReservations("", 0, "")
+
+		newsearchreservations[0].RoleID = client.RoleID
+
+		for i, res := range newsearchreservations {
+			log.Printf("#%d ReservationID Returned: %d - Cancelled: %t", i, res.ReservationID, res.Postponed)
+		}
+
+		var buf bytes.Buffer
+		//tpl.ExecuteTemplate(&buf, "searchreservations.gohtml", searchreservations)
+		if err := tpl.ExecuteTemplate(&buf, "searchreservations.gohtml", newsearchreservations); err != nil {
+			log.Printf("Error executing HTML template: %s", err.Error())
+			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		io.Copy(w, &buf)
+	} else {
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
+	}
+
+}
+
+/*
+//OmitTripHandler - omit trip
+func OmitTripHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		values := r.URL.Query()
+
+		var err error
+		trip := Trips{}
+
+		trip.TripID, err = strconv.Atoi(values["tripid"][0])
+
+		if err != nil {
+			log.Printf("Error converting tripid: %s", err.Error())
+		}
+
+		if values["cancelled"][0] == "1" {
+			trip.Cancelled = true
+		} else {
+			trip.Cancelled = false
+		}
+
+		if err != nil {
+			log.Printf("Error converting cancelled: %s", err.Error())
+		}
+
+		store.CancelTrip(&trip)
+
+		tpl.ExecuteTemplate(w, "trip.gohtml", trip)
+	} else {
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
+	}
+
+}
+*/
 
 //VenueHandler - display venue admin page
 func VenueHandler(w http.ResponseWriter, r *http.Request) {

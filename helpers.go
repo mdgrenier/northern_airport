@@ -62,6 +62,16 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 		reservation.DepartureDate, err = time.Parse("2006-01-02", r.FormValue("departuredate"))
 		reservation.DepartureTimeID, err = strconv.Atoi(r.FormValue("departuretime"))
 
+		departureairline, _ := strconv.Atoi(r.FormValue("departureairline"))
+		if departureairline > 0 {
+			reservation.DepartureAirlineID = departureairline
+		}
+
+		destinationairline, _ := strconv.Atoi(r.FormValue("destinationairline"))
+		if departureairline > 0 {
+			reservation.DepartureAirlineID = destinationairline
+		}
+
 		reservation.DepartureNumAdults, err = strconv.Atoi(r.FormValue("departurenumadults"))
 		reservation.DepartureNumSeniors, err = strconv.Atoi(r.FormValue("departurenumseniors"))
 		reservation.DepartureNumStudents, err = strconv.Atoi(r.FormValue("departurenumstudents"))
@@ -74,6 +84,16 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 			reservation.ReturnDestinationVenueID, err = strconv.Atoi(r.FormValue("returndestinationvenue"))
 			reservation.ReturnDate, err = time.Parse("2006-01-02", r.FormValue("returndeparturedate"))
 			reservation.ReturnDepartureTimeID, err = strconv.Atoi(r.FormValue("returndeparturetime"))
+
+			returndepartureairline, _ := strconv.Atoi(r.FormValue("returndepartureairline"))
+			if returndepartureairline > 0 {
+				reservation.ReturnAirlineID = returndepartureairline
+			}
+
+			returndestinationairline, _ := strconv.Atoi(r.FormValue("returndestinationairline"))
+			if returndepartureairline > 0 {
+				reservation.ReturnAirlineID = returndestinationairline
+			}
 
 			reservation.ReturnNumAdults, err = strconv.Atoi(r.FormValue("returnnumadults"))
 			reservation.ReturnNumSeniors, err = strconv.Atoi(r.FormValue("returnnumseniors"))

@@ -317,6 +317,33 @@ INSERT INTO `drivers` VALUES (1,'Andy','Duggan'),(2,'Joe','Palangio'),(3,'Mike',
 /*!40000 ALTER TABLE `drivers` ENABLE KEYS */;
 UNLOCK TABLES;
 
+
+
+--
+-- Table structure for table `omittedtrips`
+--
+
+DROP TABLE IF EXISTS `omittedtrips`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `omittedtrips` (
+  `OmittedTripsID` int(11) NOT NULL AUTO_INCREMENT,
+  `TripID` int(11) NOT NULL,
+  PRIMARY KEY (`OmittedTripsID`),
+  KEY `FK_omittrip` (`TripID`),
+  CONSTRAINT `FK_omittrip` FOREIGN KEY (`TripID`) REFERENCES `trips` (`TripID`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `omittedtrips`
+--
+
+LOCK TABLES `omittedtrips` WRITE;
+/*!40000 ALTER TABLE `omittedtrips` DISABLE KEYS */;
+/*!40000 ALTER TABLE `omittedtrips` ENABLE KEYS */;
+UNLOCK TABLES;
+
 --
 -- Table structure for table `prices`
 --
@@ -395,6 +422,8 @@ CREATE TABLE `reservations` (
   `TripID` int(11) NOT NULL,
   `BalanceOwing` float DEFAULT NULL,
   `ElavonTransactionID` int(11) DEFAULT NULL,
+  `Postponed` int(11) DEFAULT '0',
+  `Cancelled` int(11) DEFAULT '0',
   PRIMARY KEY (`ReservationID`),
   KEY `FK_163` (`DepartureCityID`),
   KEY `FK_181` (`DiscountCodeID`),
@@ -422,7 +451,7 @@ CREATE TABLE `reservations` (
 
 LOCK TABLES `reservations` WRITE;
 /*!40000 ALTER TABLE `reservations` DISABLE KEYS */;
-INSERT INTO `reservations` VALUES (1,3,1,48,1,2,16,NULL,NULL,NULL,NULL,NULL,1,1,NULL,'dnotes','inotes',1,0,0,0,NULL,NULL,NULL,NULL,120,'','',0,0,'2019-04-30',NULL,0,1,0,0),(2,4,5,4,1,2,29,NULL,NULL,NULL,NULL,NULL,1,1,NULL,'testing','test trip',1,1,0,0,NULL,NULL,NULL,NULL,75,'','',0,0,'2019-05-09',NULL,0,2,0,0);
+INSERT INTO `reservations` VALUES (1,3,1,48,1,2,16,NULL,NULL,NULL,NULL,NULL,1,1,NULL,'dnotes','inotes',1,0,0,0,NULL,NULL,NULL,NULL,120,'','',0,0,'2019-04-30',NULL,0,1,0,0,0,0),(2,4,5,4,1,2,29,NULL,NULL,NULL,NULL,NULL,1,1,NULL,'testing','test trip',1,1,0,0,NULL,NULL,NULL,NULL,75,'','',0,0,'2019-05-09',NULL,0,2,0,0,0,0);
 /*!40000 ALTER TABLE `reservations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -593,11 +622,7 @@ CREATE TABLE `trips` (
   `DriverID` int(11) DEFAULT '0',
   `VehicleID` int(11) DEFAULT '0',
   `Capacity` int(11) DEFAULT '11',
-  `OmitTrip` int(11) DEFAULT '0',
-  `Postpone` int(11) DEFAULT '0',
-  `RescheduleDate` date DEFAULT NULL,
-  `RescheduleTime` int(11) DEFAULT '0',
-  `Cancelled` int(11) DEFAULT '0',
+  `Omitted` int(11) DEFAULT '0',
   PRIMARY KEY (`TripID`),
   KEY `FK_254` (`DepartureTimeID`),
   KEY `FK_288` (`DriverID`),
@@ -612,7 +637,7 @@ CREATE TABLE `trips` (
 
 LOCK TABLES `trips` WRITE;
 /*!40000 ALTER TABLE `trips` DISABLE KEYS */;
-INSERT INTO `trips` VALUES (1,'2019-04-30',1,1,1,1,11,0,0,NULL,0,0),(2,'2019-05-09',1,2,0,0,11,0,0,NULL,0,0);
+INSERT INTO `trips` VALUES (1,'2019-04-30',1,1,1,1,11,0),(2,'2019-05-09',1,2,0,0,11,0);
 /*!40000 ALTER TABLE `trips` ENABLE KEYS */;
 UNLOCK TABLES;
 

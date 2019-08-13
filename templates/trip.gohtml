@@ -58,9 +58,8 @@
                 <div class="box header" id="vehicle-header">Vehicle</div>
                 <div class="box header" id="capacity-header">Capacity</div>
                 <div class="box header" id="omitted-header">Omitted</div>
-                <div class="box header" id="postponed-header">Postponed</div>
-                <div class="box header" id="cancelled-header">Cancelled</div>
-                <div class="box header" id="save-header">Save Row</div>
+                <div class="box header" id="save-header">Save</div>
+                <div class="box header" id="omit-header">Omit</div>
             </div>
             <div class="trip-wrapper">
                 {{ range . }}
@@ -82,17 +81,14 @@
                     <div class="box trip-row" id="capacity-{{ .TripID }}">
                         {{ .Capacity }}
                     </div>
-                    <div class="box trip-row" id="omit-{{ .TripID }}">
-                        {{ .OmitTrip }}
-                    </div>
-                    <div class="box trip-row" id="postponed-{{ .TripID }}">
-                        {{ .Postpone }}
-                    </div>
-                    <div class="box trip-row" id="cancel-{{ .TripID }}">
-                        {{ .Cancelled }}
+                    <div class="box trip-row" id="omitted-{{ .TripID }}">
+                        {{ .Omitted }}
                     </div>
                     <div class="box trip-row" id="save-{{ .TripID }}">
                         <button class="btn btn-primary">Save</button>
+                    </div>
+                    <div class="box trip-row" id="omit-{{ .TripID }}">
+                        <button class="btn btn-primary">Omit</button>
                     </div>
                 {{ end }}
             </div>
@@ -110,20 +106,19 @@
     <script type="text/javascript" >
         
         {{ range . }} 
-            //set driver list to correct one by driverid
+            //set driver list to correct driver by driverid
             var driverid = {{ .DriverID }}
             var driver = document.getElementById("driver-{{ .TripID }}");
-        
+            
             if (driverid != 0)
             {
                 driver.value = driverid;
             }
 
-            //set vehicle list to correct one by vehicleid
+            //set vehicle list to correct vehicle by vehicleid
             var vehicleid = {{ .VehicleID }}
             var vehicle = document.getElementById("vehicle-{{ .TripID }}");
-            
-        
+                        
             if (vehicleid != 0)
             {
                 vehicle.value = vehicleid;
@@ -142,6 +137,10 @@
                     if (xhr.status != 200) {
                         alert('failed:' + xhr.status);
                     }
+                    else
+                    {
+                        location.reload();
+                    }
                 }
 
                 try {
@@ -150,6 +149,12 @@
                     alert("Error sending request: " + err)
                 }
             }
+
+            var omit = document.getElementById("omit-{{ .TripID }}");
+            omit.onclick = function(){
+                
+            }
+
         {{ end }}
 
     </script>

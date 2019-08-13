@@ -4,6 +4,7 @@ package main
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -35,9 +36,15 @@ type Store interface {
 	GetDepartureTimes() []DepartureTimes
 	AddDepartureTime(departuretime *DepartureTimes) error
 	UpdateDepartureTime(departuretime *DepartureTimes) error
+	GetAirlines() []Airlines
+	GetAirlineCount() int
 	GetOrAddTrip(reservation *Reservation) error
 	GetTrips() []Trips
 	UpdateTrip(trip *Trips) error
+	OmitTrip(trip *Trips) error
+	SearchReservations(name string, phone int, email string) []SearchReservations
+	PostponeReservation(searchreservation *SearchReservations) error
+	CancelReservation(searchreservation *SearchReservations) error
 	GetDrivers() []Drivers
 	AddDriver(driver Drivers) error
 	UpdateDriver(driver *Drivers) error
@@ -777,15 +784,19 @@ func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 	var tripid int64
 	var numtrippassengers int
 	var numpassengers int
+	var capacity int
+	var omitted int
 
 	numpassengers = reservation.DepartureNumAdults + reservation.DepartureNumChildren + reservation.DepartureNumSeniors + reservation.DepartureNumStudents
 
-	err := store.db.QueryRow("select tripid, numpassengers from trips where tripid=?",
-		reservation.TripID).Scan(&tripid, &numtrippassengers)
+	err := store.db.QueryRow("select tripid, numpassengers, capacity, omitted, from trips where tripid=?",
+		reservation.TripID).Scan(&tripid, &numtrippassengers, &capacity, &omitted)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Print("No trip, create one")
+
+			//check if trip in omitted table
 
 			result, inserterr := store.db.Exec("INSERT INTO trips(departuredate, departuretimeid, numpassengers) "+
 				"VALUES (?,?,?)", reservation.DepartureDate, reservation.DepartureTimeID, numpassengers)
@@ -802,19 +813,31 @@ func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 		}
 	} else {
 		//add passengers from current reservation to trip passengers
-		numpassengers += numtrippassengers
-		_, updateerr := store.db.Exec("UPDATE trips(numpassengers)"+
-			"VALUES (?) WHERE tripid = ?", numpassengers, tripid)
+		vacancies := capacity - numpassengers
 
-		if updateerr != nil {
-			log.Printf("Error updating trip passengers: %s", updateerr.Error())
+		if omitted == 1 {
+			errorstring := fmt.Sprintf("This trip is has been cancelled")
+			err = errors.New(errorstring)
+		} else {
+			if vacancies < numpassengers {
+				errorstring := fmt.Sprintf("This trip is over capacity, only %d vacancies", vacancies)
+				err = errors.New(errorstring)
+			} else {
+				numpassengers += numtrippassengers
+
+				_, err = store.db.Exec("UPDATE trips(numpassengers)"+
+					"VALUES (?) WHERE tripid = ?", numpassengers, tripid)
+
+				if err != nil {
+					log.Printf("Error updating trip passengers: %s", err.Error())
+				}
+
+				log.Print("updated passengers num")
+
+			}
 		}
 
-		log.Print("updated passengers num")
-
 		//***if over 75% need notification***
-
-		//***if over max amount what should we do???
 	}
 
 	reservation.TripID = int(tripid)
@@ -843,7 +866,7 @@ func (store *dbStore) GetTrips() []Trips {
 
 	row, err = store.db.Query("select tripid, departuredate, t.departuretimeid, " +
 		"numpassengers, driverid, vehicleid, capacity, " +
-		"omittrip, postpone, cancelled from trips t inner join " +
+		"omitted from trips t inner join " +
 		"departuretimes dt on t.departuretimeid = dt.departuretimeid ")
 
 	if err != nil {
@@ -864,8 +887,7 @@ func (store *dbStore) GetTrips() []Trips {
 			&tripSlice[indx].TripID, &departuredate,
 			&tripSlice[indx].DepartureTimeID, &tripSlice[indx].NumPassengers,
 			&tripSlice[indx].DriverID, &tripSlice[indx].VehicleID,
-			&tripSlice[indx].Capacity, &tripSlice[indx].OmitTrip,
-			&tripSlice[indx].Postpone, &tripSlice[indx].Cancelled,
+			&tripSlice[indx].Capacity, &tripSlice[indx].Omitted,
 		)
 
 		if err != nil {
@@ -949,6 +971,185 @@ func (store *dbStore) UpdateTrip(trip *Trips) error {
 		log.Printf("Error updating trip: %s", updateerr.Error())
 	} else {
 		log.Printf("Update Trip: %d", trip.TripID)
+	}
+
+	return updateerr
+}
+
+//OmitTrip - cancel trip
+func (store *dbStore) OmitTrip(trip *Trips) error {
+
+	_, updateerr := store.db.Exec("UPDATE trips SET omitted = ? WHERE tripid = ?",
+		trip.Omitted, trip.TripID)
+
+	if updateerr != nil {
+		log.Printf("Error omitting trip: %s", updateerr.Error())
+	} else {
+		log.Printf("Omit Trip: %d", trip.TripID)
+	}
+
+	return updateerr
+}
+
+//SearchReservations - return all trips (must add parameter to return by date)
+func (store *dbStore) SearchReservations(name string, phone int, email string) []SearchReservations {
+	var reservationCount int
+
+	var addWhere bool
+	var whereClause string
+
+	whereClause = " where "
+	addWhere = false
+
+	if len(name) > 0 {
+		log.Printf("add name to where")
+		whereClause += " c.Firstname like ('" + name + "') or c.LastName like ('" + name + "') "
+		addWhere = true
+	}
+
+	if phone > 0 {
+		log.Printf("add phone to where")
+		whereClause += " c.Phone = " + strconv.Itoa(phone)
+		addWhere = true
+	}
+
+	if len(email) > 0 {
+		log.Printf("add email to where")
+		whereClause += " c.Email = '" + email + "'"
+		addWhere = true
+	}
+
+	var sqlString string
+
+	if addWhere {
+		sqlString = "select count(reservationid) " +
+			" from reservations r inner join clients c on r.clientid = c.clientid " + whereClause
+		log.Printf("sql string created with where, %s", sqlString)
+	} else {
+		sqlString = "select count(reservationid) from reservations"
+		log.Printf("sql string created")
+	}
+
+	//need to add where clause to these queries to use today's date
+	row, err := store.db.Query(sqlString)
+
+	row.Next()
+	err = row.Scan(
+		&reservationCount,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No search reservations returned")
+		} else {
+			log.Printf("Error retrieving search reservation count: %s", err.Error())
+		}
+	}
+
+	log.Printf("got the count: %d", reservationCount)
+
+	var numadults int
+	var numstudents int
+	var numseniors int
+	var numchildren int
+
+	if addWhere {
+		row, err = store.db.Query("select r.reservationid, concat(c.firstname, ' ', c.lastname) as clientname, c.phone, c.email, " +
+			"depv.name as departurevenue, desv.name as destinationvenue, r.triptypeid, " +
+			"r.departurenumadults, r.departurenumstudents, r.departurenumseniors, r.departurenumchildren, " +
+			"r.departuredate, dt.departuretime, r.postponed, r.cancelled " +
+			"from reservations r inner join clients c on r.clientid = c.clientid " +
+			"inner join venues depv on r.departurevenueid = depv.venueid " +
+			"inner join venues desv on r.destinationvenueid = desv.venueid " +
+			"inner join departuretimes dt on r.departuretimeid = dt.departuretimeid " + whereClause)
+	} else {
+		row, err = store.db.Query("select r.reservationid, concat(c.firstname, ' ', c.lastname) as clientname, c.phone, c.email, " +
+			"depv.name as departurevenue, desv.name as destinationvenue, r.triptypeid, " +
+			"r.departurenumadults, r.departurenumstudents, r.departurenumseniors, r.departurenumchildren, " +
+			"r.departuredate, dt.departuretime, r.postponed, r.cancelled " +
+			"from reservations r inner join clients c on r.clientid = c.clientid " +
+			"inner join venues depv on r.departurevenueid = depv.venueid " +
+			"inner join venues desv on r.destinationvenueid = desv.venueid " +
+			"inner join departuretimes dt on r.departuretimeid = dt.departuretimeid ")
+	}
+
+	if err != nil {
+		log.Printf("Error retrieving search reservations: %s", err.Error())
+		return nil
+	}
+	defer row.Close()
+
+	//create slice to store all departure times
+	var searchReservationSlice = make([]SearchReservations, reservationCount)
+
+	log.Printf("retrieved records")
+
+	var departuredate mysql.NullTime
+	var indx int
+
+	indx = 0
+	for row.Next() {
+		err = row.Scan(
+			&searchReservationSlice[indx].ReservationID, &searchReservationSlice[indx].ClientName,
+			&searchReservationSlice[indx].Phone, &searchReservationSlice[indx].Email,
+			&searchReservationSlice[indx].DepartureVenue, &searchReservationSlice[indx].DestinationVenue,
+			&searchReservationSlice[indx].Return, &numadults, &numstudents, &numseniors, &numchildren,
+			&departuredate, &searchReservationSlice[indx].DepartureTime,
+			&searchReservationSlice[indx].Postponed, &searchReservationSlice[indx].Cancelled,
+		)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				log.Print("No search reservations found")
+			} else {
+				log.Printf("Error retrieving search reservations: %s", err.Error())
+			}
+		} else {
+			log.Printf("setting date for record: %d", indx)
+			//store dates in departure time slice if valid dates, otherwise empty date
+			if departuredate.Valid {
+				searchReservationSlice[indx].DepartureDate = departuredate.Time
+			} else {
+				searchReservationSlice[indx].DepartureDate = time.Time{}
+			}
+
+			searchReservationSlice[indx].NumPassengers = numadults + numstudents + numseniors + numchildren
+		}
+
+		indx++
+	}
+
+	return searchReservationSlice
+}
+
+//PostponeReservation - mark reservation as postponed
+func (store *dbStore) PostponeReservation(searchreservation *SearchReservations) error {
+
+	log.Printf("Postponing Reservation: %d", searchreservation.ReservationID)
+
+	_, updateerr := store.db.Exec("UPDATE reservations SET postponed = 1 "+
+		" WHERE reservationid = ?", searchreservation.ReservationID)
+
+	if updateerr != nil {
+		log.Printf("Error postponing reservation: %s", updateerr.Error())
+	} else {
+		log.Printf("Postpone trip: %d", searchreservation.ReservationID)
+	}
+
+	return updateerr
+}
+
+//CancelReservation - mark reservation as cancelled
+func (store *dbStore) CancelReservation(searchreservation *SearchReservations) error {
+
+	log.Printf("Cancelling Reservation: %d", searchreservation.ReservationID)
+
+	_, updateerr := store.db.Exec("UPDATE reservations SET cancelled = 1 "+
+		" WHERE reservationid = ?", searchreservation.ReservationID)
+
+	if updateerr != nil {
+		log.Printf("Error postponing reservation: %s", updateerr.Error())
+	} else {
+		log.Printf("Postpone trip: %d", searchreservation.ReservationID)
 	}
 
 	return updateerr
@@ -1162,6 +1363,68 @@ func (store *dbStore) DeleteDriver(driverid int) error {
 	}
 
 	return updateerr
+}
+
+//GetAirlineCount - return count of all airlines
+func (store *dbStore) GetAirlineCount() int {
+	var airlineCount int
+
+	//need to add where clause to these queries to use today's date
+	row, err := store.db.Query("select count(airlineid) from airlines")
+
+	row.Next()
+	err = row.Scan(
+		&airlineCount,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No airlines returned")
+		} else {
+			log.Printf("Error retrieving airline count: %s", err.Error())
+		}
+
+		return 0
+	}
+
+	return airlineCount
+}
+
+//GetAirlines - return all airlines
+func (store *dbStore) GetAirlines() []Airlines {
+
+	row, err := store.db.Query("select airlineid, name, terminal " +
+		"from airlines")
+
+	if err != nil {
+		log.Printf("Error retrieving airlines times: %s", err.Error())
+		return nil
+	}
+	defer row.Close()
+
+	//create slice to store all departure times
+	var airlineSlice = make([]Airlines, store.GetAirlineCount())
+
+	var indx int
+	indx = 0
+	for row.Next() {
+		err = row.Scan(
+			&airlineSlice[indx].AirlineID, &airlineSlice[indx].Name,
+			&airlineSlice[indx].Terminal,
+		)
+
+		if err != nil {
+			// If an entry with the username does not exist, send an "Unauthorized"(401) status
+			if err == sql.ErrNoRows {
+				log.Print("No airlines found")
+			} else {
+				log.Printf("Error retrieving airlines: %s", err.Error())
+			}
+		}
+
+		indx++
+	}
+
+	return airlineSlice
 }
 
 //GetPrice - return price for a trip

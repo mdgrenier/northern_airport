@@ -62,47 +62,48 @@ type ResFormData struct {
 	VenueCount     int              `json:"venuecount" db:"venuecount"`
 	Cities         []Cities         `json:"cities" db:"cities"`
 	DepartureTimes []DepartureTimes `json:"departuretimes" db:"departuretimes"`
+	Airlines       []Airlines       `json:"airlines" db:"airlines"`
+	AirlineCount   int              `json:"airlinecount" db:"airlinecount"`
 }
 
 // Reservation - store reservation information
 type Reservation struct {
-	ReservationID            int `json:"reservationid" db:"reservationtid"`
-	ClientID                 int `json:"clientid" db:"clientid"`
-	DepartureCityID          int `json:"departurecityid" db:"departurecityid"`
-	DepartureVenueID         int `json:"departurevenueid" db:"departurevenueid"`
-	DepartureTimeID          int `json:"departuretimeid" db:"departuretimeid"`
-	DestinationCityID        int `json:"destinationcityid" db:"destinationcityid"`
-	DestinationVenueID       int `json:"destinationvenueid" db:"destinationvenueid"`
-	ReturnDepartureCityID    int `json:"returndeparturecityid" db:"returndeparturecityid"`
-	ReturnDepartureVenueID   int `json:"returndeparturevenueid" db:"returndeparturevenueid"`
-	ReturnDepartureTimeID    int `json:"returndeparturetimeid" db:"returndeparturetimeid"`
-	ReturnDestinationCityID  int `json:"returndestinationcityid" db:"returndestinationcityid"`
-	ReturnDestinationVenueID int `json:"returndestinationvenueid" db:"returndestinationvenueid"`
-	DiscountCodeID           int `json:"discountcodeid" db:"discountcodeid"`
-	//DiscountCode         DiscountCode
-	DepartureAirlineID   int       `json:"departureairlineid" db:"departureairlineid"`
-	ReturnAirlineID      int       `json:"returnairlineid" db:"returnairlineid"`
-	DriverNotes          string    `json:"drivernotes" db:"drivernotes"`
-	InternalNotes        string    `json:"internalnotes" db:"internalnotes"`
-	DepartureNumAdults   int       `json:"departurenumadults" db:"departurenumadults"`
-	DepartureNumStudents int       `json:"departurenumstudents" db:"departurenumstudent"`
-	DepartureNumSeniors  int       `json:"departurenumseniors" db:"departurenumseniors"`
-	DepartureNumChildren int       `json:"departurenumchildren" db:"departurenumchildren"`
-	ReturnNumAdults      int       `json:"returnnumadults" db:"returnnumadults"`
-	ReturnNumStudents    int       `json:"returnnumstudents" db:"returnnumstudent"`
-	ReturnNumSeniors     int       `json:"returnnumseniors" db:"returnnumseniors"`
-	ReturnNumChildren    int       `json:"returnnumchildren" db:"returnnumchildren"`
-	Price                float32   `json:"price" db:"price"`
-	Status               string    `json:"status" db:"status"`
-	Hash                 string    `json:"hash" db:"hash"`
-	CustomDepartureID    int       `json:"customdepartureid" db:"customdepartureid"`
-	CustomDestinationID  int       `json:"customdestinationid" db:"customdestinationid"`
-	DepartureDate        time.Time `json:"departuredate" db:"departuredate"`
-	ReturnDate           time.Time `json:"returndate" db:"returndate"`
-	TripTypeID           int       `json:"triptypeid" db:"triptypeid"`
-	TripID               int       `json:"tripid" db:"tripid"`
-	BalanceOwing         float32   `json:"balanceowing" db:"balanceowing"`
-	ElavonTransactionID  int       `json:"elavontranscationid" db:"elavontransactionid"`
+	ReservationID            int       `json:"reservationid" db:"reservationtid"`
+	ClientID                 int       `json:"clientid" db:"clientid"`
+	DepartureCityID          int       `json:"departurecityid" db:"departurecityid"`
+	DepartureVenueID         int       `json:"departurevenueid" db:"departurevenueid"`
+	DepartureTimeID          int       `json:"departuretimeid" db:"departuretimeid"`
+	DestinationCityID        int       `json:"destinationcityid" db:"destinationcityid"`
+	DestinationVenueID       int       `json:"destinationvenueid" db:"destinationvenueid"`
+	ReturnDepartureCityID    int       `json:"returndeparturecityid" db:"returndeparturecityid"`
+	ReturnDepartureVenueID   int       `json:"returndeparturevenueid" db:"returndeparturevenueid"`
+	ReturnDepartureTimeID    int       `json:"returndeparturetimeid" db:"returndeparturetimeid"`
+	ReturnDestinationCityID  int       `json:"returndestinationcityid" db:"returndestinationcityid"`
+	ReturnDestinationVenueID int       `json:"returndestinationvenueid" db:"returndestinationvenueid"`
+	DiscountCodeID           int       `json:"discountcodeid" db:"discountcodeid"`
+	DepartureAirlineID       int       `json:"departureairlineid" db:"departureairlineid"`
+	ReturnAirlineID          int       `json:"returnairlineid" db:"returnairlineid"`
+	DriverNotes              string    `json:"drivernotes" db:"drivernotes"`
+	InternalNotes            string    `json:"internalnotes" db:"internalnotes"`
+	DepartureNumAdults       int       `json:"departurenumadults" db:"departurenumadults"`
+	DepartureNumStudents     int       `json:"departurenumstudents" db:"departurenumstudent"`
+	DepartureNumSeniors      int       `json:"departurenumseniors" db:"departurenumseniors"`
+	DepartureNumChildren     int       `json:"departurenumchildren" db:"departurenumchildren"`
+	ReturnNumAdults          int       `json:"returnnumadults" db:"returnnumadults"`
+	ReturnNumStudents        int       `json:"returnnumstudents" db:"returnnumstudent"`
+	ReturnNumSeniors         int       `json:"returnnumseniors" db:"returnnumseniors"`
+	ReturnNumChildren        int       `json:"returnnumchildren" db:"returnnumchildren"`
+	Price                    float32   `json:"price" db:"price"`
+	Status                   string    `json:"status" db:"status"`
+	Hash                     string    `json:"hash" db:"hash"`
+	CustomDepartureID        int       `json:"customdepartureid" db:"customdepartureid"`
+	CustomDestinationID      int       `json:"customdestinationid" db:"customdestinationid"`
+	DepartureDate            time.Time `json:"departuredate" db:"departuredate"`
+	ReturnDate               time.Time `json:"returndate" db:"returndate"`
+	TripTypeID               int       `json:"triptypeid" db:"triptypeid"`
+	TripID                   int       `json:"tripid" db:"tripid"`
+	BalanceOwing             float32   `json:"balanceowing" db:"balanceowing"`
+	ElavonTransactionID      int       `json:"elavontranscationid" db:"elavontransactionid"`
 }
 
 // DiscountCode - store discount code
@@ -142,12 +143,27 @@ type Trips struct {
 	VehicleID       int `json:"vehicleid" db:"vehicleid"`
 	VehicleList     []Vehicles
 	Capacity        int       `json:"capacity" db:"capacity"`
-	OmitTrip        bool      `json:"omittrip" db:"omittrip"`
-	Postpone        bool      `json:"postpone" db:"postpone"`
+	Omitted         int       `json:"omitted" db:"omitted"`
 	RescheduleDate  time.Time `json:"rescheduledate" db:"rescheduledate"`
 	RescheduleTime  time.Time `json:"rescheduletime" db:"rescheduletime"`
-	Cancelled       bool      `json:"cancelled" db:"cancelled"`
 	RoleID          int
+}
+
+//SearchReservations - reservation display structure
+type SearchReservations struct {
+	ReservationID    int       `json:"reservationid" db:"reservationid"`
+	ClientName       string    `json:"clientname" db:"clientname"`
+	Phone            int       `json:"phone" db:"phone"`
+	Email            string    `json:"email" db:"email"`
+	DepartureVenue   string    `json:"departurevenue" db:"departurevenue"`
+	DestinationVenue string    `json:"destinationvenue" db:"destinationvenue"`
+	Return           bool      `json:"return" db:"return"`
+	NumPassengers    int       `json:"numpassengers" db:"numpassengers"`
+	DepartureDate    time.Time `json:"departuredate" db:"departuredate"`
+	DepartureTime    int       `json:"departuretime" db:"departuretime"`
+	Postponed        bool      `json:"postponed" db:"postponed"`
+	Cancelled        bool      `json:"cancelled" db:"cancelled"`
+	RoleID           int
 }
 
 //Drivers - store driver data
@@ -165,6 +181,13 @@ type Vehicles struct {
 	NumSeats     int    `json:"numseats" db:"numseats"`
 	Make         string `json:"make" db:"make"`
 	RoleID       int
+}
+
+//Airlines - store airline data
+type Airlines struct {
+	AirlineID int    `json:"airlineid" db:"airlineid"`
+	Name      string `json:"name" db:"name"`
+	Terminal  int    `json:"terminal" db:"terminal"`
 }
 
 var dateLayout string
@@ -207,6 +230,7 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/price", PriceHandler).Methods("GET")
 	r.HandleFunc("/times", DepartureTimeHandler).Methods("GET")
 	r.HandleFunc("/badsignin", BadSignInHandler).Methods("GET")
+	r.HandleFunc("/search", SearchHandler).Methods("GET")
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
@@ -222,6 +246,8 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/vehicles", UpdateVehicleHandler).Methods("PUT")
 	r.HandleFunc("/drivers", UpdateDriverHandler).Methods("PUT")
 	r.HandleFunc("/times", UpdateDepartureTimeHandler).Methods("PUT")
+	r.HandleFunc("/postpone", PostponeHandler).Methods("PUT")
+	r.HandleFunc("/cancel", CancelHandler).Methods("PUT")
 	//delete method only
 	r.HandleFunc("/cities", DeleteCityHandler).Methods("DELETE")
 	r.HandleFunc("/venues", DeleteVenueHandler).Methods("DELETE")
