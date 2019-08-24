@@ -68,40 +68,7 @@
                 </div>
             </div>
             <hr/>
-            <div class="reservation-wrapper">
-                <div class="box header" id="clientname-header">Name</div>
-                <div class="box header" id="phone-header">Phone</div>
-                <div class="box header" id="email-header">Email</div>
-                <div class="box header" id="departurevenue-header">Dep. Venue</div>
-                <div class="box header" id="destinationvenue-header">Dest. Venue</div>
-                <div class="box header" id="return-header">Return</div>
-                <div class="box header" id="numpassengers-header">Num Pass.</div>
-                <div class="box header" id="departuredate-header">Dep. Date</div>
-                <div class="box header" id="departuretime-header">Dep. Time</div>
-                <div class="box header" id="postpone-header">Ppd</div>
-                <div class="box header" id="cancel-header">Can.</div>
-            </div>
-            <div class="reservation-wrapper">
-                {{ range . }}
-                    <div class="box reservation-row" id="clientname-{{ .ReservationID }}">{{ .ClientName }}</div>
-                    <div class="box reservation-row" id="phone-{{ .ReservationID }}">{{ .Phone }}</div>
-                    <div class="box reservation-row" id="email-{{ .ReservationID }}">{{ .Email }}</div>
-                    <div class="box reservation-row" id="departurevenue-{{ .ReservationID }}">{{ .DepartureVenue }}</div>
-                    <div class="box reservation-row" id="destinationvenue-{{ .ReservationID }}">{{ .DestinationVenue }}</div>
-                    <div class="box reservation-row" id="return-{{ .ReservationID }}">{{ .Return }}</div>
-                    <div class="box reservation-row" id="numpassengers-{{ .ReservationID }}">{{ .NumPassengers }}</div>
-                    <div class="box reservation-row" id="departuredate-{{ .ReservationID }}">{{ .DepartureDate.Format "2006-01-02" }}</div>
-                    <div class="box reservation-row" id="departuretime-{{ .ReservationID }}">{{ .DepartureTime }}</div>
-                    <div class="box reservation-row" id="postponed-{{ .ReservationID }}">{{ .Postponed }}</div>
-                    <div class="box reservation-row" id="cancelled-{{ .ReservationID }}">{{ .Cancelled }}</div>
-                    <div class="box reservation-row" id="postpone-{{ .ReservationID }}">
-                        <button class="btn btn-primary">Postpone</button>
-                    </div>
-                    <div class="box reservation-row" id="cancel-{{ .ReservationID }}">
-                        <button class="btn btn-primary">Cancel</button>
-                    </div>
-                {{ end }}
-            </div>
+            {{ template "search" . }}
         </div>
     </main>
     
@@ -112,71 +79,73 @@
 
     <script type="text/javascript" >
 
-        {{ range . }} 
-            var postpone = document.getElementById("postpone-{{ .ReservationID }}"); 
-            postpone.onclick = function(){
-                var reservationid = {{ .ReservationID }}
+        window.onload = function () {
+            {{ range . }} 
+                var postpone = document.getElementById("postpone-{{ .ReservationID }}"); 
+                postpone.onclick = function(){
+                    var reservationid = {{ .ReservationID }}
 
-                var xhr = new XMLHttpRequest();
-                xhr.open('PUT', '/postpone?reservationid='+reservationid);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onload = function() {
-                    if (xhr.status != 200) {
-                        alert('postpone failed:' + xhr.status);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('PUT', '/postpone?reservationid='+reservationid);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    xhr.onload = function() {
+                        if (xhr.status != 200) {
+                            alert('postpone failed:' + xhr.status);
+                        }
+                    }
+
+                    try {
+                        xhr.send();
+                    } catch (err) {
+                        alert("Error sending request: " + err)
                     }
                 }
 
-                try {
-                    xhr.send();
-                } catch (err) {
-                    alert("Error sending request: " + err)
-                }
-            }
+                var cancel = document.getElementById("cancel-{{ .ReservationID }}");
+                cancel.onclick = function(){
+                    var reservationid = {{ .ReservationID }}
 
-            var cancel = document.getElementById("cancel-{{ .ReservationID }}");
-            cancel.onclick = function(){
-                var reservationid = {{ .ReservationID }}
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('PUT', '/cancel?reservationid='+reservationid);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    xhr.onload = function() {
+                        if (xhr.status != 200) {
+                            alert('cancel failed:' + xhr.status);
+                        }
+                    }
 
-                var xhr = new XMLHttpRequest();
-                xhr.open('PUT', '/cancel?reservationid='+reservationid);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onload = function() {
-                    if (xhr.status != 200) {
-                        alert('cancel failed:' + xhr.status);
+                    try {
+                        xhr.send();
+                    } catch (err) {
+                        alert("Error sending request: " + err)
                     }
                 }
 
-                try {
-                    xhr.send();
-                } catch (err) {
-                    alert("Error sending request: " + err)
-                }
-            }
+                var search = document.getElementById("search");
+                search.onclick = function(){
 
-            var search = document.getElementById("search");
-            search.onclick = function(){
+                    var searchname = document.getElementById("search-name").value;
+                    var searchphone = document.getElementById("search-phone").value;
+                    var searchemail = document.getElementById("search-email").value;
 
-                var searchname = document.getElementById("search-name").value;
-                var searchphone = document.getElementById("search-phone").value;
-                var searchemail = document.getElementById("search-email").value;
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', '/search2?searchname='+searchname+'&searchphone='+searchphone+'&searchemail='+searchemail);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    xhr.onload = function() {
+                        if (xhr.status != 200) {
+                            alert('search failed:' + xhr.status);
+                        }
+                    }
 
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', '/search?searchname='+searchname+'&searchphone='+searchphone+'&searchemail='+searchemail);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onload = function() {
-                    if (xhr.status != 200) {
-                        alert('search failed:' + xhr.status);
+                    try {
+                        xhr.send();
+                    } catch (err) {
+                        alert("Error sending request: " + err)
                     }
                 }
 
-                try {
-                    xhr.send();
-                } catch (err) {
-                    alert("Error sending request: " + err)
-                }
-            }
-
-        {{ end }}
+            {{ end }}
+        }
 
     </script>
 </body>

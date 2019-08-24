@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"text/template"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -609,7 +610,7 @@ func UpdateTripHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//SearchHandler - update trip
+//SearchHandler - display reservations
 func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 
@@ -618,8 +619,6 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	log.Printf("retrieve where values from url")
 
 	var name string
 	var phone int
@@ -643,7 +642,64 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 		email = ""
 	}
 
-	log.Printf("get client info")
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		//get data need to populate dropdowns in reservation form
+		searchreservations := store.SearchReservations(name, phone, email)
+
+		if len(searchreservations) > 0 {
+			searchreservations[0].RoleID = client.RoleID
+
+			log.Printf("search: we've got some reservations!")
+		} else {
+			log.Printf("search: no reservations returned!")
+		}
+
+		if err := tpl.ExecuteTemplate(w, "searchreservations.gohtml", searchreservations); err != nil {
+			log.Printf("Error executing HTML template: %s", err.Error())
+			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
+		}
+	} else {
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
+	}
+}
+
+//Search2Handler - display reservations
+func Search2Handler(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("refresh table")
+
+	var name string
+	var phone int
+	var email string
+
+	if values["searchname"] != nil {
+		name = values["searchname"][0]
+	} else {
+		name = ""
+	}
+
+	if values["searchphone"] != nil {
+		phone, err = strconv.Atoi(values["searchphone"][0])
+	} else {
+		phone = 0
+	}
+
+	if values["searchemail"] != nil {
+		email = values["searchemail"][0]
+	} else {
+		email = ""
+	}
 
 	//get client data from session cookie
 	client := GetClient(session)
@@ -655,26 +711,36 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 
 		searchreservations := store.SearchReservations(name, phone, email)
 
-		log.Printf("assign role id")
-
 		if len(searchreservations) > 0 {
 			searchreservations[0].RoleID = client.RoleID
 
-			log.Printf("we've got some reservations!")
+			log.Printf("searchreservations: we've got some reservations!")
 		} else {
-			log.Printf("no reservations returned!")
+			log.Printf("searchreservations: no reservations returned!")
 		}
 
-		log.Printf("redirect to searchreservation page")
+		//var buf bytes.Buffer
+		//if err := tpl.ExecuteTemplate(&buf, "searchreservations.gohtml", searchreservations); err != nil {
+		//	log.Printf("Error executing HTML template: %s", err.Error())
+		//	http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
+		//	return
+		//}
 
-		var buf bytes.Buffer
-		if err := tpl.ExecuteTemplate(&buf, "searchreservations.gohtml", searchreservations); err != nil {
+		searchtemp, err := template.ParseFiles("./templates/layout.gohtml")
+		if err != nil {
+			log.Printf("Error parsing searchreservations: %s", err.Error())
+		} else {
+			err = searchtemp.ExecuteTemplate(w, "search", searchreservations)
+		}
+
+		if err != nil {
 			log.Printf("Error executing HTML template: %s", err.Error())
 			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
-			return
+		} else {
+			for i, res := range searchreservations {
+				log.Printf("ReservationID: %d: %d", i, res.ReservationID)
+			}
 		}
-
-		io.Copy(w, &buf)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}

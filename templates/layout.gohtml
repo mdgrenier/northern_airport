@@ -115,3 +115,40 @@
         </div>
     {{ end }}
 {{ end }}
+
+{{ define "search" }}
+    <div class="reservation-wrapper">
+        <div class="box header" id="clientname-header">Name</div>
+        <div class="box header" id="phone-header">Phone</div>
+        <div class="box header" id="email-header">Email</div>
+        <div class="box header" id="departurevenue-header">Dep. Venue</div>
+        <div class="box header" id="destinationvenue-header">Dest. Venue</div>
+        <div class="box header" id="return-header">Return</div>
+        <div class="box header" id="numpassengers-header">Num Pass.</div>
+        <div class="box header" id="departuredate-header">Dep. Date</div>
+        <div class="box header" id="departuretime-header">Dep. Time</div>
+        <div class="box header" id="postpone-header">Ppd</div>
+        <div class="box header" id="cancel-header">Can.</div>
+    </div>
+    <div class="reservation-wrapper">
+        {{ range . }}
+            <div class="box reservation-row" id="clientname-{{ .ReservationID }}">{{ .ClientName }}</div>
+            <div class="box reservation-row" id="phone-{{ .ReservationID }}">{{ .Phone }}</div>
+            <div class="box reservation-row" id="email-{{ .ReservationID }}">{{ .Email }}</div>
+            <div class="box reservation-row" id="departurevenue-{{ .ReservationID }}">{{ .DepartureVenue }}</div>
+            <div class="box reservation-row" id="destinationvenue-{{ .ReservationID }}">{{ .DestinationVenue }}</div>
+            <div class="box reservation-row" id="return-{{ .ReservationID }}">{{ .Return }}</div>
+            <div class="box reservation-row" id="numpassengers-{{ .ReservationID }}">{{ .NumPassengers }}</div>
+            <div class="box reservation-row" id="departuredate-{{ .ReservationID }}">{{ .DepartureDate.Format "2006-01-02" }}</div>
+            <div class="box reservation-row" id="departuretime-{{ .ReservationID }}">{{ .DepartureTime }}</div>
+            <div class="box reservation-row" id="postponed-{{ .ReservationID }}">{{ .Postponed }}</div>
+            <div class="box reservation-row" id="cancelled-{{ .ReservationID }}">{{ .Cancelled }}</div>
+            <div class="box reservation-row" id="postpone-{{ .ReservationID }}">
+                <button class="btn btn-primary">Postpone</button>
+            </div>
+            <div class="box reservation-row" id="cancel-{{ .ReservationID }}">
+                <button class="btn btn-primary">Cancel</button>
+            </div>
+        {{ end }}
+    </div>
+{{ end }}
