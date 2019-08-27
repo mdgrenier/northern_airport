@@ -139,7 +139,9 @@
                     }
                     else
                     {
-                        location.reload();
+                        document.open(); 
+                        document.write(xhr.response); 
+                        document.close();
                     }
                 }
 

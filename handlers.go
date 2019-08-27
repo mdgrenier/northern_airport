@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
-	"text/template"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -603,7 +603,11 @@ func UpdateTripHandler(w http.ResponseWriter, r *http.Request) {
 
 		store.UpdateTrip(&trip)
 
-		tpl.ExecuteTemplate(w, "trip.gohtml", trip)
+		trips := store.GetTrips()
+
+		trips[0].RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "trip.gohtml", trips)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
@@ -719,13 +723,6 @@ func Search2Handler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("searchreservations: no reservations returned!")
 		}
 
-		//var buf bytes.Buffer
-		//if err := tpl.ExecuteTemplate(&buf, "searchreservations.gohtml", searchreservations); err != nil {
-		//	log.Printf("Error executing HTML template: %s", err.Error())
-		//	http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
-		//	return
-		//}
-
 		searchtemp, err := template.ParseFiles("./templates/layout.gohtml")
 		if err != nil {
 			log.Printf("Error parsing searchreservations: %s", err.Error())
@@ -741,9 +738,31 @@ func Search2Handler(w http.ResponseWriter, r *http.Request) {
 				log.Printf("ReservationID: %d: %d", i, res.ReservationID)
 			}
 		}
+
+		// layout file must be the first parameter in ParseFiles!
+		templates, err := template.ParseFiles(
+			"templates/layout.gohtml",
+			"templates/searchreservations.gohtml",
+		)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		//if err := templates.ExecuteTemplate(io.MultiWriter(w, &buf), "search", searchreservations); err != nil {
+		if err := templates.ExecuteTemplate(w, "search", searchreservations); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
+			for i, res := range searchreservations {
+				log.Printf("ReservationID: %d: %d", i, res.ReservationID)
+			}
+
+			log.Printf("%#v\n", w)
+		}
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
+
 }
 
 //PostponeHandler - postpone reservation
