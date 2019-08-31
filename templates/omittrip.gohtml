@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Northern Airport Trip Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+    <header>
+        {{ template "navbar" }}
+
+        {{ template "adminnavbar" . }}
+
+    </header>
+    <main>
+        <div class="container">
+            <h1>Trip</h1>
+            <div class="omittrip-wrapper">
+                <div class="row justify-content-around">
+                    <div class="col-xs-4">
+                        <label for="departuredate">Departure Date</label>
+                        <input type="date" class="form-control" id="departuredate" name="departuredate" required>
+                    </div>
+                    <div class="col-xs-4">
+                        <label for="departuretime">Departure Time</label>
+                        <select class="form-control" id="departuretime" name="departuretime">
+                            {{ range .DepartureTimes }}
+                                <option value="{{ .DepartureTimeID }}">{{ .DepartureTime }}</option>
+                            {{ end }}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="omittrip-button">
+                <button class="btn btn-primary" id="omittrip">Omit Trip</button>
+            </div>
+        </div>
+    </main>
+    
+    {{ template "footer" }}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" >
+        
+        var omit = document.getElementById("omittrip");
+        omit.onclick = function(){
+            var departuredate = document.getElementById("departuredate").value;
+            var departuretimeid = document.getElementById("departuretime").value;    
+            alert("field values obtained: "+departuredate+" & "+departuretimeid);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', '/omittrip?departuredate='+departuredate+'&departuretimeid='+departuretimeid);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                alert("omit trip");
+                if (xhr.status != 200) {
+                    alert('failed:' + xhr.status);
+                }
+                else
+                {
+                    document.open(); 
+                    document.write(xhr.response); 
+                    document.close();
+                }
+            }
+
+            try {
+                xhr.send();
+            } catch (err) {
+                alert("Error sending request: " + err)
+            }        
+        }
+
+    </script>
+</body>
+</html>

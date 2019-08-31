@@ -110,6 +110,10 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 	var insertError error
 	var id int64
 
+	/*****************************************************
+	*	must ensure trip is not omitted!
+	******************************************************/
+
 	if reservation.TripTypeID == 2 {
 		result, err := store.db.Exec("INSERT INTO reservations("+
 			"clientid, departurecityid, departurevenueid, departuretimeid, "+
@@ -979,16 +983,44 @@ func (store *dbStore) UpdateTrip(trip *Trips) error {
 //OmitTrip - cancel trip
 func (store *dbStore) OmitTrip(trip *Trips) error {
 
-	_, updateerr := store.db.Exec("UPDATE trips SET omitted = ? WHERE tripid = ?",
-		trip.Omitted, trip.TripID)
+	var tripid int
 
-	if updateerr != nil {
-		log.Printf("Error omitting trip: %s", updateerr.Error())
+	row := store.db.QueryRow("SELECT tripid FROM trips WHERE departuredate = ? AND departuretimeid = ?",
+		trip.DepartureDate, trip.DepartureTimeID)
+
+	err := row.Scan(
+		&tripid,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			_, inserterr := store.db.Exec("INSERT INTO trips (departuredate, departuretimeid, omitted) "+
+				"VALUE (?,?,?)", trip.DepartureDate, trip.DepartureTimeID, 1)
+
+			if inserterr != nil {
+				log.Printf("Error creating omitted trip: %s", inserterr.Error())
+			} else {
+				log.Printf("Created Omitted Trip: %d", trip.TripID)
+			}
+
+			err = inserterr
+		} else {
+			log.Printf("Error getting tripid: %s", err.Error())
+		}
 	} else {
-		log.Printf("Omit Trip: %d", trip.TripID)
+		_, updateerr := store.db.Exec("UPDATE trips SET omitted = ? WHERE tripid = ?",
+			1, tripid)
+
+		if updateerr != nil {
+			log.Printf("Error omitting trip: %s", updateerr.Error())
+		} else {
+			log.Printf("Omitted Trip: %d", trip.TripID)
+		}
+
+		err = updateerr
 	}
 
-	return updateerr
+	return err
 }
 
 //SearchReservations - return all trips (must add parameter to return by date)

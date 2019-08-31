@@ -34,6 +34,25 @@
     opacity: 0.9;
 }
 
+.dropdown-toggle {
+    color: #9d9d9d;
+    padding: 10px 15px;
+}
+
+/*
+.dropdown-menu .nav-link {
+    color: #9d9d9d;
+    background: #101010;
+    padding: 10px 15px;
+    opacity: 0.9;
+}
+*/
+
+.dropdown-menu {
+    margin-top: 0px;
+    padding: 0px;
+}
+
 .trip-wrapper {
     display: grid;
     grid-template-columns: 10% 10% 11% 12% 14% 6% 7% 7% 7%;
@@ -101,4 +120,8 @@
 
 .header {
   background-color: #999;
+}
+
+.nav>li>a {
+    padding: 10px 10px;
 }

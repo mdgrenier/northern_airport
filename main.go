@@ -149,6 +149,15 @@ type Trips struct {
 	RoleID          int
 }
 
+// OmitTrip - store omit trip data
+type OmitTrip struct {
+	TripID          int              `json:"tripid" db:"tripid"`
+	DepartureDate   time.Time        `json:"departuredate" db:"departuredate"`
+	DepartureTimeID int              `json:"departuretimeid" db:"departuretimeid"`
+	DepartureTimes  []DepartureTimes `json:"departuretimes" db:"departuretimes"`
+	RoleID          int
+}
+
 //SearchReservations - reservation display structure
 type SearchReservations struct {
 	ReservationID    int       `json:"reservationid" db:"reservationid"`
@@ -223,6 +232,7 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/reports", ReportHandler)
 	//get method only
 	r.HandleFunc("/trips", TripHandler).Methods("GET")
+	r.HandleFunc("/omittrip", OmitTripFormHandler).Methods("GET")
 	r.HandleFunc("/vehicles", VehicleHandler).Methods("GET")
 	r.HandleFunc("/venues", VenueHandler).Methods("GET")
 	r.HandleFunc("/drivers", DriverHandler).Methods("GET")
@@ -231,7 +241,8 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/times", DepartureTimeHandler).Methods("GET")
 	r.HandleFunc("/badsignin", BadSignInHandler).Methods("GET")
 	r.HandleFunc("/search", SearchHandler).Methods("GET")
-	r.HandleFunc("/search2", Search2Handler).Methods("GET")
+	//r.HandleFunc("/search2", Search2Handler).Methods("GET")
+	r.HandleFunc("/driverreport", DriverReportHandler).Methods("GET")
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
@@ -249,6 +260,7 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/times", UpdateDepartureTimeHandler).Methods("PUT")
 	r.HandleFunc("/postpone", PostponeHandler).Methods("PUT")
 	r.HandleFunc("/cancel", CancelHandler).Methods("PUT")
+	r.HandleFunc("/omittrip", OmitTripHandler).Methods("PUT")
 	//delete method only
 	r.HandleFunc("/cities", DeleteCityHandler).Methods("DELETE")
 	r.HandleFunc("/venues", DeleteVenueHandler).Methods("DELETE")
