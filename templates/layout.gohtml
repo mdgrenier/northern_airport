@@ -55,15 +55,19 @@
                             </div>
                         </li>
                         {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
-                             <div class="dropdown">
-                                <div class="dropdown-toggle" data-toggle="dropdown">Trips
-                                    <span class="caret"></span>
+                            <li>
+                            
+                                <div class="dropdown">
+                                    <div class="dropdown-toggle" data-toggle="dropdown">Trips
+                                        <span class="caret"></span>
+                                    </div>
+                                    <ul class="dropdown-menu">
+                                        <li class="nav-link-inverse" href="/trips">Update Trips</li>
+                                        <li class="nav-link-inverse"><a href="/omittrip">Omit Trip</a></li>
+                                        <li class="nav-link-inverse"><a href="/prices">Update Price</a></li>
+                                    </ul>
                                 </div>
-                                <ul class="dropdown-menu">
-                                    <li class="nav-link-inverse" href="/trips">Update Trips</li>
-                                    <li class="nav-link-inverse"><a href="/omittrip">Omit Trip</a></li>
-                                </ul>
-                            </div>
+                            </li>
                             <li>
                                 <a href="/search">Search</a>
                             </li>

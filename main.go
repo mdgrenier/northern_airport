@@ -199,6 +199,20 @@ type Airlines struct {
 	Terminal  int    `json:"terminal" db:"terminal"`
 }
 
+//Prices - store price data
+type Prices struct {
+	PriceID           int     `json:"priceid" db:"priceid"`
+	CustomerTypeID    int     `json:"customertypeid" db:"customertypeid"`
+	CustomerType      string  `json:"customertype" db:"customertype"`
+	Price             float32 `json:"price" db:"price"`
+	ReturnPrice       float32 `json:"returnprice" db:"returnprice"`
+	DepartureCity     string  `json:"departurecity" db:"departurecity"`
+	DepartureCityID   int     `json:"departurecityid" db:"departurecityid"`
+	DestinationCity   string  `json:"destinationcity" db:"destinationcity"`
+	DestinationCityID int     `json:"destinationcityid" db:"destinationcityid"`
+	RoleID            int
+}
+
 var dateLayout string
 var sessionStore *sessions.CookieStore
 
@@ -237,7 +251,8 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/venues", VenueHandler).Methods("GET")
 	r.HandleFunc("/drivers", DriverHandler).Methods("GET")
 	r.HandleFunc("/cities", CityHandler).Methods("GET")
-	r.HandleFunc("/price", PriceHandler).Methods("GET")
+	r.HandleFunc("/price", GetPriceHandler).Methods("GET")
+	r.HandleFunc("/prices", PriceHandler).Methods("GET")
 	r.HandleFunc("/times", DepartureTimeHandler).Methods("GET")
 	r.HandleFunc("/badsignin", BadSignInHandler).Methods("GET")
 	r.HandleFunc("/search", SearchHandler).Methods("GET")
@@ -254,6 +269,7 @@ func newRouter() *mux.Router {
 	//put method only
 	r.HandleFunc("/trips", UpdateTripHandler).Methods("PUT")
 	r.HandleFunc("/cities", UpdateCityHandler).Methods("PUT")
+	r.HandleFunc("/prices", UpdatePriceHandler).Methods("PUT")
 	r.HandleFunc("/venues", UpdateVenueHandler).Methods("PUT")
 	r.HandleFunc("/vehicles", UpdateVehicleHandler).Methods("PUT")
 	r.HandleFunc("/drivers", UpdateDriverHandler).Methods("PUT")

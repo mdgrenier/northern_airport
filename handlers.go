@@ -1093,6 +1093,78 @@ func UpdateCityHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//PriceHandler - display price admin page
+func PriceHandler(w http.ResponseWriter, r *http.Request) {
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		prices := store.GetPrices()
+
+		prices[0].RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "prices.gohtml", prices)
+	} else {
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
+	}
+}
+
+//UpdatePriceHandler - update price in database
+func UpdatePriceHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("execute update price handler")
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 4) {
+		values := r.URL.Query()
+
+		price := Prices{}
+		var err error
+
+		log.Printf("get values from form")
+
+		price.PriceID, err = strconv.Atoi(values["priceid"][0])
+		var tempPrice float64
+		tempPrice, err = strconv.ParseFloat(values["price"][0], 32)
+		price.Price = float32(tempPrice)
+
+		log.Printf("saves form values")
+
+		store.UpdatePrice(&price)
+
+		log.Printf("updated ")
+
+		prices := store.GetPrices()
+
+		prices[0].RoleID = client.RoleID
+
+		if err != nil {
+			log.Printf("Error converting northoffset or southoffset: %s", err.Error())
+		}
+
+		tpl.ExecuteTemplate(w, "prices.gohtml", prices)
+	} else {
+		tpl.ExecuteTemplate(w, "city.gohtml", r)
+	}
+
+}
+
 //DeleteCityHandler - delete city from database
 func DeleteCityHandler(w http.ResponseWriter, r *http.Request) {
 	session, err := sessionStore.Get(r, "northern-airport")
@@ -1126,8 +1198,8 @@ func DeleteCityHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//PriceHandler - return price given the departure, destination and customer type
-func PriceHandler(w http.ResponseWriter, r *http.Request) {
+//GetPriceHandler - return price given the departure, destination and customer type
+func GetPriceHandler(w http.ResponseWriter, r *http.Request) {
 
 	values := r.URL.Query()
 

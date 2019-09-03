@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Northern Airport Driver Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+    <header>
+        {{ template "navbar" }}
+
+        {{ template "adminnavbar" index . 0 }}
+
+    </header>
+        <main>
+        <div class="container">
+            <h1>Drivers</h1>
+            <div class="driver-report-wrapper">
+                <div class="box header" id="firstname-header">Firstname</div>
+                <div class="box header" id="lastname-header">Lastname</div>
+            </div>
+            <div class="driver-report-wrapper">
+                {{ range . }}
+                    <div class="box driver-row">
+                        <input type="text" class="form-control" id="firstname-{{ .DriverID }}" name="firstname" value="{{ .FirstName }}" required>
+                    </div>
+                    <div class="box driver-row">
+                        <input type="text" class="form-control" id="lastname-{{ .DriverID }}" name="lastname" value="{{ .LastName }}" required>
+                    </div>
+                    <div class="box driver-row">
+                        <button id="update-{{ .DriverID }}" type="button" name="update" class="btn btn-primary">Update</button>
+                    </div>
+                    <div class="box driver-row">
+                        <button id="remove-{{ .DriverID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
+                    </div>
+                {{ end }}
+            </div>
+            <form id="add-driver" method="post" action="/drivers" onsubmit="submit.disabled = true; return true;">
+                <div class="driver-wrapper">
+                    <div class="box driver-row" id="firstname-add">
+                        <input type="text" class="form-control" id="firstname" name="firstname" required>
+                    </div>
+                    <div class="box driver-row" id="lastname-add">
+                        <input type="text" class="form-control" id="lastname" name="lastname" required>
+                    </div>
+                    <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    
+    {{ template "footer" }}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" >
+        
+        {{ range . }} 
+        
+            var update = document.getElementById("update-{{ .DriverID }}");
+            update.onclick = function(){
+                
+                var driverid = {{ .DriverID }}
+                var firstname = document.getElementById("firstname-{{ .DriverID }}").value;
+                var lastname = document.getElementById("lastname-{{ .DriverID }}").value;
+        
+                var xhr = new XMLHttpRequest();
+                xhr.open('PUT', '/drivers?driverid='+driverid+'&firstname='+firstname+'&lastname='+lastname);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status != 200) {
+                        alert('failed:' + xhr.status);
+                    }
+                };
+
+                try {
+                    xhr.send();
+                } catch (err) {
+                    alert("Error sending request: " + err);
+                }
+            };
+
+            var remove = document.getElementById("remove-{{ .DriverID }}");
+            remove.onclick = function(){
+                var driverid = {{ .DriverID }}
+                
+                var xhr = new XMLHttpRequest();
+                xhr.open('DELETE', '/drivers?driverid='+driverid);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onload = function() {
+                    if (xhr.status != 200) {
+                        alert('failed:' + xhr.status);
+                    }
+                };
+
+                try {
+                    xhr.send();
+                } catch (err) {
+                    alert("Error sending request: " + err)
+                }
+            };
+
+        {{ end }}
+    </script>
+</body>
+</html>

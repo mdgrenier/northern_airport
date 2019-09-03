@@ -109,7 +109,13 @@
     color: #444;
 }
 
-
+.price-wrapper {
+    display: grid;
+    grid-template-columns: 25% 25% 15% 10% 10%;
+    grid-gap: 2px;
+    background-color: #fff;
+    color: #444;
+}
 
 .box {
     /*background-color: #444;*/

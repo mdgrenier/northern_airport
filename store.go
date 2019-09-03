@@ -54,6 +54,8 @@ type Store interface {
 	UpdateVehicle(vehicle *Vehicles) error
 	DeleteVehicle(vehicle int) error
 	GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, reservationtypeid int, discountcode string) float32
+	GetPrices() []Prices
+	UpdatePrice(price *Prices) error
 	GetDiscount(discountcode *DiscountCode) error
 	AddVenueFee(departurevenueid int, destinationvenueid int, retdeparturevenueid int, retdestinationvenueid int) float32
 }
@@ -1540,6 +1542,81 @@ func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retde
 	}
 
 	return price
+}
+
+//GetPrices - return all prices
+func (store *dbStore) GetPrices() []Prices {
+	var priceCount int
+
+	//need to add where clause to these queries to use today's date
+	row, err := store.db.Query("select count(priceid) from prices")
+
+	row.Next()
+	err = row.Scan(
+		&priceCount,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No prices returned")
+		} else {
+			log.Printf("Error retrieving price count: %s", err.Error())
+		}
+	}
+
+	row, err = store.db.Query("select p.priceid, p.departurecityid, dep.name, p.destinationcityid, " +
+		"dest.name, p.customertypeid, c.name, p.price " +
+		"from prices p inner join cities dep on p.departurecityid = dep.cityid " +
+		"inner join cities dest on p.destinationcityid = dest.cityid " +
+		"inner join customertypes c on p.customertypeid = c.customertypeid ")
+
+	if err != nil {
+		log.Printf("Error retrieving prices: %s", err.Error())
+		return nil
+	}
+	defer row.Close()
+
+	//create slice to store all departure times
+	var priceSlice = make([]Prices, priceCount)
+
+	var indx int
+
+	indx = 0
+	for row.Next() {
+		err = row.Scan(
+			&priceSlice[indx].PriceID, &priceSlice[indx].DepartureCityID,
+			&priceSlice[indx].DepartureCity, &priceSlice[indx].DestinationCityID,
+			&priceSlice[indx].DestinationCity, &priceSlice[indx].CustomerTypeID,
+			&priceSlice[indx].CustomerType, &priceSlice[indx].Price,
+		)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				log.Print("No prices found")
+			} else {
+				log.Printf("Error retrieving prices: %s", err.Error())
+			}
+		}
+
+		indx++
+	}
+
+	return priceSlice
+}
+
+//UpdatePrices - update price for a trip
+func (store *dbStore) UpdatePrice(price *Prices) error {
+	log.Printf("update price: %d in database", price.PriceID)
+
+	_, updateerr := store.db.Exec("UPDATE prices SET price = ? "+
+		"WHERE priceid = ?", price.Price, price.PriceID)
+
+	if updateerr != nil {
+		log.Printf("Error updating price: %s", updateerr.Error())
+	} else {
+		log.Printf("Update Price: %d", price.PriceID)
+	}
+
+	return updateerr
 }
 
 //GetDiscount - populate discount if applicable discount code found
