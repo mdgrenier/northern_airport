@@ -12,43 +12,69 @@
     <header>
         {{ template "navbar" }}
 
-        {{ template "adminnavbar" index . 0 }}
+
+        {{ template "adminnavbar" . }}
 
     </header>
         <main>
         <div class="container">
-            <h1>Drivers</h1>
-            <div class="driver-report-wrapper">
-                <div class="box header" id="firstname-header">Firstname</div>
-                <div class="box header" id="lastname-header">Lastname</div>
-            </div>
-            <div class="driver-report-wrapper">
-                {{ range . }}
-                    <div class="box driver-row">
-                        <input type="text" class="form-control" id="firstname-{{ .DriverID }}" name="firstname" value="{{ .FirstName }}" required>
+            <h1>Driver Report</h1>
+            {{ with . }}
+                <div class="driver-report-criteria-wrapper">
+                    <div class="row justify-content-around">
+                        <div class="col-xs-4">
+                            <label for="name">Driver Name</label>
+                            <select class="form-control" id="drivername" name="drivername">
+                                <option value="0">Select a Driver</option>
+                                {{ range .Drivers }}
+                                    <option value="{{ .DriverID }}">{{ .DriverName }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                        <div class="col-xs-4">
+                            <label for="departuredate">Departure Date</label>
+                            <input type="date" class="form-control" id="departuredate" name="departuredate" required>
+                        </div>
+                        <div class="col-xs-4">
+                                <button class="btn btn-primary" id="update">Update</button>
+                        </div>
                     </div>
-                    <div class="box driver-row">
-                        <input type="text" class="form-control" id="lastname-{{ .DriverID }}" name="lastname" value="{{ .LastName }}" required>
-                    </div>
-                    <div class="box driver-row">
-                        <button id="update-{{ .DriverID }}" type="button" name="update" class="btn btn-primary">Update</button>
-                    </div>
-                    <div class="box driver-row">
-                        <button id="remove-{{ .DriverID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
-                    </div>
-                {{ end }}
-            </div>
-            <form id="add-driver" method="post" action="/drivers" onsubmit="submit.disabled = true; return true;">
-                <div class="driver-wrapper">
-                    <div class="box driver-row" id="firstname-add">
-                        <input type="text" class="form-control" id="firstname" name="firstname" required>
-                    </div>
-                    <div class="box driver-row" id="lastname-add">
-                        <input type="text" class="form-control" id="lastname" name="lastname" required>
-                    </div>
-                    <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
                 </div>
-            </form>
+                <div class="driver-report-wrapper">
+                    <div class="box header" id="client-header">Client Name</div>
+                    <div class="box header" id="departurecity-header">Departure City</div>
+                    <div class="box header" id="departurevenue-header">Departure Venue</div>
+                    <div class="box header" id="destinationcity-header">Destination City</div>
+                    <div class="box header" id="destinationvenue-header">Destination Venue</div>
+                    <div class="box header" id="departuretime-header">Departure Time</div>
+                    <div class="box header" id="numpassengers-header">Number of Passengers</div>
+                </div>
+                <div class="driver-report-wrapper">
+                    {{ range .DriverReports }}
+                        <div class="box driver-report-row">
+                            <input type="text" class="form-control" id="client-{{ .ReservationID }}" name="clientname" value="{{ .ClientName }}">
+                        </div>
+                        <div class="box driver-report-row">
+                            <input type="text" class="form-control" id="departurecity-{{ .ReservationID }}" name="departurecity" value="{{ .DepartureCity }}">
+                        </div>
+                        <div class="box driver-report-row">
+                            <input type="text" class="form-control" id="departurevenue-{{ .ReservationID }}" name="departurevenue" value="{{ .DepartureVenue }}">
+                        </div>
+                        <div class="box driver-report-row">
+                            <input type="text" class="form-control" id="destinationcity-{{ .ReservationID }}" name="destinationcity" value="{{ .DestinationCity }}">
+                        </div>
+                        <div class="box driver-report-row">
+                            <input type="text" class="form-control" id="destinationvenue-{{ .ReservationID }}" name="destinationvenue" value="{{ .DestinationVenue }}">
+                        </div>
+                        <div class="box driver-report-row">
+                            <input type="text" class="form-control" id="departuretime-{{ .ReservationID }}" name="departuretime" value="{{ .DepartureTime }}">
+                        </div>
+                        <div class="box driver-report-row">
+                            <input type="text" class="form-control" id="numpassengers-{{ .ReservationID }}" name="numpassengers" value="{{ .NumPassengers }}">
+                        </div>
+                    {{ end }}
+                </div>
+            {{ end }}
         </div>
     </main>
     
@@ -59,21 +85,47 @@
 
     <script type="text/javascript" >
         
-        {{ range . }} 
-        
-            var update = document.getElementById("update-{{ .DriverID }}");
-            update.onclick = function(){
-                
-                var driverid = {{ .DriverID }}
-                var firstname = document.getElementById("firstname-{{ .DriverID }}").value;
-                var lastname = document.getElementById("lastname-{{ .DriverID }}").value;
-        
+        var update = document.getElementById("update");
+        var validdate = 0;
+                 
+        update.onclick = function(){
+            var driverid = document.getElementById("drivername").value;
+            var departuredate = document.getElementById("departuredate").value;
+
+            if(driverid == 0) {
+                alert("Please select a driver");
+            }
+
+            /*
+            if (Object.prototype.toString.call(d) === "[object Date]") {
+                if (isNaN(d.getTime())) {
+                    alert("Please select a date");
+                    validdate = 1;
+                }
+                else
+                {
+                    validdate = 1;
+                }
+            } else {
+                alert("Please select a date");
+            }
+            */
+
+            if (driverid > 0) {
+                alert("driverid: "+driverid);
+                alert("departuredate: "+departuredate);
                 var xhr = new XMLHttpRequest();
-                xhr.open('PUT', '/drivers?driverid='+driverid+'&firstname='+firstname+'&lastname='+lastname);
+                xhr.open('GET', '/driverreport?driverid='+driverid+'&departuredate='+departuredate);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.onload = function() {
                     if (xhr.status != 200) {
                         alert('failed:' + xhr.status);
+                    }
+                    else
+                    {
+                        document.open(); 
+                        document.write(xhr.response); 
+                        document.close();
                     }
                 };
 
@@ -82,29 +134,8 @@
                 } catch (err) {
                     alert("Error sending request: " + err);
                 }
-            };
-
-            var remove = document.getElementById("remove-{{ .DriverID }}");
-            remove.onclick = function(){
-                var driverid = {{ .DriverID }}
-                
-                var xhr = new XMLHttpRequest();
-                xhr.open('DELETE', '/drivers?driverid='+driverid);
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onload = function() {
-                    if (xhr.status != 200) {
-                        alert('failed:' + xhr.status);
-                    }
-                };
-
-                try {
-                    xhr.send();
-                } catch (err) {
-                    alert("Error sending request: " + err)
-                }
-            };
-
-        {{ end }}
+            }
+        };
     </script>
 </body>
 </html>

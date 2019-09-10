@@ -58,6 +58,7 @@ type Store interface {
 	UpdatePrice(price *Prices) error
 	GetDiscount(discountcode *DiscountCode) error
 	AddVenueFee(departurevenueid int, destinationvenueid int, retdeparturevenueid int, retdestinationvenueid int) float32
+	DriverReservations(driverid int, departuredate time.Time) DriverReportForm
 }
 
 //The `dbStore` struct will implement the `Store` interface it also takes the sql
@@ -1320,8 +1321,8 @@ func (store *dbStore) GetDriverCount() int {
 //GetDrivers - return all drivers
 func (store *dbStore) GetDrivers() []Drivers {
 
-	row, err := store.db.Query("select driverid, firstname, lastname " +
-		"from drivers")
+	row, err := store.db.Query("select driverid, firstname, lastname,  " +
+		"concat(firstname, ' ', lastname) as drivername from drivers")
 
 	if err != nil {
 		log.Printf("Error retrieving drivers: %s", err.Error())
@@ -1337,7 +1338,7 @@ func (store *dbStore) GetDrivers() []Drivers {
 	for row.Next() {
 		err = row.Scan(
 			&driverSlice[indx].DriverID, &driverSlice[indx].FirstName,
-			&driverSlice[indx].LastName,
+			&driverSlice[indx].LastName, &driverSlice[indx].DriverName,
 		)
 
 		if err != nil {
@@ -1707,9 +1708,99 @@ func (store *dbStore) AddVenueFee(departurevenueid int, destinationvenueid int, 
 
 }
 
-//GetReports - return list of reports
-func (store *dbStore) GetReports() {
+//DriverReservations - return list of reservations for driver
+func (store *dbStore) DriverReservations(driverid int, reportdate time.Time) DriverReportForm {
+	var reservationCount int
 
+	var whereClause string
+	var sqlString string
+
+	drivers := store.GetDrivers()
+
+	whereClause = " where r.postponed = 0 and r.cancelled = 0 and t.driverid = " + strconv.Itoa(driverid)
+
+	var nulldate time.Time
+
+	if reportdate != nulldate {
+		whereClause += " and r.departuredate = '" + reportdate.Format("2006-01-02") + "'"
+	} else {
+		whereClause += " and r.departuredate = '" + time.Time{}.Format("2006-01-02") + "'"
+	}
+
+	sqlString = "select count(reservationid) " +
+		"from reservations r inner join trips t on r.tripid = t.tripid " +
+		"" + whereClause
+	log.Printf("sql string created with where, %s", sqlString)
+
+	row, err := store.db.Query(sqlString)
+
+	row.Next()
+	err = row.Scan(
+		&reservationCount,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No driver reservations returned")
+		} else {
+			log.Printf("Error retrieving driver reservation count: %s", err.Error())
+		}
+	}
+
+	log.Printf("reservation count: %d", reservationCount)
+	var driverReportSlice = make([]DriverReport, reservationCount)
+
+	if reservationCount > 0 {
+		row, err = store.db.Query("select r.reservationid, concat(c.firstname, ' ', c.lastname) as clientname, " +
+			"depv.name as departurevenue, desv.name as destinationvenue, " +
+			"depc.name as departurecity, des.name as destinationcity, " +
+			"sum(r.departurenumadults + r.departurenumstudents + r.departurenumseniors + r.departurenumchildren) as numpassengers, " +
+			"dt.departuretime from reservations r inner join clients c on r.clientid = c.clientid " +
+			"inner join trips t on r.tripid = t.tripid " +
+			"inner join venues depv on r.departurevenueid = depv.venueid " +
+			"inner join venues desv on r.destinationvenueid = desv.venueid " +
+			"inner join cities depc on r.departurecityid = depc.cityid " +
+			"inner join cities des on r.destinationcityid = des.cityid " +
+			"inner join departuretimes dt on r.departuretimeid = dt.departuretimeid " + whereClause +
+			"group by r.reservationid, clientname, departurevenue, destinationvenue, " +
+			"departurecity, destinationcity, dt.departuretime")
+
+		if err != nil {
+			log.Printf("Error retrieving driver reservations: %s", err.Error())
+			return DriverReportForm{}
+		}
+		defer row.Close()
+
+		log.Printf("retrieved records")
+
+		var indx int
+
+		indx = 0
+		for row.Next() {
+			err = row.Scan(
+				&driverReportSlice[indx].ReservationID, &driverReportSlice[indx].ClientName,
+				&driverReportSlice[indx].DepartureVenue, &driverReportSlice[indx].DestinationVenue,
+				&driverReportSlice[indx].DepartureCity, &driverReportSlice[indx].DestinationCity,
+				&driverReportSlice[indx].NumPassengers, &driverReportSlice[indx].DepartureTime,
+			)
+
+			if err != nil {
+				if err == sql.ErrNoRows {
+					log.Print("No driver reservations found")
+				} else {
+					log.Printf("Error retrieving driver reservations: %s", err.Error())
+				}
+			}
+
+			indx++
+		}
+	}
+
+	driverReportForm := DriverReportForm{}
+
+	driverReportForm.Drivers = drivers
+	driverReportForm.DriverReports = driverReportSlice
+
+	return driverReportForm
 }
 
 // The store variable is a package level variable that will be available for

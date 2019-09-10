@@ -55,7 +55,7 @@
 
 .trip-wrapper {
     display: grid;
-    grid-template-columns: 10% 10% 11% 12% 14% 6% 7% 7% 7%;
+    grid-template-columns: 10% 10% 11% 12% 14% 6% 7% 7%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;
@@ -112,6 +112,14 @@
 .price-wrapper {
     display: grid;
     grid-template-columns: 25% 25% 15% 10% 10%;
+    grid-gap: 2px;
+    background-color: #fff;
+    color: #444;
+}
+
+.driver-report-wrapper {
+    display: grid;
+    grid-template-columns: 10% 12% 20% 12% 20% 7% 7%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;

@@ -1375,6 +1375,7 @@ func AddDepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
 
 //DriverReportHandler - display driver report page
 func DriverReportHandler(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
 
 	session, err := sessionStore.Get(r, "northern-airport")
 	if err != nil {
@@ -1382,20 +1383,56 @@ func DriverReportHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("get the filter criteria")
+
+	var driverid int
+	var date time.Time
+
+	if values["driverid"] != nil {
+		driverid, err = strconv.Atoi(values["driverid"][0])
+
+		if err != nil {
+			log.Printf("Error getting driverid: %s", err.Error())
+		}
+	} else {
+		driverid = 0
+	}
+
+	if values["departuredate"] != nil {
+		date, err = time.Parse("2006-01-02", values["departuredate"][0])
+
+		if err != nil {
+			log.Printf("Error getting date: %s", err.Error())
+		}
+	} else {
+		date = time.Time{}
+	}
+
 	//get client data from session cookie
 	client := GetClient(session)
 
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4 || client.RoleID == 5) {
-		drivers := store.GetDrivers()
+		//get data need to populate dropdowns in reservation form
+		log.Printf("get driver reservations")
+		driverreservations := store.DriverReservations(driverid, date)
+		log.Printf("reservations retrieved")
 
-		drivers[0].RoleID = client.RoleID
+		if len(driverreservations.DriverReports) > 0 {
+			log.Printf("driver report: we've got some reservations!")
+		} else {
+			log.Printf("driver report: no reservations returned!")
+		}
 
-		tpl.ExecuteTemplate(w, "driverreport.gohtml", drivers)
+		driverreservations.RoleID = client.RoleID
+
+		if err := tpl.ExecuteTemplate(w, "driverreport.gohtml", driverreservations); err != nil {
+			log.Printf("Error executing HTML template: %s", err.Error())
+			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
+		}
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
-
 }
 
 //ReportHandler - display reports admin page

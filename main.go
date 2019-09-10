@@ -175,12 +175,33 @@ type SearchReservations struct {
 	RoleID           int
 }
 
+//DriverReport - reservation display structure by driver
+type DriverReport struct {
+	ReservationID    int    `json:"reservationid" db:"reservationid"`
+	DriverID         int    `json:"driverid" db:"driverid"`
+	DepartureCity    string `json:"departurecity" db:"departurecity"`
+	DepartureVenue   string `json:"departurevenue" db:"departurevenue"`
+	DestinationCity  string `json:"destinationcity" db:"destinationcity"`
+	DestinationVenue string `json:"destinationvenue" db:"destinationvenue"`
+	DepartureTime    int    `json:"departuretime" db:"departuretime"`
+	ClientName       string `json:"passengername" db:"passengername"`
+	NumPassengers    int    `json:"numpassengers" db:"numpassengers"`
+}
+
 //Drivers - store driver data
 type Drivers struct {
-	DriverID  int    `json:"driverid" db:"driverid"`
-	FirstName string `json:"firstname" db:"firstname"`
-	LastName  string `json:"lastname" db:"lastname"`
-	RoleID    int
+	DriverID   int    `json:"driverid" db:"driverid"`
+	FirstName  string `json:"firstname" db:"firstname"`
+	LastName   string `json:"lastname" db:"lastname"`
+	DriverName string `json:"drivername" db:"drivername"`
+	RoleID     int
+}
+
+//DriverReportForm - driver and reservation display structure
+type DriverReportForm struct {
+	Drivers       []Drivers
+	DriverReports []DriverReport
+	RoleID        int
 }
 
 //Vehicles - store vehicle data
