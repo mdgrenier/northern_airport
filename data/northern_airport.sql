@@ -141,12 +141,9 @@ CREATE TABLE `clients` (
   `Country` varchar(50) NOT NULL,
   `DefaultDepartureAddress` varchar(100) DEFAULT NULL,
   `DefaultDepartureCityID` int(11) DEFAULT NULL,
-  `TravelAgentID` int(11) DEFAULT NULL,
   `Notes` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`ClientID`),
-  KEY `FK_171` (`TravelAgentID`),
   KEY `FK_217` (`DefaultDepartureCityID`),
-  CONSTRAINT `FK_171` FOREIGN KEY (`TravelAgentID`) REFERENCES `travelagents` (`TravelAgentID`),
   CONSTRAINT `FK_217` FOREIGN KEY (`DefaultDepartureCityID`) REFERENCES `cities` (`CityID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -157,7 +154,7 @@ CREATE TABLE `clients` (
 
 LOCK TABLES `clients` WRITE;
 /*!40000 ALTER TABLE `clients` DISABLE KEYS */;
-INSERT INTO `clients` VALUES (3,'test','test',1234567890,'test@test.com','test','test','ontario','p1b8p4','canada',NULL,1,NULL,NULL),(4,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL,NULL),(5,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL,NULL),(6,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL,NULL),(7,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL,NULL);
+INSERT INTO `clients` VALUES (3,'test','test',1234567890,'test@test.com','test','test','ontario','p1b8p4','canada',NULL,1,NULL),(4,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL),(5,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL),(6,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL),(7,'Matthew','Grenier',7053034658,'matt@mgrenier.ca','102 Kathryn Crescent','North Bay','ON','P1B 8P4','Canada',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `clients` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -388,6 +385,7 @@ DROP TABLE IF EXISTS `reservations`;
 CREATE TABLE `reservations` (
   `ReservationID` int(11) NOT NULL AUTO_INCREMENT,
   `ClientID` int(11) NOT NULL,
+  `TravelAgencyID` int(11) DEFAULT 0,
   `DepartureCityID` int(11) NOT NULL,
   `DepartureVenueID` int(11) NOT NULL,
   `DepartureTimeID` int(11) NOT NULL,
@@ -426,7 +424,6 @@ CREATE TABLE `reservations` (
   `Cancelled` int(11) DEFAULT '0',
   PRIMARY KEY (`ReservationID`),
   KEY `FK_163` (`DepartureCityID`),
-  KEY `FK_181` (`DiscountCodeID`),
   KEY `FK_195` (`DepartureTimeID`),
   KEY `FK_203` (`DestinationCityID`),
   KEY `FK_211` (`DepartureVenueID`),
@@ -441,7 +438,11 @@ CREATE TABLE `reservations` (
   CONSTRAINT `FK_195` FOREIGN KEY (`DepartureTimeID`) REFERENCES `departuretimes` (`DepartureTimeID`),
   CONSTRAINT `FK_203` FOREIGN KEY (`DestinationCityID`) REFERENCES `cities` (`CityID`),
   CONSTRAINT `FK_211` FOREIGN KEY (`DepartureVenueID`) REFERENCES `venues` (`VenueID`),
-  CONSTRAINT `FK_214` FOREIGN KEY (`DestinationVenueID`) REFERENCES `venues` (`VenueID`)
+  CONSTRAINT `FK_214` FOREIGN KEY (`DestinationVenueID`) REFERENCES `venues` (`VenueID`),
+  CONSTRAINT `FK_273` FOREIGN KEY (`DepartureAirlineID`) REFERENCES `airlines` (`AirlineID`),
+  CONSTRAINT `FK_311` FOREIGN KEY (`ReturnAirlineID`) REFERENCES `airlines` (`AirlineID`),
+  CONSTRAINT `FK_341` FOREIGN KEY (`TripTypeID`) REFERENCES `triptypes` (`TripTypeID`),
+  CONSTRAINT `FK_342` FOREIGN KEY (`TripID`) REFERENCES `trips` (`TripID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -451,32 +452,10 @@ CREATE TABLE `reservations` (
 
 LOCK TABLES `reservations` WRITE;
 /*!40000 ALTER TABLE `reservations` DISABLE KEYS */;
-INSERT INTO `reservations` VALUES (1,3,1,48,1,2,16,NULL,NULL,NULL,NULL,NULL,1,1,NULL,'dnotes','inotes',1,0,0,0,NULL,NULL,NULL,NULL,120,'','',0,0,'2019-04-30',NULL,0,1,0,0,0,0),(2,4,5,4,1,2,29,NULL,NULL,NULL,NULL,NULL,1,1,NULL,'testing','test trip',1,1,0,0,NULL,NULL,NULL,NULL,75,'','',0,0,'2019-05-09',NULL,0,2,0,0,0,0);
+INSERT INTO `reservations` VALUES 
+	(1,3,1,1,48,1,2,16,NULL,NULL,NULL,NULL,NULL,1,1,NULL,'dnotes','inotes',1,0,0,0,NULL,NULL,NULL,NULL,120,'','',0,0,'2019-04-30',NULL,1,1,0,0,0,0),
+	(2,4,0,5,4,1,2,29,NULL,NULL,NULL,NULL,NULL,1,1,NULL,'testing','test trip',1,1,0,0,NULL,NULL,NULL,NULL,75,'','',0,0,'2019-05-09',NULL,1,2,0,0,0,0);
 /*!40000 ALTER TABLE `reservations` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `reservationtypes`
---
-
-DROP TABLE IF EXISTS `reservationtypes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
-CREATE TABLE `reservationtypes` (
-  `ReservationTypeID` int(11) NOT NULL AUTO_INCREMENT,
-  `Name` varchar(25) NOT NULL,
-  PRIMARY KEY (`ReservationTypeID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `reservationtypes`
---
-
-LOCK TABLES `reservationtypes` WRITE;
-/*!40000 ALTER TABLE `reservationtypes` DISABLE KEYS */;
-INSERT INTO `reservationtypes` VALUES (1,'one way'),(2,'round trip');
-/*!40000 ALTER TABLE `reservationtypes` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -567,6 +546,7 @@ DROP TABLE IF EXISTS `travelagencies`;
 CREATE TABLE `travelagencies` (
   `TravelAgencyID` int(11) NOT NULL AUTO_INCREMENT,
   `TravelAgencyName` varchar(50) NOT NULL,
+  `IATANumber` varchar(10) NOT NULL,
   PRIMARY KEY (`TravelAgencyID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -577,6 +557,12 @@ CREATE TABLE `travelagencies` (
 
 LOCK TABLES `travelagencies` WRITE;
 /*!40000 ALTER TABLE `travelagencies` DISABLE KEYS */;
+INSERT INTO `travelagencies` VALUES (1,'AgencyTest','12345678'),(2,'Huntsville Travel & Cruises','96536462'),(3,'Godfrey\'s Travel Huntsville','96505500'),(4,'Carlson Wagonlit Bracebridge','67687944');
+INSERT INTO `travelagencies` VALUES (5,'Mayne Travel North Bay','67757336'),(6,'Keystone Travel North Bay','67672581'),(7,'Sears Travel Northgate','96537895'),(8,'Vision Travel Gravenhur','67833570');
+INSERT INTO `travelagencies` VALUES (9,'Maritime Travel North Bay','67578486'),(10,'CAA North Bay','67662335'),(11,'Maritime, New Liskeard','67527364'),(12,'Flight Center, Vancouver BC','965342');
+INSERT INTO `travelagencies` VALUES (13,'Travel Counselors, Gravenhurst','67505432'),(14,'The Travel Place BC','61582533'),(15,'Marlin Travel Winnipeg','62752944'),(16,'Carlson Wagonlit, Lynne Ramsbottom','67662825');
+INSERT INTO `travelagencies` VALUES (17,'The Travel Agent Next Door','67500296'),(18,'Travel Professional, Deborah Avery','62512052'),(19,'Centre Holidays, Mississauga','96511240'),(20,'Travel Experts, North Bay','96516302');
+INSERT INTO `travelagencies` VALUES (21,'Just Say Yes! Destinations','67927204'),(22,'Enjoy Travel, Bracebridge','67539872');
 /*!40000 ALTER TABLE `travelagencies` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -590,7 +576,6 @@ DROP TABLE IF EXISTS `travelagents`;
 CREATE TABLE `travelagents` (
   `TravelAgentID` int(11) NOT NULL AUTO_INCREMENT,
   `TravelAgentName` varchar(100) NOT NULL,
-  `IATANumber` varchar(100) NOT NULL,
   `TravelAgencyID` int(11) NOT NULL,
   PRIMARY KEY (`TravelAgentID`),
   KEY `FK_354` (`TravelAgencyID`),
@@ -604,6 +589,7 @@ CREATE TABLE `travelagents` (
 
 LOCK TABLES `travelagents` WRITE;
 /*!40000 ALTER TABLE `travelagents` DISABLE KEYS */;
+INSERT INTO `travelagents` VALUES (1,1,1),(2,1,2);
 /*!40000 ALTER TABLE `travelagents` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -637,7 +623,7 @@ CREATE TABLE `trips` (
 
 LOCK TABLES `trips` WRITE;
 /*!40000 ALTER TABLE `trips` DISABLE KEYS */;
-INSERT INTO `trips` VALUES (1,'2019-04-30',1,1,1,1,11,0),(2,'2019-05-09',1,2,0,0,11,0);
+INSERT INTO `trips` VALUES (1,'2019-04-30',1,9,1,1,11,0),(2,'2019-05-09',1,2,0,0,11,0);
 /*!40000 ALTER TABLE `trips` ENABLE KEYS */;
 UNLOCK TABLES;
 

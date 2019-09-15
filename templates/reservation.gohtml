@@ -142,8 +142,8 @@
                     </header>
                     <div class="row justify-content-around">    
                         <div class="col-xs-4">
-                            <label for="reservationtype">Reservation Type</label>
-                            <select class="form-control" id="reservationtype" name="reservationtype">
+                            <label for="triptype">Trip Type</label>
+                            <select class="form-control" id="triptype" name="triptype">
                                 <option value="1">One Way</option>
                                 <option value="2">Round Trip</option>
                             </select>
@@ -428,7 +428,7 @@
         var email = document.getElementById("email");
         var phone = document.getElementById("phone");
         
-        var reservationtype = document.getElementById("reservationtype")
+        var triptype = document.getElementById("triptype")
 
         var departurevenue = document.getElementById("departurevenue");
         var departurecity = document.getElementById("departurecity");
@@ -472,8 +472,8 @@
         var tempprice = 0.0;
         var totalprice = 0.0;
 
-        reservationtype.onchange = function() { 
-            if(reservationtype.value == 2) {
+        triptype.onchange = function() { 
+            if(triptype.value == 2) {
                 document.getElementById('return-info').style.display = "block";
             } else {
                 document.getElementById('return-info').style.display = "none";
@@ -495,7 +495,6 @@
 
         function ShowSelects(venuechanged, addresstoshow, airlinetoshow) {
             return function() {
-                alert("Venue Value:" + venuechanged.value);
                 if(venuechanged.value == 100) {
                     addresstoshow.style.display = "block";
                 } else {
@@ -550,7 +549,7 @@
 
                 var retdeparturevenueid = 0;
 
-                if(reservationtype.value == "2")
+                if(triptype.value == "2")
                 {
                     retdeparturevenueid = returndeparturevenue.options[returndeparturevenue.selectedIndex].value;
                     retdestinationvenueid = returndestinationvenue.options[returndestinationvenue.selectedIndex].value;
@@ -689,14 +688,14 @@
         };
 
         function GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, 
-            numpassengers, customertypeid, reservationtypeid, departurevenueid, destinationvenueid,
+            numpassengers, customertypeid, triptypeid, departurevenueid, destinationvenueid,
             retdeparturevenueid, retdestinationvenueid, discount, callback){
             var xhr = new XMLHttpRequest();
 
             xhr.open('GET', '/price?departurecityid='+departurecityid+'&destinationcityid='+
                 destinationcityid+'&retdeparturecityid='+retdeparturecityid+'&retdestinationcityid='+
                 retdestinationcityid+'&numpassengers='+numpassengers+'&customertypeid='+customertypeid+
-                '&reservationtypeid='+reservationtypeid+'&departurevenueid='+departurevenueid+
+                '&triptypeid='+triptypeid+'&departurevenueid='+departurevenueid+
                 '&destinationvenueid='+destinationvenueid+'&retdeparturevenueid='+retdeparturevenueid+
                 '&retdestinationvenueid='+retdestinationvenueid+'&discount='+discount);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -721,7 +720,6 @@
         };
 
         function SubmitForm() {
-            alert("price: " + document.getElementById("tripprice").value);
             document.getElementById("reservation").submit();
         };
 
@@ -748,7 +746,7 @@
             var retdeparturevenueid = 0;
             var retdestinationvenueid = 0;
 
-            if(reservationtype.value == "2")
+            if(triptype.value == "2")
             {
                 retdeparturecityid = returndeparturecity.options[returndeparturecity.selectedIndex].value;
                 retdestinationcityid = returndestinationcity.options[returndestinationcity.selectedIndex].value;
@@ -769,7 +767,7 @@
                     var tempchildren = departurenumchildren;
     
                     //is this a return trip
-                    if(reservationtype.value == "2")
+                    if(triptype.value == "2")
                     {
                         if((returnnumadults + returnnumseniors + returnnumstudents + returnnumchildren) > 0)
                         {
@@ -907,6 +905,7 @@
                 formvalid = false;
             }
 
+            /*
             if (jsdeparturedate < today && formvalid == true) 
             {
                 alert("Cannot select a departure date in the past");
@@ -918,8 +917,9 @@
                 alert("Cannot select a departure date within 24 hours");
                 formvalid = false;
             }
+            */
             
-            if(reservationtype.value == 2 && formvalid == true)
+            if(triptype.value == 2 && formvalid == true)
             {
                 datearray = returndeparturedate.value.split("-");
                 jsreturndeparturedate = new Date();

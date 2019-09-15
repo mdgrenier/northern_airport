@@ -125,6 +125,14 @@
     color: #444;
 }
 
+.travelagency-report-wrapper {
+    display: grid;
+    grid-template-columns: 40% 15% 15% 15%;
+    grid-gap: 2px;
+    background-color: #fff;
+    color: #444;
+}
+
 .box {
     /*background-color: #444;*/
     color: #000;

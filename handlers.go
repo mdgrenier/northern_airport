@@ -219,6 +219,14 @@ func ReservationHandler(w http.ResponseWriter, r *http.Request) {
 
 //CreateReservationHandler - store reservation in database
 func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
 
 	reservation := Reservation{}
 
@@ -230,7 +238,7 @@ func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Form information retrieved")
 
 	//check if trip exists, if not create one
-	err := store.GetOrAddTrip(&reservation)
+	err = store.GetOrAddTrip(&reservation)
 
 	if err != nil {
 		log.Printf("Error creating reservation: %s", err.Error())
@@ -247,7 +255,8 @@ func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 			log.Print("reservation created")
 		}
 
-		http.Redirect(w, r, "/reservationcreated", http.StatusFound)
+		//http.Redirect(w, r, "/reservationcreated", http.StatusFound)
+		tpl.ExecuteTemplate(w, "created.gohtml", client)
 	}
 
 }
@@ -1203,7 +1212,7 @@ func GetPriceHandler(w http.ResponseWriter, r *http.Request) {
 
 	values := r.URL.Query()
 
-	reservationtypeid, err := strconv.Atoi(values["reservationtypeid"][0])
+	triptypeid, err := strconv.Atoi(values["triptypeid"][0])
 	departurecityid, err := strconv.Atoi(values["departurecityid"][0])
 	destinationcityid, err := strconv.Atoi(values["destinationcityid"][0])
 	retdeparturecityid, err := strconv.Atoi(values["retdeparturecityid"][0])
@@ -1212,7 +1221,7 @@ func GetPriceHandler(w http.ResponseWriter, r *http.Request) {
 	customertypeid, err := strconv.Atoi(values["customertypeid"][0])
 	discountcode := values["discount"][0]
 
-	price := store.GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, customertypeid, reservationtypeid, discountcode)
+	price := store.GetPrice(departurecityid, destinationcityid, retdeparturecityid, retdestinationcityid, customertypeid, triptypeid, discountcode)
 
 	departurevenueid, err := strconv.Atoi(values["departurevenueid"][0])
 	destinationvenueid, err := strconv.Atoi(values["destinationvenueid"][0])
@@ -1427,6 +1436,71 @@ func DriverReportHandler(w http.ResponseWriter, r *http.Request) {
 		driverreservations.RoleID = client.RoleID
 
 		if err := tpl.ExecuteTemplate(w, "driverreport.gohtml", driverreservations); err != nil {
+			log.Printf("Error executing HTML template: %s", err.Error())
+			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
+		}
+	} else {
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
+	}
+}
+
+//TravelAgencyReportHandler - display travel agent report page
+func TravelAgencyReportHandler(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("get travel agent criteria")
+
+	var month int
+	var year int
+
+	if values["month"] != nil {
+		month, err = strconv.Atoi(values["month"][0])
+
+		if err != nil {
+			log.Printf("Error getting month: %s", err.Error())
+		}
+	} else {
+		month = 0
+	}
+
+	if values["year"] != nil {
+		year, err = strconv.Atoi(values["year"][0])
+
+		if err != nil {
+			log.Printf("Error getting year: %s", err.Error())
+		}
+	} else {
+		year = 0
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		//get data need to populate dropdowns in reservation form
+		log.Printf("get travel agent records")
+		travelagentreports := store.TravelAgencyReports(month, year)
+		log.Printf("travel agent reports retrieved")
+
+		if len(travelagentreports) > 0 {
+			log.Printf("travel agent report: we've got some records!")
+			log.Printf("handler: travel agent report: %s", travelagentreports[0].TravelAgencyName)
+		} else {
+			log.Printf("travel agent report: no records returned!")
+		}
+
+		travelagencyform := TravelAgencyForm{}
+		travelagencyform.TravelAgencyReports = travelagentreports
+		travelagencyform.RoleID = client.RoleID
+
+		if err := tpl.ExecuteTemplate(w, "travelagentreport.gohtml", travelagencyform); err != nil {
 			log.Printf("Error executing HTML template: %s", err.Error())
 			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
 		}

@@ -68,7 +68,7 @@ type ResFormData struct {
 
 // Reservation - store reservation information
 type Reservation struct {
-	ReservationID            int       `json:"reservationid" db:"reservationtid"`
+	ReservationID            int       `json:"reservationid" db:"reservationid"`
 	ClientID                 int       `json:"clientid" db:"clientid"`
 	DepartureCityID          int       `json:"departurecityid" db:"departurecityid"`
 	DepartureVenueID         int       `json:"departurevenueid" db:"departurevenueid"`
@@ -234,6 +234,30 @@ type Prices struct {
 	RoleID            int
 }
 
+//TravelAgencies - store travel agency data
+type TravelAgencies struct {
+	TravelAgencyID   int    `json:"travelagencyid" db:"travelagencyid"`
+	TravelAgencyName string `json:"travelagencyname" db:"travelagencyname"`
+	IATANumber       string `json:"iatanumber" db:"iatanumber"`
+}
+
+//TravelAgencyReport - store travel report data
+type TravelAgencyReport struct {
+	TravelAgencyID   int     `json:"travelagencyid" db:"travelagencyid"`
+	TravelAgencyName string  `json:"travelagencyname" db:"travelagencyname"`
+	ReservationCount int     `json:"reservationcount" db:"reservationcount"`
+	TotalCost        float32 `json:"totalcount" db:"totalcount"`
+	Commission       float32 `json:"commission" db:"commission"`
+	ReportMonth      int     `json:"reportmonth" db:"reportmonth"`
+	ReportYear       int     `json:"reportyear" db:"reportyear"`
+}
+
+//TravelAgencyForm - store travel agency data for report form
+type TravelAgencyForm struct {
+	TravelAgencyReports []TravelAgencyReport
+	RoleID              int
+}
+
 var dateLayout string
 var sessionStore *sessions.CookieStore
 
@@ -277,8 +301,8 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/times", DepartureTimeHandler).Methods("GET")
 	r.HandleFunc("/badsignin", BadSignInHandler).Methods("GET")
 	r.HandleFunc("/search", SearchHandler).Methods("GET")
-	//r.HandleFunc("/search2", Search2Handler).Methods("GET")
 	r.HandleFunc("/driverreport", DriverReportHandler).Methods("GET")
+	r.HandleFunc("/travelagencyreport", TravelAgencyReportHandler).Methods("GET")
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")

@@ -53,12 +53,15 @@ type Store interface {
 	AddVehicle(vehicle Vehicles) error
 	UpdateVehicle(vehicle *Vehicles) error
 	DeleteVehicle(vehicle int) error
-	GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, reservationtypeid int, discountcode string) float32
+	GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, triptypeid int, discountcode string) float32
 	GetPrices() []Prices
 	UpdatePrice(price *Prices) error
 	GetDiscount(discountcode *DiscountCode) error
 	AddVenueFee(departurevenueid int, destinationvenueid int, retdeparturevenueid int, retdestinationvenueid int) float32
 	DriverReservations(driverid int, departuredate time.Time) DriverReportForm
+	GetTravelAgencyCount() int
+	GetTravelAgencies() []TravelAgencies
+	TravelAgencyReports(month int, year int) []TravelAgencyReport
 }
 
 //The `dbStore` struct will implement the `Store` interface it also takes the sql
@@ -136,7 +139,7 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 			reservation.DriverNotes, reservation.InternalNotes, reservation.DepartureNumAdults, reservation.DepartureNumStudents, reservation.DepartureNumSeniors,
 			reservation.DepartureNumChildren, reservation.ReturnNumAdults, reservation.ReturnNumStudents, reservation.ReturnNumSeniors, reservation.ReturnNumChildren,
 			reservation.Price, reservation.Status, reservation.Hash, reservation.CustomDepartureID, reservation.CustomDepartureID,
-			reservation.DepartureDate, reservation.ReturnDate, reservation.TripTypeID, reservation.TripID, reservation.BalanceOwing, reservation.ElavonTransactionID)
+			reservation.DepartureDate, reservation.ReturnDate, 2, reservation.TripID, reservation.BalanceOwing, reservation.ElavonTransactionID)
 
 		if err != nil {
 			log.Printf("Error creating return reservation: %s", err)
@@ -176,7 +179,7 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 			reservation.DestinationCityID, reservation.DestinationVenueID, reservation.DiscountCodeID, reservation.DepartureAirlineID, reservation.DriverNotes,
 			reservation.InternalNotes, reservation.DepartureNumAdults, reservation.DepartureNumStudents, reservation.DepartureNumSeniors, reservation.DepartureNumChildren,
 			reservation.Price, reservation.Status, reservation.Hash, reservation.CustomDepartureID, reservation.CustomDepartureID,
-			reservation.DepartureDate, reservation.TripTypeID, reservation.TripID, reservation.BalanceOwing, reservation.ElavonTransactionID)
+			reservation.DepartureDate, 1, reservation.TripID, reservation.BalanceOwing, reservation.ElavonTransactionID)
 
 		if err != nil {
 			log.Printf("Error creating one-way reservation: %s", err)
@@ -788,7 +791,8 @@ func (store *dbStore) GetClientInfo(client *Client) error {
 //GetOrAddTrip - store appropriate tripid in reservation, if no trip
 //				 generate new trip
 func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
-	var tripid int64
+	var tripid int
+	var tripid64 int64
 	var numtrippassengers int
 	var numpassengers int
 	var capacity int
@@ -796,7 +800,7 @@ func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 
 	numpassengers = reservation.DepartureNumAdults + reservation.DepartureNumChildren + reservation.DepartureNumSeniors + reservation.DepartureNumStudents
 
-	err := store.db.QueryRow("select tripid, numpassengers, capacity, omitted, from trips where tripid=?",
+	err := store.db.QueryRow("select tripid, numpassengers, capacity, omitted from trips where tripid=?",
 		reservation.TripID).Scan(&tripid, &numtrippassengers, &capacity, &omitted)
 
 	if err != nil {
@@ -811,8 +815,9 @@ func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 			if inserterr != nil {
 				log.Printf("Error inserting new trip: %s", inserterr.Error())
 			} else {
-				tripid, _ = result.LastInsertId()
-				log.Printf("TripID: %d", tripid)
+				tripid64, _ = result.LastInsertId()
+				log.Printf("TripID: %d", tripid64)
+				tripid = int(tripid64)
 				err = nil
 			}
 		} else {
@@ -830,6 +835,13 @@ func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 				errorstring := fmt.Sprintf("This trip is over capacity, only %d vacancies", vacancies)
 				err = errors.New(errorstring)
 			} else {
+				if float32(capacity)*(0.75) >= float32(vacancies) {
+
+					trip := store.GetTrip(tripid)
+
+					SendCapacityEmail(trip)
+				}
+
 				numpassengers += numtrippassengers
 
 				_, err = store.db.Exec("UPDATE trips(numpassengers)"+
@@ -954,6 +966,59 @@ func (store *dbStore) GetTrips() []Trips {
 	return tripSlice
 }
 
+//GetTrips - return all trips (must add parameter to return by date)
+func (store *dbStore) GetTrip(tripid int) Trips {
+
+	row := store.db.QueryRow("select tripid, departuredate, t.departuretimeid, "+
+		"numpassengers, driverid, vehicleid, capacity, "+
+		"omitted from trips t inner join "+
+		"departuretimes dt on t.departuretimeid = dt.departuretimeid "+
+		"where tripid = ?", tripid)
+
+	trip := Trips{}
+	var departuredate mysql.NullTime
+
+	err := row.Scan(
+		&trip.TripID, &departuredate,
+		&trip.DepartureTimeID, &trip.NumPassengers,
+		&trip.DriverID, &trip.VehicleID,
+		&trip.Capacity, &trip.Omitted,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No trips found")
+		} else {
+			log.Printf("Error retrieving trips: %s", err.Error())
+		}
+	} else {
+		//store dates in departure time slice if valid dates, otherwise empty date
+		if departuredate.Valid {
+			trip.DepartureDate = departuredate.Time
+		} else {
+			trip.DepartureDate = time.Time{}
+		}
+
+		dtrow := store.db.QueryRow("select departuretime "+
+			"from departuretimes where departuretimeid = ? ",
+			trip.DepartureTimeID)
+
+		dterr := dtrow.Scan(
+			&trip.DepartureTime,
+		)
+
+		if dterr != nil {
+			if dterr == sql.ErrNoRows {
+				log.Print("No departuretime found")
+			} else {
+				log.Printf("Error retrieving departuretime: %s", dterr.Error())
+			}
+		}
+	}
+
+	return trip
+}
+
 //UpdateTrip - update driver and vehicle associated with trip
 func (store *dbStore) UpdateTrip(trip *Trips) error {
 
@@ -1040,15 +1105,11 @@ func (store *dbStore) SearchReservations(name string, phone int, email string) [
 		log.Printf("add name to where")
 		whereClause += " c.Firstname like ('" + name + "') or c.LastName like ('" + name + "') "
 		addWhere = true
-	}
-
-	if phone > 0 {
+	} else if phone > 0 {
 		log.Printf("add phone to where")
 		whereClause += " c.Phone = " + strconv.Itoa(phone)
 		addWhere = true
-	}
-
-	if len(email) > 0 {
+	} else if len(email) > 0 {
 		log.Printf("add email to where")
 		whereClause += " c.Email = '" + email + "'"
 		addWhere = true
@@ -1463,7 +1524,7 @@ func (store *dbStore) GetAirlines() []Airlines {
 }
 
 //GetPrice - return price for a trip
-func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, reservationtypeid int, discountcode string) float32 {
+func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retdeparturecityid int, retdestinationcityid int, customertypeid int, triptypeid int, discountcode string) float32 {
 	var err error
 
 	row := store.db.QueryRow("SELECT price FROM prices "+
@@ -1490,7 +1551,7 @@ func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retde
 		}
 	}
 
-	if (departurecityid != retdeparturecityid || destinationcityid != retdestinationcityid) && reservationtypeid == 2 {
+	if (departurecityid != retdeparturecityid || destinationcityid != retdestinationcityid) && triptypeid == 2 {
 		row := store.db.QueryRow("SELECT price FROM prices "+
 			"WHERE departurecityid = ? and destinationcityid = ? and customertypeid = ?",
 			retdeparturecityid, retdestinationcityid, customertypeid)
@@ -1517,7 +1578,7 @@ func (store *dbStore) GetPrice(departurecityid int, destinationcityid int, retde
 
 		price = (price + retprice) * 0.9
 
-	} else if reservationtypeid == 2 {
+	} else if triptypeid == 2 {
 		price = (price * 2) * 0.9
 	}
 
@@ -1801,6 +1862,153 @@ func (store *dbStore) DriverReservations(driverid int, reportdate time.Time) Dri
 	driverReportForm.DriverReports = driverReportSlice
 
 	return driverReportForm
+}
+
+//GetTravelAgencyCount - return count of all travel agencies
+func (store *dbStore) GetTravelAgencyCount() int {
+	var travelAgencyCount int
+
+	//need to add where clause to these queries to use today's date
+	row, err := store.db.Query("select count(travelagencyid) from travelagencies")
+
+	row.Next()
+	err = row.Scan(
+		&travelAgencyCount,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No travel agencies returned")
+		} else {
+			log.Printf("Error retrieving travel agency count: %s", err.Error())
+		}
+
+		return 0
+	}
+
+	return travelAgencyCount
+}
+
+//GetTravelAgencies - return all travel agencies
+func (store *dbStore) GetTravelAgencies() []TravelAgencies {
+
+	row, err := store.db.Query("select travelagencyid, travelagentname, iatanumber" +
+		"from travelagencies")
+
+	if err != nil {
+		log.Printf("Error retrieving travel agencies: %s", err.Error())
+		return nil
+	}
+	defer row.Close()
+
+	//create slice to store all departure times
+	var travelAgencySlice = make([]TravelAgencies, store.GetTravelAgencyCount())
+
+	var indx int
+	indx = 0
+	for row.Next() {
+		err = row.Scan(
+			&travelAgencySlice[indx].TravelAgencyID, &travelAgencySlice[indx].TravelAgencyName,
+			&travelAgencySlice[indx].IATANumber,
+		)
+
+		if err != nil {
+			// If an entry with the username does not exist, send an "Unauthorized"(401) status
+			if err == sql.ErrNoRows {
+				log.Print("No travel agencies found")
+			} else {
+				log.Printf("Error retrieving travel agencies: %s", err.Error())
+			}
+		}
+
+		indx++
+	}
+
+	return travelAgencySlice
+}
+
+//TravelAgentRecords - return list of reservations for driver
+func (store *dbStore) TravelAgencyReports(month int, year int) []TravelAgencyReport {
+	var travelAgencyCount int
+
+	var whereClause string
+	var sqlString string
+
+	log.Printf("query travel agent report")
+
+	if month > 0 && year > 0 {
+		log.Printf("we have date criteria")
+
+		whereClause = " where postponed = 0 and cancelled = 0 and " +
+			"month(departuredate) = " + strconv.Itoa(month) + " and year(departuredate) = " + strconv.Itoa(year)
+
+		sqlString = "select count(r.travelagencyid) from reservations r inner join travelagencies ta on r.travelagencyid = ta.travelagencyid" +
+			"" + whereClause
+
+		log.Printf("%s", sqlString)
+
+		row, err := store.db.Query(sqlString)
+
+		log.Printf("query executed")
+
+		row.Next()
+		err = row.Scan(
+			&travelAgencyCount,
+		)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				log.Print("No travel agency report returned")
+			} else {
+				log.Printf("Error retrieving travel agency report count: %s", err.Error())
+			}
+		}
+
+		log.Printf("travel agency report count: %d", travelAgencyCount)
+		var travelAgencyReportSlice = make([]TravelAgencyReport, travelAgencyCount)
+
+		if travelAgencyCount > 0 {
+			row, err = store.db.Query("select r.travelagencyid, ta.travelagencyname, count(r.ReservationID) " +
+				"reservationcount, sum(r.Price) totalcost, sum(r.Price)*0.10 as commission " +
+				"from reservations r inner join travelagencies ta on r.travelagencyid = ta.travelagencyid " +
+				"" + whereClause + " group by ta.travelagencyid, ta.travelagencyname")
+
+			if err != nil {
+				if err == sql.ErrNoRows {
+					log.Print("No travel agency reports found")
+				} else {
+					log.Printf("Error retrieving travel agency records: %s", err.Error())
+				}
+				return []TravelAgencyReport{}
+			}
+			defer row.Close()
+
+			log.Printf("retrieved records")
+
+			var indx int
+			indx = 0
+			for row.Next() {
+				log.Printf("test")
+				err = row.Scan(
+					&travelAgencyReportSlice[indx].TravelAgencyID, &travelAgencyReportSlice[indx].TravelAgencyName,
+					&travelAgencyReportSlice[indx].ReservationCount, &travelAgencyReportSlice[indx].TotalCost,
+					&travelAgencyReportSlice[indx].Commission,
+				)
+
+				if err != nil {
+					log.Printf("Error retrieving travel agent reports: %s", err.Error())
+				}
+
+				log.Printf("travel agency: %s", travelAgencyReportSlice[indx].TravelAgencyName)
+
+				indx++
+			}
+		}
+
+		return travelAgencyReportSlice
+	}
+
+	log.Printf("no date criteria, return empty report")
+
+	return []TravelAgencyReport{}
 }
 
 // The store variable is a package level variable that will be available for

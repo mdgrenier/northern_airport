@@ -241,7 +241,7 @@ func SendCapacityEmail(trip Trips) {
 		trip.DepartureDate, trip.DepartureTime, trip.NumPassengers, drivername, vehicleplate, trip.Capacity)
 
 	msg := "From: " + from + "\n" +
-		"To: " + to + "; mdgrenier@gmail.com\n" +
+		"To: mdgrenier@gmail.com\n" +
 		"Subject: Northern Airport Reservation Confirmation\n\n" +
 		body
 
