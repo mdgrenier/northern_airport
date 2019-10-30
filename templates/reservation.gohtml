@@ -480,10 +480,10 @@
             }
         };
 
-        departurecity.onchange = UpdateVenue(departurecity, departurevenue);
-        destinationcity.onchange = UpdateVenue(destinationcity, destinationvenue);
-        returndeparturecity.onchange = UpdateVenue(returndeparturecity, returndeparturevenue);
-        returndestinationcity.onchange = UpdateVenue(returndestinationcity, returndestinationvenue);
+        departurecity.onchange = UpdateVenue(departurecity, departurevenue, destinationcity);
+        destinationcity.onchange = UpdateVenue(destinationcity, destinationvenue, departurecity);
+        returndeparturecity.onchange = UpdateVenue(returndeparturecity, returndeparturevenue, returndestinationcity);
+        returndestinationcity.onchange = UpdateVenue(returndestinationcity, returndestinationvenue, returndeparturecity);
 
         departurevenue.onchange = ShowSelects(departurevenue, pickupaddress, showdepartureairline);
         destinationvenue.onchange = ShowSelects(destinationvenue, dropoffaddress, showdestinationairline);
@@ -509,9 +509,63 @@
             };
         };
 
-        function UpdateVenue(cityselect, venueselect) {
+        function UpdateVenue(cityselect, venueselect, selecttoupdate) {
             return function() {
                 var selectvenuecount = venueselect.options.length;
+                var selectcitycount = selecttoupdate.options.length;
+
+                if(cityselect.value != 2)
+                {
+                    // Only display toronto as city and toronto venues for destinations
+                    for(i=0; i<selectcitycount; i++)
+                    {
+                        selecttoupdate.remove(selecttoupdate.options[i]);
+                    }
+                    
+                    var opt = document.createElement('option');
+                    opt.appendChild(document.createTextNode('Select a City'));
+                    opt.value = 0;
+                    selecttoupdate.appendChild(opt);
+                    
+                    {{ range .Cities }}
+                        var cityid = {{ .CityID }}
+                        var cityname = {{ .CityName }}
+
+                        if(cityid == 2)
+                        {
+                            var opt = document.createElement('option'); 
+                            opt.appendChild(document.createTextNode(cityname));
+                            opt.value = cityid;
+                            selecttoupdate.appendChild(opt);
+                        }
+                    {{ end }}
+                }
+                // Display all cities but toronto and all non-toronto venues 
+                else 
+                {
+                    for(i=0; i<selectcitycount; i++)
+                    {
+                        selecttoupdate.remove(selecttoupdate.options[i]);
+                    }
+                    
+                    var opt = document.createElement('option');
+                    opt.appendChild(document.createTextNode('Select a City'));
+                    opt.value = 0;
+                    selecttoupdate.appendChild(opt);
+   
+                    {{ range .Cities }}
+                        var cityid = {{ .CityID }}
+                        var cityname = {{ .CityName }}
+                        
+                        if(cityid != 2)
+                        {
+                            var opt = document.createElement('option'); 
+                            opt.appendChild(document.createTextNode(cityname));
+                            opt.value = cityid;
+                            selecttoupdate.appendChild(opt);
+                        }
+                    {{ end }}
+                }
 
                 for(i=0; i<selectvenuecount; i++)
                 {

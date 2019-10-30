@@ -166,7 +166,7 @@ type SearchReservations struct {
 	Email            string    `json:"email" db:"email"`
 	DepartureVenue   string    `json:"departurevenue" db:"departurevenue"`
 	DestinationVenue string    `json:"destinationvenue" db:"destinationvenue"`
-	Return           bool      `json:"return" db:"return"`
+	Return           int       `json:"return" db:"return"`
 	NumPassengers    int       `json:"numpassengers" db:"numpassengers"`
 	DepartureDate    time.Time `json:"departuredate" db:"departuredate"`
 	DepartureTime    int       `json:"departuretime" db:"departuretime"`

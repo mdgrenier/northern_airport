@@ -883,10 +883,17 @@ func (store *dbStore) GetTrips() []Trips {
 		}
 	}
 
+	if tripCount > 20 {
+		tripCount = 20
+	}
+
 	row, err = store.db.Query("select tripid, departuredate, t.departuretimeid, " +
-		"numpassengers, driverid, vehicleid, capacity, " +
+		"numpassengers, driverid, vehicleid, capacity, departuretime, " +
 		"omitted from trips t inner join " +
-		"departuretimes dt on t.departuretimeid = dt.departuretimeid ")
+		"departuretimes dt on t.departuretimeid = dt.departuretimeid " +
+		"where year(departuredate) = year(CURDATE()) AND month(departuredate) = month(CURDATE()) " +
+		"order by departuredate desc " +
+		"limit 20")
 
 	if err != nil {
 		log.Printf("Error retrieving trips: %s", err.Error())
@@ -906,7 +913,8 @@ func (store *dbStore) GetTrips() []Trips {
 			&tripSlice[indx].TripID, &departuredate,
 			&tripSlice[indx].DepartureTimeID, &tripSlice[indx].NumPassengers,
 			&tripSlice[indx].DriverID, &tripSlice[indx].VehicleID,
-			&tripSlice[indx].Capacity, &tripSlice[indx].Omitted,
+			&tripSlice[indx].Capacity, &tripSlice[indx].DepartureTime,
+			&tripSlice[indx].Omitted,
 		)
 
 		if err != nil {
@@ -916,38 +924,13 @@ func (store *dbStore) GetTrips() []Trips {
 				log.Printf("Error retrieving trips: %s", err.Error())
 			}
 		} else {
+			log.Printf("Trip record id: %d", tripSlice[indx].TripID)
+
 			//store dates in departure time slice if valid dates, otherwise empty date
 			if departuredate.Valid {
 				tripSlice[indx].DepartureDate = departuredate.Time
 			} else {
 				tripSlice[indx].DepartureDate = time.Time{}
-			}
-
-			//populate departuretime
-			{
-
-				dtrow, dterr := store.db.Query("select departuretime "+
-					"from departuretimes where departuretimeid = ? ",
-					tripSlice[indx].DepartureTimeID)
-
-				if dterr != nil {
-					log.Printf("Error retrieving departuretime: %s", dterr.Error())
-					return nil
-				}
-
-				dtrow.Next()
-				dterr = dtrow.Scan(
-					&tripSlice[indx].DepartureTime,
-				)
-
-				if dterr != nil {
-					if dterr == sql.ErrNoRows {
-						log.Print("No departuretime found")
-					} else {
-						log.Printf("Error retrieving departuretime: %s", dterr.Error())
-					}
-				}
-				dtrow.Close()
 			}
 
 			//populate drivers
@@ -957,7 +940,6 @@ func (store *dbStore) GetTrips() []Trips {
 			//populate vehicle
 			tripSlice[indx].VehicleList = make([]Vehicles, store.GetVehicleCount())
 			tripSlice[indx].VehicleList = store.GetVehicles()
-
 		}
 
 		indx++
@@ -1111,7 +1093,7 @@ func (store *dbStore) SearchReservations(name string, phone int, email string) [
 		addWhere = true
 	} else if len(email) > 0 {
 		log.Printf("add email to where")
-		whereClause += " c.Email = '" + email + "'"
+		whereClause += " c.Email = '" + email + "' "
 		addWhere = true
 	}
 
@@ -1143,6 +1125,10 @@ func (store *dbStore) SearchReservations(name string, phone int, email string) [
 
 	log.Printf("got the count: %d", reservationCount)
 
+	if reservationCount > 100 {
+		reservationCount = 100
+	}
+
 	var numadults int
 	var numstudents int
 	var numseniors int
@@ -1156,7 +1142,8 @@ func (store *dbStore) SearchReservations(name string, phone int, email string) [
 			"from reservations r inner join clients c on r.clientid = c.clientid " +
 			"inner join venues depv on r.departurevenueid = depv.venueid " +
 			"inner join venues desv on r.destinationvenueid = desv.venueid " +
-			"inner join departuretimes dt on r.departuretimeid = dt.departuretimeid " + whereClause)
+			"inner join departuretimes dt on r.departuretimeid = dt.departuretimeid " + whereClause +
+			"limit 100")
 	} else {
 		row, err = store.db.Query("select r.reservationid, concat(c.firstname, ' ', c.lastname) as clientname, c.phone, c.email, " +
 			"depv.name as departurevenue, desv.name as destinationvenue, r.triptypeid, " +
@@ -1165,7 +1152,8 @@ func (store *dbStore) SearchReservations(name string, phone int, email string) [
 			"from reservations r inner join clients c on r.clientid = c.clientid " +
 			"inner join venues depv on r.departurevenueid = depv.venueid " +
 			"inner join venues desv on r.destinationvenueid = desv.venueid " +
-			"inner join departuretimes dt on r.departuretimeid = dt.departuretimeid ")
+			"inner join departuretimes dt on r.departuretimeid = dt.departuretimeid " +
+			"limit 100")
 	}
 
 	if err != nil {

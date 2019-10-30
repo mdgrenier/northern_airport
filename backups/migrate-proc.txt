@@ -1,0 +1,167 @@
+CREATE DEFINER=`root`@`%` PROCEDURE `delete_migrated_data`()
+BEGIN
+    SELECT 'delete old records';
+    
+    DELETE FROM `northernairport`.`clients` WHERE ClientID > 7;
+    ALTER TABLE `northernairport`.`clients` AUTO_INCREMENT = 8;
+    
+    DELETE FROM `northernairport`.`reservations` WHERE ReservationID > 2;
+    ALTER TABLE `northernairport`.`reservations` AUTO_INCREMENT = 3;
+    
+    SELECT 'old records deleted!';
+END
+
+CREATE DEFINER=`root`@`%` PROCEDURE `migrate_trips`()
+BEGIN
+	
+	SET @DateCounter = (SELECT CONCAT(2016,'-',01,'-01'));
+    SET @Today = CURDATE();
+    
+    SELECT 'trips started';
+    
+    WHILE @DateCounter<=@Today DO
+		INSERT INTO `northernairport`.`trips` (departuredate, departuretimeid, 
+		 	numpassengers, driverid, vehicleid, capacity, omitted)
+		VALUES
+			
+			(@DateCounter, 1, 0, 0, 0, 11, 0),
+            (@DateCounter, 2, 0, 0, 0, 11, 0),
+            (@DateCounter, 3, 0, 0, 0, 11, 0),
+            (@DateCounter, 4, 0, 0, 0, 11, 0),
+            (@DateCounter, 5, 0, 0, 0, 11, 0),
+            (@DateCounter, 6, 0, 0, 0, 11, 0),
+            (@DateCounter, 7, 0, 0, 0, 11, 0),
+            (@DateCounter, 8, 0, 0, 0, 11, 0),
+			
+			(DATE_ADD(@DateCounter, INTERVAL 1 DAY), 1, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 1 DAY), 2, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 1 DAY), 3, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 1 DAY), 4, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 1 DAY), 5, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 1 DAY), 6, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 1 DAY), 7, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 1 DAY), 8, 0, 0, 0, 11, 0),
+			
+			(DATE_ADD(@DateCounter, INTERVAL 2 DAY), 1, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 2 DAY), 2, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 2 DAY), 3, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 2 DAY), 4, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 2 DAY), 5, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 2 DAY), 6, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 2 DAY), 7, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 2 DAY), 8, 0, 0, 0, 11, 0),
+			
+			(DATE_ADD(@DateCounter, INTERVAL 3 DAY), 1, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 3 DAY), 2, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 3 DAY), 3, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 3 DAY), 4, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 3 DAY), 5, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 3 DAY), 6, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 3 DAY), 7, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 3 DAY), 8, 0, 0, 0, 11, 0),
+			
+			(DATE_ADD(@DateCounter, INTERVAL 4 DAY), 1, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 4 DAY), 2, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 4 DAY), 3, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 4 DAY), 4, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 4 DAY), 5, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 4 DAY), 6, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 4 DAY), 7, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 4 DAY), 8, 0, 0, 0, 11, 0),
+			
+			(DATE_ADD(@DateCounter, INTERVAL 5 DAY), 1, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 5 DAY), 2, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 5 DAY), 3, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 5 DAY), 4, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 5 DAY), 5, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 5 DAY), 6, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 5 DAY), 7, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 5 DAY), 8, 0, 0, 0, 11, 0),
+			
+			(DATE_ADD(@DateCounter, INTERVAL 6 DAY), 1, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 6 DAY), 2, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 6 DAY), 3, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 6 DAY), 4, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 6 DAY), 5, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 6 DAY), 6, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 6 DAY), 7, 0, 0, 0, 11, 0),
+            (DATE_ADD(@DateCounter, INTERVAL 6 DAY), 8, 0, 0, 0, 11, 0);
+            
+        SET @DateCounter = (SELECT DATE_ADD(@DateCounter, INTERVAL 7 DAY));
+    END WHILE;
+
+    SELECT 'trips complete';
+END
+
+
+CREATE DEFINER=`root`@`%` PROCEDURE `migrate_reservations`()
+BEGIN
+	    
+    SET @Today = CURDATE();
+    SET @DateCounter = (SELECT CONCAT(2016,'-',01,'-01'));
+    
+	SET @Start= 1;
+    SET @Count = 0;
+    
+    WHILE @DateCounter<=@Today DO
+    
+		SET @PlusOneMonth = DATE_ADD(@DateCounter, INTERVAL 1 MONTH);
+        
+        SELECT 'date: ', @DateCounter, ' plus one month: ', @PlusOneMonth;
+        
+		-- SET @Count = (
+		-- 	SELECT COUNT(*) FROM `northernairport`.`old_res_table` 
+		-- 	WHERE departuredate > @DateCounter AND departuredate <= @PlusOneMonth
+		-- );
+        
+        -- SELECT 'records to add: ', @Count;
+    
+		-- WHILE @Start<=@Count DO
+			INSERT INTO `northernairport`.`clients` (firstname, lastname, phone, 
+				email, streetaddress, city, province, postalcode, country)
+			SELECT firstname, lastname, 
+				CASE WHEN REGEXP_REPLACE(phone, '[^0-9]','') = '' THEN 0 
+					ELSE LEFT(REGEXP_REPLACE(phone, '[^0-9]',''),10) END AS phone, 
+				email, billingaddress, city, province, postal, country 
+			FROM `northernairport`.`old_res_table`
+            WHERE departuredate >= @DateCounter AND departuredate <= @PlusOneMonth;
+		
+			SET @ClientID = LAST_INSERT_ID();
+		
+			INSERT INTO `northernairport`.`reservations` (clientid, travelagencyid, departurecityid, 
+				departurevenueid, departuretimeid, destinationcityid, destinationvenueid, returndeparturecityid, 
+				returndeparturevenueid, returndeparturetimeid, returndestinationcityid, returndestinationvenueid,
+				discountcodeid, departureairlineid, returnairlineid, drivernotes, internalnotes, departurenumadults,
+				departurenumstudents, departurenumseniors, departurenumchildren, returnnumadults, returnnumstudents,
+				returnnumseniors, returnnumchildren, price, customdepartureid, customdestinationid, departuredate,
+				returndate, triptypeid, balanceowing, elavontransactionid, postponed, cancelled, tripid)
+			SELECT @ClientID, 1, departurecity, departurevenue, 1,
+				destinationcity, destinationvenue, destinationcity, IF(returndeparturevenue LIKE '', null, returndeparturevenue), REGEXP_REPLACE(returntime, '[^0-9]',null), 
+				IF(returndestinationcity LIKE '', null, returndestinationcity), IF(returndestinationvenue LIKE '', null, returndestinationvenue), 1, IF(airline LIKE '', null, airline), 
+                IF(returnairline LIKE '', null, returnairline),	drivernotes, tanotes, departureadults, departurestudents, departureseniors, departurechildren, 
+				IF(returnadults LIKE '', null, returnadults), IF(returnstudents LIKE '', null, returnstudents), IF(returnseniors LIKE '', null, returnseniors),
+                IF(returnchildren LIKE '', null, returnchildren), cost, 0, 0, departuredate, IF(returndate LIKE '', null, returndate), IF(triptype LIKE 'oneway', 1, 2), balanceowing, elavontransactionid, 
+                0, 0, 1
+			FROM `northernairport`.`old_res_table` r 
+			WHERE departuredate >= @DateCounter AND departuredate <= @PlusOneMonth;
+		
+			-- SET @Start = @Start + 1;
+            
+            -- select stuff removed
+            -- clientid needs to be retrieved from table
+            -- ta.travelagencyid
+            -- dc.discountcodeid
+            -- dt.departuretimeid
+            -- ** tripid
+            
+            -- INNER JOIN `northernairport`.`travelagencies` ta ON r.iata = ta.iatanumber
+            -- INNER JOIN `northernairport`.`discountcodes` dc ON r.discountcode = dc.name
+            -- INNER JOIN `northernairport`.`departuretimes` dt ON dt.departuretime = REGEXP_REPLACE(r.departuretime, '[^0-9]','')
+		-- END WHILE;
+		COMMIT;
+        
+        SELECT @PlusOneMonth, YEAR(@DateCounter);
+    
+		SET @DateCounter = @PlusOneMonth;
+    END WHILE;
+END
