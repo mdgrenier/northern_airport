@@ -104,6 +104,8 @@ type Reservation struct {
 	TripID                   int       `json:"tripid" db:"tripid"`
 	BalanceOwing             float32   `json:"balanceowing" db:"balanceowing"`
 	ElavonTransactionID      int       `json:"elavontranscationid" db:"elavontransactionid"`
+	FlightNumber             int       `json:"flightnumber" db:"flightnumber"`
+	FlightTime               int       `json:"flighttime" db:"flighttime"`
 }
 
 // DiscountCode - store discount code

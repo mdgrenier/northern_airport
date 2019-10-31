@@ -113,6 +113,9 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 			reservation.ReturnNumChildren = 0
 		}
 
+		reservation.FlightNumber, err = strconv.Atoi(r.Form.Get("flightnumber"))
+		reservation.FlightTime, err = strconv.Atoi(r.Form.Get("flighttime"))
+
 		reservation.InternalNotes = r.Form.Get("internalnotes")
 		reservation.DriverNotes = r.Form.Get("drivernotes")
 

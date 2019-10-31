@@ -128,7 +128,7 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 			"drivernotes, internalnotes, departurenumadults, departurenumstudents, departurenumseniors, "+
 			"departurenumchildren, returnnumadults, returnnumstudents, returnnumseniors, returnnumchildren, "+
 			"price, status, hash, customdepartureid, customdestinationid, "+
-			"departuredate, returndate, triptypeid, tripid, balanceowing, elavontransactionid) VALUES "+
+			"departuredate, returndate, triptypeid, tripid, balanceowing, elavontransactionid, flightnumber, flighttime) VALUES "+
 			"(?, ?, ?, ?, ?, ?, ?, ?, ?, "+
 			"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
 			"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
@@ -139,7 +139,7 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 			reservation.DriverNotes, reservation.InternalNotes, reservation.DepartureNumAdults, reservation.DepartureNumStudents, reservation.DepartureNumSeniors,
 			reservation.DepartureNumChildren, reservation.ReturnNumAdults, reservation.ReturnNumStudents, reservation.ReturnNumSeniors, reservation.ReturnNumChildren,
 			reservation.Price, reservation.Status, reservation.Hash, reservation.CustomDepartureID, reservation.CustomDepartureID,
-			reservation.DepartureDate, reservation.ReturnDate, 2, reservation.TripID, reservation.BalanceOwing, reservation.ElavonTransactionID)
+			reservation.DepartureDate, reservation.ReturnDate, 2, reservation.TripID, reservation.BalanceOwing, reservation.ElavonTransactionID, reservation.FlightNumber, reservation.FlightTime)
 
 		if err != nil {
 			log.Printf("Error creating return reservation: %s", err)
@@ -179,7 +179,7 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 			reservation.DestinationCityID, reservation.DestinationVenueID, reservation.DiscountCodeID, reservation.DepartureAirlineID, reservation.DriverNotes,
 			reservation.InternalNotes, reservation.DepartureNumAdults, reservation.DepartureNumStudents, reservation.DepartureNumSeniors, reservation.DepartureNumChildren,
 			reservation.Price, reservation.Status, reservation.Hash, reservation.CustomDepartureID, reservation.CustomDepartureID,
-			reservation.DepartureDate, 1, reservation.TripID, reservation.BalanceOwing, reservation.ElavonTransactionID)
+			reservation.DepartureDate, 1, reservation.TripID, reservation.BalanceOwing, reservation.ElavonTransactionID, reservation.FlightNumber, reservation.FlightTime)
 
 		if err != nil {
 			log.Printf("Error creating one-way reservation: %s", err)
