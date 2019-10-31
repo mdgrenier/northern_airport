@@ -378,6 +378,22 @@
                     </div>
                 </section>
 
+                <section id="flight">
+                    <header>
+                        <h3>Flight Info</h3>
+                    </header>
+                    <div class="row justify-content-around">    
+                        <div class="col-xs-4">
+                            <label for="flightnumber">Flight Number</label>
+                            <input type="text" class="form-control" id="flightnumber" name="flightnumber" value="0">
+                        </div>
+                        <div class="col-xs-4">
+                            <label for="flighttime">Flight Time</label>
+                            <input type="text" class="form-control" id="flighttime" name="flighttime" value="0">
+                        </div>
+                    </div>
+                </section>
+
                 <section id="notes">
                     <header>
                         <h3>Notes</h3>
@@ -481,9 +497,9 @@
         };
 
         departurecity.onchange = UpdateVenue(departurecity, departurevenue, destinationcity);
-        destinationcity.onchange = UpdateVenue(destinationcity, destinationvenue, departurecity);
+        destinationcity.onchange = UpdateVenue(destinationcity, destinationvenue, null);
         returndeparturecity.onchange = UpdateVenue(returndeparturecity, returndeparturevenue, returndestinationcity);
-        returndestinationcity.onchange = UpdateVenue(returndestinationcity, returndestinationvenue, returndeparturecity);
+        returndestinationcity.onchange = UpdateVenue(returndestinationcity, returndestinationvenue, null);
 
         departurevenue.onchange = ShowSelects(departurevenue, pickupaddress, showdepartureairline);
         destinationvenue.onchange = ShowSelects(destinationvenue, dropoffaddress, showdestinationairline);
@@ -512,59 +528,63 @@
         function UpdateVenue(cityselect, venueselect, selecttoupdate) {
             return function() {
                 var selectvenuecount = venueselect.options.length;
-                var selectcitycount = selecttoupdate.options.length;
-
-                if(cityselect.value != 2)
+                
+                if(selecttoupdate !== null)
                 {
-                    // Only display toronto as city and toronto venues for destinations
-                    for(i=0; i<selectcitycount; i++)
+                    var selectcitycount = selecttoupdate.options.length;
+                    
+                    if(cityselect.value != 2)
                     {
-                        selecttoupdate.remove(selecttoupdate.options[i]);
-                    }
-                    
-                    var opt = document.createElement('option');
-                    opt.appendChild(document.createTextNode('Select a City'));
-                    opt.value = 0;
-                    selecttoupdate.appendChild(opt);
-                    
-                    {{ range .Cities }}
-                        var cityid = {{ .CityID }}
-                        var cityname = {{ .CityName }}
-
-                        if(cityid == 2)
+                        // Only display toronto as city and toronto venues for destinations
+                        for(i=0; i<selectcitycount; i++)
                         {
-                            var opt = document.createElement('option'); 
-                            opt.appendChild(document.createTextNode(cityname));
-                            opt.value = cityid;
-                            selecttoupdate.appendChild(opt);
+                            selecttoupdate.remove(selecttoupdate.options[i]);
                         }
-                    {{ end }}
-                }
-                // Display all cities but toronto and all non-toronto venues 
-                else 
-                {
-                    for(i=0; i<selectcitycount; i++)
-                    {
-                        selecttoupdate.remove(selecttoupdate.options[i]);
-                    }
-                    
-                    var opt = document.createElement('option');
-                    opt.appendChild(document.createTextNode('Select a City'));
-                    opt.value = 0;
-                    selecttoupdate.appendChild(opt);
-   
-                    {{ range .Cities }}
-                        var cityid = {{ .CityID }}
-                        var cityname = {{ .CityName }}
                         
-                        if(cityid != 2)
+                        var opt = document.createElement('option');
+                        opt.appendChild(document.createTextNode('Select a City'));
+                        opt.value = 0;
+                        selecttoupdate.appendChild(opt);
+                        
+                        {{ range .Cities }}
+                            var cityid = {{ .CityID }}
+                            var cityname = {{ .CityName }}
+
+                            if(cityid == 2)
+                            {
+                                var opt = document.createElement('option'); 
+                                opt.appendChild(document.createTextNode(cityname));
+                                opt.value = cityid;
+                                selecttoupdate.appendChild(opt);
+                            }
+                        {{ end }}
+                    }
+                    // Display all cities but toronto and all non-toronto venues 
+                    else 
+                    {
+                        for(i=0; i<selectcitycount; i++)
                         {
-                            var opt = document.createElement('option'); 
-                            opt.appendChild(document.createTextNode(cityname));
-                            opt.value = cityid;
-                            selecttoupdate.appendChild(opt);
+                            selecttoupdate.remove(selecttoupdate.options[i]);
                         }
-                    {{ end }}
+                        
+                        var opt = document.createElement('option');
+                        opt.appendChild(document.createTextNode('Select a City'));
+                        opt.value = 0;
+                        selecttoupdate.appendChild(opt);
+    
+                        {{ range .Cities }}
+                            var cityid = {{ .CityID }}
+                            var cityname = {{ .CityName }}
+                            
+                            if(cityid != 2)
+                            {
+                                var opt = document.createElement('option'); 
+                                opt.appendChild(document.createTextNode(cityname));
+                                opt.value = cityid;
+                                selecttoupdate.appendChild(opt);
+                            }
+                        {{ end }}
+                    }
                 }
 
                 for(i=0; i<selectvenuecount; i++)
@@ -597,6 +617,8 @@
 
         function UpdateTime(departurecityselect, destinationcityselect, timeselect) {
             return function() {
+
+                alert("update time");
 
                 var departurevenueid = departurevenue.options[departurevenue.selectedIndex].value;
                 var destinationvenueid = destinationvenue.options[destinationvenue.selectedIndex].value;
@@ -676,8 +698,11 @@
                     var departuretimeid = {{ .DepartureTimeID }};
                     var departuretimecityid = {{ .CityID }}                 
             
+                    alert("loop through departure times");
+
                     if(departurecityid == 1) 
                     {
+                        alert("departure is north bay");
                         if(departuretimecityid == 1)
                         {
                             var startdate = {{ .StartDate.Format "2006-01-02" }};
@@ -697,6 +722,7 @@
                     } 
                     else if(departurecityid == 2) 
                     {
+                        alert("departure is toronto");
                         if(departuretimecityid == 2)
                         {
                             opt.appendChild(document.createTextNode(time));
@@ -706,6 +732,7 @@
                     }
                     else
                     {
+                        alert("departure is somewhere else");
                         if(departurecityid == 0 || destinationcityid == 0)
                         {
                             if(timeselect.options.length == 0)
