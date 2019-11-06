@@ -883,6 +883,7 @@ func (store *dbStore) GetTrips() []Trips {
 		}
 	}
 
+	//problem with more than 20, not sure why
 	if tripCount > 20 {
 		tripCount = 20
 	}
@@ -891,7 +892,7 @@ func (store *dbStore) GetTrips() []Trips {
 		"numpassengers, driverid, vehicleid, capacity, departuretime, " +
 		"omitted from trips t inner join " +
 		"departuretimes dt on t.departuretimeid = dt.departuretimeid " +
-		"where year(departuredate) = year(CURDATE()) AND month(departuredate) = month(CURDATE()) " +
+		//"where year(departuredate) = year(CURDATE()) AND month(departuredate) = month(CURDATE()) " +
 		"order by departuredate desc " +
 		"limit 20")
 
@@ -924,8 +925,6 @@ func (store *dbStore) GetTrips() []Trips {
 				log.Printf("Error retrieving trips: %s", err.Error())
 			}
 		} else {
-			log.Printf("Trip record id: %d", tripSlice[indx].TripID)
-
 			//store dates in departure time slice if valid dates, otherwise empty date
 			if departuredate.Valid {
 				tripSlice[indx].DepartureDate = departuredate.Time
@@ -948,7 +947,7 @@ func (store *dbStore) GetTrips() []Trips {
 	return tripSlice
 }
 
-//GetTrips - return all trips (must add parameter to return by date)
+//GetTrip - return one trip based on id
 func (store *dbStore) GetTrip(tripid int) Trips {
 
 	row := store.db.QueryRow("select tripid, departuredate, t.departuretimeid, "+

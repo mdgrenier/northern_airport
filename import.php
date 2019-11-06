@@ -13,16 +13,18 @@ if(! $conn )
   die('Could not connect: ' . mysql_error());
 }
 
-$sql = "SELECT r.id, flighttime, (select name FROM airlines WHERE id=airline) AS AirlineName, flightnumber, '' as FlightCity, " .
-"(select terminal FROM airlines WHERE id=airline) AS TerminalName, confirmationnumber, CONCAT(lastname, ', ', firstname) AS PaxName, departurechildren + departurestudents + departureadults + departureseniors as NumPax, " .
-"IF (destinationvenue=100, destinationdropoffaddress, (SELECT name FROM venues WHERE id=destinationvenue)) AS DropLocation, (select name FROM cities WHERE ID = destinationcity) AS DropCity, clientnotes, drivernotes,  departuretime,  (SELECT CONCAT(lastname, ', ' , firstname) FROM drivers WHERE id=tv.driverid) AS DriverName , tv.driverid, " .
-"(SELECT licenseplate FROM vehicles WHERE id=tv.vehicleid) AS VehicleNum,(datecancelled is null) AS IsValid, departuredate, IF(departurevenue=99, '', (SELECT name FROM venues WHERE id=departurevenue)) AS HotelInfo " .
-"FROM 201655_a.reservations r JOIN 201655_a.trips t " .
-"ON r.id = t.reservationid " .
-"AND r.departuredate = t.tripdate " .
-"JOIN 201655_a.tripvehicles tv " .
-"ON t.triptypeid = tv.triptypeid and t.tripdate = tv.tripdate " .
-"WHERE departurecity=2 and datecancelled is null ";
+$sql = "SELECT r.reservationid, flighttime, (select name FROM airlines WHERE airlineid=departureairlineid) AS AirlineName, " +
+	"flightnumber, '' as FlightCity, (select terminal FROM airlines WHERE airlineid=departureairlineid) AS TerminalName, " +
+	"r.reservationid AS confirmationnumber, departurenumchildren + departurenumstudents + departurenumadults + departurenumseniors as NumPax, " + 
+	"IF (destinationvenueid=100, dropoffaddress, (SELECT name FROM venues WHERE venueid=destinationvenueid)) AS DropLocation, " +
+	"(select name FROM cities WHERE cityid=destinationcityid) AS DropCity, internalnotes, drivernotes, dt.departuretime, " +
+	"(SELECT CONCAT(lastname, ', ' , firstname) FROM drivers WHERE driverid=t.driverid) AS DriverName , t.driverid, " +
+	"(SELECT licenseplate FROM vehicles WHERE vehicleid=t.vehicleid) AS VehicleNum, (cancelled is null or cancelled = 0) AS IsValid, " +
+	"r.departuredate, IF(departurevenueid=99, '', (SELECT name FROM venues WHERE venueid=departurevenueid)) AS HotelInfo " +
+	"FROM northernairport.reservations r JOIN northernairport.trips t ON r.tripid = t.tripid " +
+	"JOIN northernairport.vehicles v	ON t.vehicleid = v.vehicleid " +
+	"JOIN northernairport.departuretimes dt ON dt.departuretimeid = r.departuretimeid " +
+	"WHERE departurecityid=2 and (cancelled is null or cancelled = 0)";
 
 if(isset($_GET['startDate']))
 {
