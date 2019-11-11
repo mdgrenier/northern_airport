@@ -551,6 +551,8 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 //TripHandler - display trip admin page
 func TripHandler(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+
 	session, err := sessionStore.Get(r, "northern-airport")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -560,14 +562,28 @@ func TripHandler(w http.ResponseWriter, r *http.Request) {
 	//get client data from session cookie
 	client := GetClient(session)
 
+	var tripdate time.Time
+
+	if values["searchdate"] != nil {
+		tripdate, err = time.Parse("2006-01-02", values["searchdate"][0])
+	}
+
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
-		//get data need to populate dropdowns in reservation form
-		trips := store.GetTrips()
+		searchtrips := store.SearchTrips(tripdate)
 
-		trips[0].RoleID = client.RoleID
+		if len(searchtrips) > 0 {
+			searchtrips[0].RoleID = client.RoleID
 
-		tpl.ExecuteTemplate(w, "trip.gohtml", trips)
+			log.Printf("trips: we've got some trips!")
+		} else {
+			log.Printf("trips: no trips returned!")
+		}
+
+		if err := tpl.ExecuteTemplate(w, "trip.gohtml", searchtrips); err != nil {
+			log.Printf("Error executing HTML template: %s", err.Error())
+			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
+		}
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}

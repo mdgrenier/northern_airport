@@ -43,6 +43,7 @@ type Store interface {
 	UpdateTrip(trip *Trips) error
 	OmitTrip(trip *Trips) error
 	SearchReservations(name string, phone int, email string) []SearchReservations
+	SearchTrips(tripdate time.Time) []Trips
 	PostponeReservation(searchreservation *SearchReservations) error
 	CancelReservation(searchreservation *SearchReservations) error
 	GetDrivers() []Drivers
@@ -1202,6 +1203,135 @@ func (store *dbStore) SearchReservations(name string, phone int, email string) [
 	}
 
 	return searchReservationSlice
+}
+
+//TripReservations - return trips for given date
+func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
+	var tripCount int
+
+	var addWhere bool
+	var whereClause string
+
+	//populate drivers
+	driverlist := make([]Drivers, store.GetDriverCount())
+	driverlist = store.GetDrivers()
+	//populate vehicle
+	vehiclelist := make([]Vehicles, store.GetVehicleCount())
+	vehiclelist = store.GetVehicles()
+
+	whereClause = " where "
+	addWhere = false
+
+	var epoch = time.Time{}
+
+	if tripdate.After(epoch) {
+		log.Printf("add date to where")
+		whereClause += " departuredate ='" + tripdate.Format("2006-01-02") + "'"
+		addWhere = true
+	}
+
+	var sqlString string
+
+	if addWhere {
+		sqlString = "select count(tripid) " +
+			" from trips t " + whereClause
+		log.Printf("sql string created with where, %s", sqlString)
+	} else {
+		sqlString = "select count(tripid) from trips limit 20"
+		log.Printf("sql string created")
+	}
+
+	//need to add where clause to these queries to use today's date
+	row, err := store.db.Query(sqlString)
+
+	row.Next()
+	err = row.Scan(
+		&tripCount,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No trips returned")
+		} else {
+			log.Printf("Error retrieving trip count: %s", err.Error())
+		}
+	}
+
+	log.Printf("got the count: %d", tripCount)
+
+	if tripCount > 20 {
+		tripCount = 20
+	}
+
+	if addWhere {
+		sqlstring := "select tripid, departuredate, t.departuretimeid, departuretime, " +
+			"numpassengers, driverid, vehicleid, capacity, omitted " +
+			"from trips t inner join departuretimes dt on t.departuretimeid = dt.departuretimeid " +
+			whereClause + " order by departuredate limit 20"
+
+		log.Printf("%s", sqlstring)
+
+		row, err = store.db.Query(sqlstring)
+	} else {
+		sqlstring := "select tripid, departuredate, t.departuretimeid, departuretime, " +
+			"numpassengers, driverid, vehicleid, capacity, omitted " +
+			"from trips t inner join departuretimes dt on t.departuretimeid = dt.departuretimeid " +
+			" order by departuredate limit 20"
+
+		log.Printf(sqlstring)
+
+		row, err = store.db.Query("select tripid, departuredate, t.departuretimeid, departuretime, " +
+			"numpassengers, driverid, vehicleid, capacity, omitted " +
+			"from trips t inner join departuretimes dt on t.departuretimeid = dt.departuretimeid " +
+			" order by departuredate limit 20")
+	}
+
+	if err != nil {
+		log.Printf("Error retrieving search trips: %s", err.Error())
+		return nil
+	}
+	defer row.Close()
+
+	//create slice to store all departure times
+	var searchTripSlice = make([]Trips, tripCount)
+
+	log.Printf("retrieved records")
+
+	var departuredate mysql.NullTime
+	var indx int
+
+	indx = 0
+	for row.Next() {
+		err = row.Scan(
+			&searchTripSlice[indx].TripID, &departuredate,
+			&searchTripSlice[indx].DepartureTimeID, &searchTripSlice[indx].DepartureTime,
+			&searchTripSlice[indx].NumPassengers, &searchTripSlice[indx].DriverID,
+			&searchTripSlice[indx].VehicleID, &searchTripSlice[indx].Capacity,
+			&searchTripSlice[indx].Omitted,
+		)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				log.Print("No search trips found")
+			} else {
+				log.Printf("Error retrieving search trips: %s", err.Error())
+			}
+		} else {
+			log.Printf("setting date for record: %d", indx)
+			//store dates in departure time slice if valid dates, otherwise empty date
+			if departuredate.Valid {
+				searchTripSlice[indx].DepartureDate = departuredate.Time
+			} else {
+				searchTripSlice[indx].DepartureDate = time.Time{}
+			}
+		}
+
+		searchTripSlice[indx].DriverList = driverlist
+		searchTripSlice[indx].VehicleList = vehiclelist
+
+		indx++
+	}
+
+	return searchTripSlice
 }
 
 //PostponeReservation - mark reservation as postponed

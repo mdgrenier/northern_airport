@@ -12,11 +12,20 @@
     <header>
         {{ template "navbar" }}
 
-        {{ template "adminnavbar" index . 0 }}
+        
 
     </header>
     <main>
         <div class="container">
+            <div class="row justify-content-around">
+                <div class="col-xs-4">
+                    <label for="trip-date">Trip Date</label>
+                    <input type="date" class="form-control" id="search-date" name="search-date">
+                </div>
+                <div class="col-xs-4">
+                    <button class="btn btn-primary" id="search">Search</button>
+                </div>
+            </div>
             <h1>Trips</h1>
             <div class="trip-wrapper">
                 <div class="box header" id="departuredate-header">Departure Date</div>
@@ -68,6 +77,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <script type="text/javascript" >
+
+        console.log("trips, selected correct driver and vehicle");
         
         {{ range . }} 
             //set driver list to correct driver by driverid
@@ -117,6 +128,36 @@
             }
 
         {{ end }}
+        
+        var search = document.getElementById("search");
+        search.onclick = function(){
+
+            var searchdate = document.getElementById("search-date").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/trips?searchdate='+searchdate);
+            //xhr.open('GET', '/trips');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                if (xhr.status != 200) {
+                    alert('search failed:' + xhr.status);
+                }
+                else
+                {
+                    document.open(); 
+                    document.write(xhr.response); 
+                    document.close();
+
+                    console.log("display page");
+                }
+            }
+
+            try {
+                xhr.send();
+            } catch (err) {
+                alert("Error sending request: " + err)
+            }
+        }
 
     </script>
 </body>
