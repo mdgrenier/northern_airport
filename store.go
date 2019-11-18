@@ -1268,8 +1268,6 @@ func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
 			"from trips t inner join departuretimes dt on t.departuretimeid = dt.departuretimeid " +
 			whereClause + " order by departuredate limit 20"
 
-		log.Printf("%s", sqlstring)
-
 		row, err = store.db.Query(sqlstring)
 	} else {
 		sqlstring := "select tripid, departuredate, t.departuretimeid, departuretime, " +
@@ -1277,12 +1275,7 @@ func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
 			"from trips t inner join departuretimes dt on t.departuretimeid = dt.departuretimeid " +
 			" order by departuredate limit 20"
 
-		log.Printf(sqlstring)
-
-		row, err = store.db.Query("select tripid, departuredate, t.departuretimeid, departuretime, " +
-			"numpassengers, driverid, vehicleid, capacity, omitted " +
-			"from trips t inner join departuretimes dt on t.departuretimeid = dt.departuretimeid " +
-			" order by departuredate limit 20")
+		row, err = store.db.Query(sqlstring)
 	}
 
 	if err != nil {

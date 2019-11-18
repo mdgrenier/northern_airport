@@ -1525,17 +1525,43 @@ func TravelAgencyReportHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//ReportHandler - display reports admin page
-func ReportHandler(w http.ResponseWriter, r *http.Request) {
+//CalendarReportHandler - display reports admin page
+func CalendarReportHandler(w http.ResponseWriter, r *http.Request) {
+	//values := r.URL.Query()
 
-	//session, err := sessionStore.Get(r, "northern-airport")
-	//if err != nil {
-	//	http.Error(w, err.Error(), http.StatusInternalServerError)
-	//	return
-	//}
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	//get client data from session cookie
-	//client := GetClient(session)
+	client := GetClient(session)
 
-	tpl.ExecuteTemplate(w, "reports.gohtml", r)
+	//if authenticated get all client info
+	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
+		//get days in month
+		currentTime := time.Now()
+		month := currentTime.Month()
+		year := currentTime.Year()
+
+		numdays := NumDaysLookup(int(month), year)
+
+		calReport := CalendarReport{}
+		calDays := make([]CalendarDays, numdays)
+
+		calReport.RoleID = client.RoleID
+
+		for indx := 0; indx < numdays; indx++ {
+			calDays[indx].DayNum = indx + 1
+			calDays[indx].CalendarTrips = []Trips{}
+		}
+
+		calReport.Days = calDays
+		calReport.CurrentDate = currentTime
+
+		tpl.ExecuteTemplate(w, "calendar.gohtml", calReport)
+	} else {
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
+	}
 }

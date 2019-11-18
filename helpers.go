@@ -257,3 +257,51 @@ func SendCapacityEmail(trip Trips) {
 		return
 	}
 }
+
+//NumDaysLookup - given month and year return number of days in the month
+func NumDaysLookup(month int, year int) int {
+	switch month {
+	case 1:
+		//January
+		return 31
+	case 2:
+		//February
+		//leap year calculation
+		if year%400 == 0 {
+			return 29
+		} else if year%100 == 0 {
+			return 28
+		} else if year%4 == 0 {
+			return 29
+		} else {
+			return 28
+		}
+	case 3:
+		//March
+		return 31
+	case 4:
+		//April
+		return 30
+	case 5:
+		//May
+		return 31
+	case 6:
+		//June
+		return 30
+	case 7:
+		//July
+		return 31
+	case 8:
+		return 30
+	case 9:
+		return 31
+	case 10:
+		return 31
+	case 11:
+		return 30
+	case 12:
+		return 31
+	default:
+		return 0
+	}
+}

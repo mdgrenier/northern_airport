@@ -1,5 +1,4 @@
 {{ define "navbar" }}
-    <img class="logo" src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container">
             <div class="navbar-header">
@@ -47,7 +46,7 @@
                                 </div>
                                 <ul class="dropdown-menu">
                                     {{ if or (eq .RoleID 3) (eq .RoleID 4) }}
-                                        <li class="nav-link-inverse"><a href="#">Trip Calendar Report</a></li>
+                                        <li class="nav-link-inverse"><a href="/calendarreport">Trip Calendar Report</a></li>
                                         <li class="nav-link-inverse"><a href="/travelagencyreport">Travel Agent Report</a></li>
                                     {{ end }}
                                     <li class="nav-link-inverse"><a href="/driverreport">Driver Report</a></li>

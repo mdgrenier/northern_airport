@@ -260,6 +260,19 @@ type TravelAgencyForm struct {
 	RoleID              int
 }
 
+//CalendarDays - store days and trips for calendar report
+type CalendarDays struct {
+	DayNum        int
+	CalendarTrips []Trips
+}
+
+//CalendarReport - store calendar report info
+type CalendarReport struct {
+	CurrentDate time.Time
+	Days        []CalendarDays
+	RoleID		int
+}
+
 var dateLayout string
 var sessionStore *sessions.CookieStore
 
@@ -290,7 +303,6 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/createreservation", CreateReservationHandler)
 	r.HandleFunc("/reservationcreated", ReservationCreatedHandler)
 	r.HandleFunc("/createuser", CreateUserHandler)
-	r.HandleFunc("/reports", ReportHandler)
 	//get method only
 	r.HandleFunc("/trips", TripHandler).Methods("GET")
 	r.HandleFunc("/omittrip", OmitTripFormHandler).Methods("GET")
@@ -305,6 +317,7 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/search", SearchHandler).Methods("GET")
 	r.HandleFunc("/driverreport", DriverReportHandler).Methods("GET")
 	r.HandleFunc("/travelagencyreport", TravelAgencyReportHandler).Methods("GET")
+	r.HandleFunc("/calendarreport", CalendarReportHandler).Methods("GET")
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
