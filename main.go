@@ -139,10 +139,12 @@ type Trips struct {
 	DepartureDate   time.Time `json:"departuredate" db:"departuredate"`
 	DepartureTimeID int       `json:"departuretimeid" db:"departuretimeid"`
 	DepartureTime   int
-	NumPassengers   int `json:"numpassengers" db:"numpassengers"`
-	DriverID        int `json:"driverid" db:"driverid"`
+	NumPassengers   int    `json:"numpassengers" db:"numpassengers"`
+	DriverID        int    `json:"driverid" db:"driverid"`
+	DriverName      string `json:"drivername" db:"drivername"`
 	DriverList      []Drivers
-	VehicleID       int `json:"vehicleid" db:"vehicleid"`
+	VehicleID       int    `json:"vehicleid" db:"vehicleid"`
+	LicensePlate    string `json:"licenseplate" db:"licenseplate"`
 	VehicleList     []Vehicles
 	Capacity        int       `json:"capacity" db:"capacity"`
 	Omitted         int       `json:"omitted" db:"omitted"`
@@ -270,7 +272,7 @@ type CalendarDays struct {
 type CalendarReport struct {
 	CurrentDate time.Time
 	Days        []CalendarDays
-	RoleID		int
+	RoleID      int
 }
 
 var dateLayout string

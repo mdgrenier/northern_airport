@@ -26,44 +26,1306 @@
     opacity: 1;
   }
 }
-[id="schedule"]:target ~ .cal-device .cal-bar .-schedule {
+
+[id="schedule-1"]:target ~ .cal-device .cal-bar .-schedule-1 {
   opacity: 1;
 }
-[id="schedule"]:target ~ .cal-device .cal-bar .-calendar {
+[id="schedule-1"]:target ~ .cal-device .cal-bar .-calendar {
   opacity: 0;
 }
-[id="schedule"]:target ~ .cal-device .cal-scene.-schedule {
+[id="schedule-1"]:target ~ .cal-device .cal-scene.-schedule-1 {
   opacity: 1;
   z-index: 2;
 }
-[id="schedule"]:target ~ .cal-device .cal-time > *, [id="schedule"]:target ~ .cal-device .cal-task > * {
+
+[id="schedule-2"]:target ~ .cal-device .cal-bar .-schedule-2 {
+  opacity: 1;
+}
+[id="schedule-2"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-2"]:target ~ .cal-device .cal-scene.-schedule-2 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-3"]:target ~ .cal-device .cal-bar .-schedule-3 {
+  opacity: 1;
+}
+[id="schedule-3"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-3"]:target ~ .cal-device .cal-scene.-schedule-3 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-4"]:target ~ .cal-device .cal-bar .-schedule-4 {
+  opacity: 1;
+}
+[id="schedule-4"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-4"]:target ~ .cal-device .cal-scene.-schedule-4 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-5"]:target ~ .cal-device .cal-bar .-schedule-5 {
+  opacity: 1;
+}
+[id="schedule-5"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-5"]:target ~ .cal-device .cal-scene.-schedule-5 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-6"]:target ~ .cal-device .cal-bar .-schedule-6 {
+  opacity: 1;
+}
+[id="schedule-6"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-6"]:target ~ .cal-device .cal-scene.-schedule-6 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-7"]:target ~ .cal-device .cal-bar .-schedule-7 {
+  opacity: 1;
+}
+[id="schedule-7"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-7"]:target ~ .cal-device .cal-scene.-schedule-7 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-8"]:target ~ .cal-device .cal-bar .-schedule-8 {
+  opacity: 1;
+}
+[id="schedule-8"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-8"]:target ~ .cal-device .cal-scene.-schedule-8 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-9"]:target ~ .cal-device .cal-bar .-schedule-9 {
+  opacity: 1;
+}
+[id="schedule-9"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-9"]:target ~ .cal-device .cal-scene.-schedule-9 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-10"]:target ~ .cal-device .cal-bar .-schedule-10 {
+  opacity: 1;
+}
+[id="schedule-10"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-10"]:target ~ .cal-device .cal-scene.-schedule-10 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-11"]:target ~ .cal-device .cal-bar .-schedule-11 {
+  opacity: 1;
+}
+[id="schedule-11"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-11"]:target ~ .cal-device .cal-scene.-schedule-11 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-12"]:target ~ .cal-device .cal-bar .-schedule-12 {
+  opacity: 1;
+}
+[id="schedule-12"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-12"]:target ~ .cal-device .cal-scene.-schedule-12 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-13"]:target ~ .cal-device .cal-bar .-schedule-13 {
+  opacity: 1;
+}
+[id="schedule-13"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-13"]:target ~ .cal-device .cal-scene.-schedule-13 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-14"]:target ~ .cal-device .cal-bar .-schedule-14 {
+  opacity: 1;
+}
+[id="schedule-14"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-14"]:target ~ .cal-device .cal-scene.-schedule-14 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-15"]:target ~ .cal-device .cal-bar .-schedule-15 {
+  opacity: 1;
+}
+[id="schedule-15"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-15"]:target ~ .cal-device .cal-scene.-schedule-15 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-16"]:target ~ .cal-device .cal-bar .-schedule-16 {
+  opacity: 1;
+}
+[id="schedule-16"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-16"]:target ~ .cal-device .cal-scene.-schedule-16 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-17"]:target ~ .cal-device .cal-bar .-schedule-17 {
+  opacity: 1;
+}
+[id="schedule-17"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-17"]:target ~ .cal-device .cal-scene.-schedule-17 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-18"]:target ~ .cal-device .cal-bar .-schedule-18 {
+  opacity: 1;
+}
+[id="schedule-18"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-18"]:target ~ .cal-device .cal-scene.-schedule-18 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-19"]:target ~ .cal-device .cal-bar .-schedule-19 {
+  opacity: 1;
+}
+[id="schedule-19"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-19"]:target ~ .cal-device .cal-scene.-schedule-19 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-20"]:target ~ .cal-device .cal-bar .-schedule-20 {
+  opacity: 1;
+}
+[id="schedule-20"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-20"]:target ~ .cal-device .cal-scene.-schedule-20 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-21"]:target ~ .cal-device .cal-bar .-schedule-21 {
+  opacity: 1;
+}
+[id="schedule-21"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-21"]:target ~ .cal-device .cal-scene.-schedule-21 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-22"]:target ~ .cal-device .cal-bar .-schedule-22 {
+  opacity: 1;
+}
+[id="schedule-22"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-22"]:target ~ .cal-device .cal-scene.-schedule-22 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-23"]:target ~ .cal-device .cal-bar .-schedule-23 {
+  opacity: 1;
+}
+[id="schedule-23"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-23"]:target ~ .cal-device .cal-scene.-schedule-23 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-24"]:target ~ .cal-device .cal-bar .-schedule-24 {
+  opacity: 1;
+}
+[id="schedule-24"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-24"]:target ~ .cal-device .cal-scene.-schedule-24 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-25"]:target ~ .cal-device .cal-bar .-schedule-25 {
+  opacity: 1;
+}
+[id="schedule-25"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-25"]:target ~ .cal-device .cal-scene.-schedule-25 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-26"]:target ~ .cal-device .cal-bar .-schedule-26 {
+  opacity: 1;
+}
+[id="schedule-26"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-26"]:target ~ .cal-device .cal-scene.-schedule-26 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-27"]:target ~ .cal-device .cal-bar .-schedule-27 {
+  opacity: 1;
+}
+[id="schedule-27"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-27"]:target ~ .cal-device .cal-scene.-schedule-27 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-28"]:target ~ .cal-device .cal-bar .-schedule-28 {
+  opacity: 1;
+}
+[id="schedule-28"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-28"]:target ~ .cal-device .cal-scene.-schedule-28 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-29"]:target ~ .cal-device .cal-bar .-schedule-29 {
+  opacity: 1;
+}
+[id="schedule-29"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-29"]:target ~ .cal-device .cal-scene.-schedule-29 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-30"]:target ~ .cal-device .cal-bar .-schedule-30 {
+  opacity: 1;
+}
+[id="schedule-30"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-30"]:target ~ .cal-device .cal-scene.-schedule-30 {
+  opacity: 1;
+  z-index: 2;
+}
+
+[id="schedule-31"]:target ~ .cal-device .cal-bar .-schedule-31 {
+  opacity: 1;
+}
+[id="schedule-31"]:target ~ .cal-device .cal-bar .-calendar {
+  opacity: 0;
+}
+[id="schedule-31"]:target ~ .cal-device .cal-scene.-schedule-31 {
+  opacity: 1;
+  z-index: 2;
+}
+
+
+[id="schedule-1"]:target ~ .cal-device .cal-time > *, [id="schedule-1"]:target ~ .cal-device .cal-task > * {
   -webkit-transform: translateX(0);
           transform: translateX(0);
 }
-[id="schedule"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+
+[id="schedule-2"]:target ~ .cal-device .cal-time > *, [id="schedule-2"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-3"]:target ~ .cal-device .cal-time > *, [id="schedule-3"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-4"]:target ~ .cal-device .cal-time > *, [id="schedule-4"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-5"]:target ~ .cal-device .cal-time > *, [id="schedule-5"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-6"]:target ~ .cal-device .cal-time > *, [id="schedule-6"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-7"]:target ~ .cal-device .cal-time > *, [id="schedule-7"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-8"]:target ~ .cal-device .cal-time > *, [id="schedule-8"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-9"]:target ~ .cal-device .cal-time > *, [id="schedule-9"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-10"]:target ~ .cal-device .cal-time > *, [id="schedule-10"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-11"]:target ~ .cal-device .cal-time > *, [id="schedule-11"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-12"]:target ~ .cal-device .cal-time > *, [id="schedule-12"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-13"]:target ~ .cal-device .cal-time > *, [id="schedule-13"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-14"]:target ~ .cal-device .cal-time > *, [id="schedule-14"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-15"]:target ~ .cal-device .cal-time > *, [id="schedule-15"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-16"]:target ~ .cal-device .cal-time > *, [id="schedule-16"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-17"]:target ~ .cal-device .cal-time > *, [id="schedule-17"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-18"]:target ~ .cal-device .cal-time > *, [id="schedule-18"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-19"]:target ~ .cal-device .cal-time > *, [id="schedule-19"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-20"]:target ~ .cal-device .cal-time > *, [id="schedule-20"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-21"]:target ~ .cal-device .cal-time > *, [id="schedule-21"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-22"]:target ~ .cal-device .cal-time > *, [id="schedule-22"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-23"]:target ~ .cal-device .cal-time > *, [id="schedule-23"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-24"]:target ~ .cal-device .cal-time > *, [id="schedule-24"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-25"]:target ~ .cal-device .cal-time > *, [id="schedule-25"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-26"]:target ~ .cal-device .cal-time > *, [id="schedule-26"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-27"]:target ~ .cal-device .cal-time > *, [id="schedule-27"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-28"]:target ~ .cal-device .cal-time > *, [id="schedule-28"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-29"]:target ~ .cal-device .cal-time > *, [id="schedule-29"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-30"]:target ~ .cal-device .cal-time > *, [id="schedule-30"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-31"]:target ~ .cal-device .cal-time > *, [id="schedule-31"]:target ~ .cal-device .cal-task > * {
+  -webkit-transform: translateX(0);
+          transform: translateX(0);
+}
+
+[id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
   transition-delay: 0s;
 }
-[id="schedule"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+[id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
   transition-delay: 0.06s;
 }
-[id="schedule"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+[id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
   transition-delay: 0.12s;
 }
-[id="schedule"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+[id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
   transition-delay: 0.18s;
 }
-[id="schedule"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+[id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
   transition-delay: 0.24s;
 }
-[id="schedule"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+[id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
   transition-delay: 0.3s;
 }
-[id="schedule"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+[id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-1"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
   transition-delay: 0.36s;
 }
-[id="schedule"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule"]:target ~ .cal-device .cal-scene.-calendar * {
+[id="schedule-1"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-1"]:target ~ .cal-device .cal-scene.-calendar * {
   transition-delay: 0.6s;
 }
+
+[id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-2"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-2"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-2"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+[id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-3"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-3"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-3"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+[id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-4"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-4"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-4"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-5"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-5"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-5"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+[id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-6"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-6"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-6"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-7"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-7"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-7"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-8"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-8"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-8"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-9"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-9"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-9"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-10"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-10"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-10"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-11"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-11"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-11"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-12"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-12"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-12"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-13"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-13"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-13"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-14"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-14"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-14"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-15"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-15"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-15"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-16"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-16"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-16"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-17"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-17"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-17"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-18"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-18"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-18"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-19"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-19"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-19"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-20"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-20"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-20"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-21"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-21"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-21"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-22"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-22"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-22"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-23"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-23"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-23"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-24"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-24"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-24"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-25"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-25"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-25"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-26"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-26"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-26"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-27"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-27"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-27"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-28"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-28"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-28"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-29"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-29"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-29"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-30"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-30"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-30"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
+[id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(1) .cal-time > *, [id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(1) .cal-task > * {
+  transition-delay: 0s;
+}
+[id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(2) .cal-time > *, [id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(2) .cal-task > * {
+  transition-delay: 0.06s;
+}
+[id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(3) .cal-time > *, [id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(3) .cal-task > * {
+  transition-delay: 0.12s;
+}
+[id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(4) .cal-time > *, [id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(4) .cal-task > * {
+  transition-delay: 0.18s;
+}
+[id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(5) .cal-time > *, [id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(5) .cal-task > * {
+  transition-delay: 0.24s;
+}
+[id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(6) .cal-time > *, [id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(6) .cal-task > * {
+  transition-delay: 0.3s;
+}
+[id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(7) .cal-time > *, [id="schedule-31"]:target ~ .cal-device .cal-item:nth-child(7) .cal-task > * {
+  transition-delay: 0.36s;
+}
+[id="schedule-31"]:target ~ .cal-device .cal-scene.-calendar, [id="schedule-31"]:target ~ .cal-device .cal-scene.-calendar * {
+  transition-delay: 0.6s;
+}
+
+
 
 .cal-device {
   width: 180vh;
@@ -121,7 +1383,157 @@
   left: 0;
   transition: box-shadow 0.6s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
-.cal-scene.-schedule {
+.cal-scene.-schedule-1 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-2 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-3 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-4 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-5 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-6 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-7 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-8 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-9 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-10 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-11 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-12 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-13 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-14 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-15 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-16 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-17 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-18 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-19 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-20 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-21 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-22 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-23 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-24 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-25 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-26 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-27 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-28 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-29 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-30 {
+  z-index: -1;
+  opacity: 0;
+}
+
+.cal-scene.-schedule-31 {
   z-index: -1;
   opacity: 0;
 }
@@ -191,7 +1603,127 @@
   flex-grow: 1;
   height: 100%;
 }
-.cal-bar .-schedule {
+.cal-bar .-schedule-1 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-2 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-3 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-4 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-5 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-6 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-7 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-8 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-9 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-10 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-11 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-12 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-13 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-14 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-15 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-16 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-17 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-18 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-19 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-20 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-21 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-22 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-23 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-24 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-25 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-26 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-27 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-28 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-29 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-30 {
+  opacity: 0;
+}
+
+.cal-bar .-schedule-31 {
   opacity: 0;
 }
 
@@ -264,9 +1796,130 @@
   font-size: 4vh;
   top: 10vh;
 }
-.cal-day[href="#schedule"]:before {
+.cal-day[href="#schedule-1"]:before {
   background: rgba(255, 255, 255, 0.4);
 }
+
+.cal-day[href="#schedule-2"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-3"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-4"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-5"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-6"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-7"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-8"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-9"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-10"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-11"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-12"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-13"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-14"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-15"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-16"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-17"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-18"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-19"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-20"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-21"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-22"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-23"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-24"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-25"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-26"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-27"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-28"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-29"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-30"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cal-day[href="#schedule-31"]:before {
+  background: rgba(255, 255, 255, 0.4);
+}
+
 .cal-day:before {
   content: counter(month);
   display: block;
@@ -295,7 +1948,6 @@
    background-color: gray;
 }
 
-
 .cal-time {
   width: 15vh;
   flex-basis: 30vh;
@@ -316,7 +1968,7 @@
 }
 
 .cal-task {
-  flex-basis: 38.5714285714vh;
+  flex-basis: 65;
   height: 100%;
   background-color: lightgray;
   display: flex;

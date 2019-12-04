@@ -865,7 +865,7 @@ func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 	return err
 }
 
-//GetTrips - return all trips (must add parameter to return by date)
+//GetTrips - return all trips
 func (store *dbStore) GetTrips() []Trips {
 	var tripCount int
 
@@ -1143,6 +1143,7 @@ func (store *dbStore) SearchReservations(name string, phone int, email string) [
 			"inner join venues depv on r.departurevenueid = depv.venueid " +
 			"inner join venues desv on r.destinationvenueid = desv.venueid " +
 			"inner join departuretimes dt on r.departuretimeid = dt.departuretimeid " + whereClause +
+			"order by r.departuredate " +
 			"limit 100")
 	} else {
 		row, err = store.db.Query("select r.reservationid, concat(c.firstname, ' ', c.lastname) as clientname, c.phone, c.email, " +
@@ -1153,6 +1154,7 @@ func (store *dbStore) SearchReservations(name string, phone int, email string) [
 			"inner join venues depv on r.departurevenueid = depv.venueid " +
 			"inner join venues desv on r.destinationvenueid = desv.venueid " +
 			"inner join departuretimes dt on r.departuretimeid = dt.departuretimeid " +
+			"order by r.departuredate " +
 			"limit 100")
 	}
 
@@ -1188,7 +1190,6 @@ func (store *dbStore) SearchReservations(name string, phone int, email string) [
 				log.Printf("Error retrieving search reservations: %s", err.Error())
 			}
 		} else {
-			log.Printf("setting date for record: %d", indx)
 			//store dates in departure time slice if valid dates, otherwise empty date
 			if departuredate.Valid {
 				searchReservationSlice[indx].DepartureDate = departuredate.Time
@@ -1233,12 +1234,12 @@ func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
 	var sqlString string
 
 	if addWhere {
-		sqlString = "select count(tripid) " +
-			" from trips t " + whereClause
-		log.Printf("sql string created with where, %s", sqlString)
+		sqlString = "select count(departuredate) " +
+			"from (select departuredate, departuretimeid " +
+			"from trips " + whereClause + " " +
+			"group by departuredate, departuretimeid) as tripbydate"
 	} else {
-		sqlString = "select count(tripid) from trips limit 20"
-		log.Printf("sql string created")
+		sqlString = "select count(departuredate) from trips group by departuredate"
 	}
 
 	//need to add where clause to these queries to use today's date
@@ -1255,25 +1256,42 @@ func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
 			log.Printf("Error retrieving trip count: %s", err.Error())
 		}
 	}
+	row.Close()
 
 	log.Printf("got the count: %d", tripCount)
 
-	if tripCount > 20 {
-		tripCount = 20
+	if tripCount > 50 {
+		tripCount = 50
 	}
 
 	if addWhere {
-		sqlstring := "select tripid, departuredate, t.departuretimeid, departuretime, " +
-			"numpassengers, driverid, vehicleid, capacity, omitted " +
+		sqlstring := "select departuredate, t.departuretimeid, departuretime, " +
+			"sum(numpassengers) as numpassengers, t.driverid, t.vehicleid, capacity, omitted, " +
+			"if(t.driverid > 0, concat(d.firstname, ' ', d.lastname), 'no driver') as drivername, " +
+			"if(t.vehicleid > 0, v.licenseplate, 'no vehicle') as vehicle " +
 			"from trips t inner join departuretimes dt on t.departuretimeid = dt.departuretimeid " +
-			whereClause + " order by departuredate limit 20"
+			"left join drivers d on d.driverid = t.driverid " +
+			"left join vehicles v on v.vehicleid = t.vehicleid " +
+			whereClause +
+			"group by departuredate, t.departuretimeid, departuretime, " +
+			"t.driverid, t.vehicleid, capacity, omitted, " +
+			"drivername, vehicle " +
+			"order by departuredate desc"
 
 		row, err = store.db.Query(sqlstring)
+
 	} else {
-		sqlstring := "select tripid, departuredate, t.departuretimeid, departuretime, " +
-			"numpassengers, driverid, vehicleid, capacity, omitted " +
+		sqlstring := "select departuredate, t.departuretimeid, departuretime, " +
+			"sum(numpassengers) as numpassengers, t.driverid, t.vehicleid, capacity, omitted, " +
+			"if(t.driverid > 0, concat(d.firstname, ' ', d.lastname), 'no driver') as drivername, " +
+			"if(t.vehicleid > 0, v.licenseplate, 'no vehicle') as vehicle " +
 			"from trips t inner join departuretimes dt on t.departuretimeid = dt.departuretimeid " +
-			" order by departuredate limit 20"
+			"left join drivers d on d.driverid = t.driverid " +
+			"left join vehicles v on v.vehicleid = t.vehicleid " +
+			"group by departuredate, t.departuretimeid, departuretime, " +
+			"t.driverid, t.vehicleid, capacity, omitted, " +
+			"drivername, vehicle " +
+			"order by departuredate desc"
 
 		row, err = store.db.Query(sqlstring)
 	}
@@ -1287,7 +1305,7 @@ func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
 	//create slice to store all departure times
 	var searchTripSlice = make([]Trips, tripCount)
 
-	log.Printf("retrieved records")
+	log.Printf("SearchTrips: retrieved records")
 
 	var departuredate mysql.NullTime
 	var indx int
@@ -1295,11 +1313,11 @@ func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
 	indx = 0
 	for row.Next() {
 		err = row.Scan(
-			&searchTripSlice[indx].TripID, &departuredate,
-			&searchTripSlice[indx].DepartureTimeID, &searchTripSlice[indx].DepartureTime,
+			&departuredate, &searchTripSlice[indx].DepartureTimeID, &searchTripSlice[indx].DepartureTime,
 			&searchTripSlice[indx].NumPassengers, &searchTripSlice[indx].DriverID,
 			&searchTripSlice[indx].VehicleID, &searchTripSlice[indx].Capacity,
-			&searchTripSlice[indx].Omitted,
+			&searchTripSlice[indx].Omitted, &searchTripSlice[indx].DriverName,
+			&searchTripSlice[indx].LicensePlate,
 		)
 
 		if err != nil {
@@ -1309,7 +1327,6 @@ func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
 				log.Printf("Error retrieving search trips: %s", err.Error())
 			}
 		} else {
-			log.Printf("setting date for record: %d", indx)
 			//store dates in departure time slice if valid dates, otherwise empty date
 			if departuredate.Valid {
 				searchTripSlice[indx].DepartureDate = departuredate.Time
@@ -1323,6 +1340,8 @@ func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
 
 		indx++
 	}
+
+	row.Close()
 
 	return searchTripSlice
 }
@@ -1382,6 +1401,8 @@ func (store *dbStore) GetVehicleCount() int {
 		return 0
 	}
 
+	row.Close()
+
 	return vehicleCount
 }
 
@@ -1419,6 +1440,8 @@ func (store *dbStore) GetVehicles() []Vehicles {
 
 		indx++
 	}
+
+	row.Close()
 
 	return vehicleSlice
 }
@@ -1486,6 +1509,8 @@ func (store *dbStore) GetDriverCount() int {
 		return 0
 	}
 
+	row.Close()
+
 	return driverCount
 }
 
@@ -1523,6 +1548,8 @@ func (store *dbStore) GetDrivers() []Drivers {
 
 		indx++
 	}
+
+	row.Close()
 
 	return driverSlice
 }
@@ -1592,6 +1619,8 @@ func (store *dbStore) GetAirlineCount() int {
 		return 0
 	}
 
+	row.Close()
+
 	return airlineCount
 }
 
@@ -1629,6 +1658,8 @@ func (store *dbStore) GetAirlines() []Airlines {
 
 		indx++
 	}
+
+	row.Close()
 
 	return airlineSlice
 }

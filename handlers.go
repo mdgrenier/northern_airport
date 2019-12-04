@@ -572,6 +572,8 @@ func TripHandler(w http.ResponseWriter, r *http.Request) {
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
 		searchtrips := store.SearchTrips(tripdate)
 
+		log.Printf("test 3")
+
 		if len(searchtrips) > 0 {
 			searchtrips[0].RoleID = client.RoleID
 
@@ -1554,7 +1556,10 @@ func CalendarReportHandler(w http.ResponseWriter, r *http.Request) {
 
 		for indx := 0; indx < numdays; indx++ {
 			calDays[indx].DayNum = indx + 1
-			calDays[indx].CalendarTrips = []Trips{}
+
+			tripday := time.Date(year, month, indx, 0, 0, 0, 0, time.UTC)
+			tripsbyday := store.SearchTrips(tripday)
+			calDays[indx].CalendarTrips = tripsbyday
 		}
 
 		calReport.Days = calDays
