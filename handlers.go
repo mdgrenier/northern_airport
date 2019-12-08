@@ -570,14 +570,12 @@ func TripHandler(w http.ResponseWriter, r *http.Request) {
 
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
-		searchtrips := store.SearchTrips(tripdate)
-
-		log.Printf("test 3")
+		searchtrips := store.SearchTrips(tripdate, 0)
 
 		if len(searchtrips) > 0 {
 			searchtrips[0].RoleID = client.RoleID
 
-			log.Printf("trips: we've got some trips!")
+			log.Printf("trips: we've got %d trips!", len(searchtrips))
 		} else {
 			log.Printf("trips: no trips returned!")
 		}
@@ -1363,6 +1361,8 @@ func AddDepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
 		departuretime := DepartureTimes{}
 		var err error
 
+		departuretime.RoleID = client.RoleID
+
 		departuretime.CityID, err = strconv.Atoi(values["cityid"][0])
 		departuretime.DepartureTime, err = strconv.Atoi(values["departuretime"][0])
 		departuretime.Recurring, err = strconv.Atoi(values["recurring"][0])
@@ -1558,7 +1558,7 @@ func CalendarReportHandler(w http.ResponseWriter, r *http.Request) {
 			calDays[indx].DayNum = indx + 1
 
 			tripday := time.Date(year, month, indx, 0, 0, 0, 0, time.UTC)
-			tripsbyday := store.SearchTrips(tripday)
+			tripsbyday := store.SearchTrips(tripday, 1)
 			calDays[indx].CalendarTrips = tripsbyday
 		}
 

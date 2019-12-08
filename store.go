@@ -43,7 +43,7 @@ type Store interface {
 	UpdateTrip(trip *Trips) error
 	OmitTrip(trip *Trips) error
 	SearchReservations(name string, phone int, email string) []SearchReservations
-	SearchTrips(tripdate time.Time) []Trips
+	SearchTrips(tripdate time.Time, reportType int) []Trips
 	PostponeReservation(searchreservation *SearchReservations) error
 	CancelReservation(searchreservation *SearchReservations) error
 	GetDrivers() []Drivers
@@ -1207,10 +1207,10 @@ func (store *dbStore) SearchReservations(name string, phone int, email string) [
 }
 
 //TripReservations - return trips for given date
-func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
+//reportType 0 = trips, 1 = calendar
+func (store *dbStore) SearchTrips(tripdate time.Time, reportType int) []Trips {
 	var tripCount int
 
-	var addWhere bool
 	var whereClause string
 
 	//populate drivers
@@ -1221,26 +1221,24 @@ func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
 	vehiclelist = store.GetVehicles()
 
 	whereClause = " where "
-	addWhere = false
 
 	var epoch = time.Time{}
+	var today = time.Now()
 
 	if tripdate.After(epoch) {
-		log.Printf("add date to where")
-		whereClause += " departuredate ='" + tripdate.Format("2006-01-02") + "'"
-		addWhere = true
+		whereClause += " departuredate = '" + tripdate.Format("2006-01-02") + "' "
+	} else {
+		whereClause += " departuredate = '" + today.Format("2006-01-02") + "' "
 	}
 
 	var sqlString string
 
-	if addWhere {
-		sqlString = "select count(departuredate) " +
-			"from (select departuredate, departuretimeid " +
-			"from trips " + whereClause + " " +
-			"group by departuredate, departuretimeid) as tripbydate"
-	} else {
-		sqlString = "select count(departuredate) from trips group by departuredate"
-	}
+	sqlString = "select count(departuretimeid) " +
+		"from (select departuretimeid " +
+		"from trips " + whereClause + " " +
+		"group by departuretimeid) as deptimeids"
+	
+	log.Printf("%s", sqlString)
 
 	//need to add where clause to these queries to use today's date
 	row, err := store.db.Query(sqlString)
@@ -1264,37 +1262,22 @@ func (store *dbStore) SearchTrips(tripdate time.Time) []Trips {
 		tripCount = 50
 	}
 
-	if addWhere {
-		sqlstring := "select departuredate, t.departuretimeid, departuretime, " +
-			"sum(numpassengers) as numpassengers, t.driverid, t.vehicleid, capacity, omitted, " +
-			"if(t.driverid > 0, concat(d.firstname, ' ', d.lastname), 'no driver') as drivername, " +
-			"if(t.vehicleid > 0, v.licenseplate, 'no vehicle') as vehicle " +
-			"from trips t inner join departuretimes dt on t.departuretimeid = dt.departuretimeid " +
-			"left join drivers d on d.driverid = t.driverid " +
-			"left join vehicles v on v.vehicleid = t.vehicleid " +
-			whereClause +
-			"group by departuredate, t.departuretimeid, departuretime, " +
-			"t.driverid, t.vehicleid, capacity, omitted, " +
-			"drivername, vehicle " +
-			"order by departuredate desc"
+	sqlstring := "select departuredate, t.departuretimeid, departuretime, " +
+		" sum(numpassengers) as numpassengers, t.driverid, t.vehicleid, capacity, omitted, " +
+		"if(t.driverid > 0, concat(d.firstname, ' ', d.lastname), 'no driver') as drivername, " +
+		"if(t.vehicleid > 0, v.licenseplate, 'no vehicle') as vehicle " +
+		"from trips t inner join departuretimes dt on t.departuretimeid = dt.departuretimeid " +
+		"left join drivers d on d.driverid = t.driverid " +
+		"left join vehicles v on v.vehicleid = t.vehicleid " +
+		whereClause +
+		"group by departuredate, t.departuretimeid, departuretime, " +
+		"t.driverid, t.vehicleid, capacity, omitted, " +
+		"drivername, vehicle " +
+		"order by departuredate desc limit 50"
 
-		row, err = store.db.Query(sqlstring)
+	row, err = store.db.Query(sqlstring)
 
-	} else {
-		sqlstring := "select departuredate, t.departuretimeid, departuretime, " +
-			"sum(numpassengers) as numpassengers, t.driverid, t.vehicleid, capacity, omitted, " +
-			"if(t.driverid > 0, concat(d.firstname, ' ', d.lastname), 'no driver') as drivername, " +
-			"if(t.vehicleid > 0, v.licenseplate, 'no vehicle') as vehicle " +
-			"from trips t inner join departuretimes dt on t.departuretimeid = dt.departuretimeid " +
-			"left join drivers d on d.driverid = t.driverid " +
-			"left join vehicles v on v.vehicleid = t.vehicleid " +
-			"group by departuredate, t.departuretimeid, departuretime, " +
-			"t.driverid, t.vehicleid, capacity, omitted, " +
-			"drivername, vehicle " +
-			"order by departuredate desc"
-
-		row, err = store.db.Query(sqlstring)
-	}
+	log.Printf(sqlstring)
 
 	if err != nil {
 		log.Printf("Error retrieving search trips: %s", err.Error())
