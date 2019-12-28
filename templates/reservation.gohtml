@@ -619,8 +619,6 @@
         function UpdateTime(departurecityselect, destinationcityselect, timeselect) {
             return function() {
 
-                alert("update time");
-
                 var departurevenueid = departurevenue.options[departurevenue.selectedIndex].value;
                 var destinationvenueid = destinationvenue.options[destinationvenue.selectedIndex].value;
 
@@ -638,18 +636,6 @@
                 jsdeparturedate.setMonth(datearray[1]-1);
                 jsdeparturedate.setDate(datearray[2]);
                 jsdeparturedate = jsdeparturedate.getFullYear() + "-" + ("0" + (jsdeparturedate.getMonth() + 1)).slice(-2)  + "-" + ("0" + jsdeparturedate.getDate()).slice(-2);
-
-                //if (jsdeparturedate === "[object Date]") 
-                //{
-                //    if (isNaN(jsdeparturedate.getTime())) 
-                //    {
-                //        alert("invalid date: " + jsdeparturedate.getTime());    
-                //        return;
-                //    } 
-                //} else {
-                //    alert("invalid date: " + jsdeparturedate);    
-                //    return;
-                //}
 
                 if(departurevenueid <= 0 || destinationvenueid <= 0)
                 {
@@ -698,12 +684,9 @@
                     var time = {{ .DepartureTime }};
                     var departuretimeid = {{ .DepartureTimeID }};
                     var departuretimecityid = {{ .CityID }}                 
-            
-                    alert("loop through departure times");
 
                     if(departurecityid == 1) 
                     {
-                        alert("departure is north bay");
                         if(departuretimecityid == 1)
                         {
                             var startdate = {{ .StartDate.Format "2006-01-02" }};
@@ -723,7 +706,6 @@
                     } 
                     else if(departurecityid == 2) 
                     {
-                        alert("departure is toronto");
                         if(departuretimecityid == 2)
                         {
                             opt.appendChild(document.createTextNode(time));
@@ -733,7 +715,6 @@
                     }
                     else
                     {
-                        alert("departure is somewhere else");
                         if(departurecityid == 0 || destinationcityid == 0)
                         {
                             if(timeselect.options.length == 0)
