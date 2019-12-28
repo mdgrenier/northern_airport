@@ -36,7 +36,7 @@
                         {{ end }}
                     </div>
                     <div class="cal-title">
-                        <div class="cal-heading -calendar"><h1>Calendar Report</h1></div>
+                        <div class="cal-heading -calendar"><h1>Calendar Report - {{ .CurrentDate.Format "January 2006" }}</h1></div>
                         {{ range .Days }}
                             {{ if not .CalendarTrips }}
                             {{ else }}
@@ -62,11 +62,20 @@
                 <div class="cal-scene -calendar">
                     <div class="cal-month -">
                         {{ range .Days }}
-                            {{ if not .CalendarTrips }}
-                                <a class="cal-day"></a>
-                            {{ else }}
-                                <a href="#schedule-{{ .DayNum }}"  class="cal-day"></a>
-                            {{ end }}
+                                {{ if not .CalendarTrips }}
+                                    <div class="cal-day"></div>
+                                {{ else }}
+                                    <div href="#schedule-{{ .DayNum }}"  class="cal-day">
+                                        <span class="trips">
+                                            {{ range .CalendarTrips }}
+                                                <div class="trip">
+                                                    <span class="dep-time">Time: {{ .DepartureTime }} - </span>
+                                                    <span class="num-pass">{{ .NumPassengers }} Pass.</span>
+                                                </div>
+                                            {{ end }}
+                                        </span>
+                                    </div>
+                                {{ end }}
                         {{ end }}
                     </div>
                 </div>
@@ -76,17 +85,11 @@
                         <div class="cal-scene -schedule-{{ .DayNum }}">
                             {{ range .CalendarTrips }}
                                 <div class="cal-item">
-                                    <div class="cal-time"><span>{{ .DepartureTime }}</span></div>
+                                    <div class="cal-time"><span>Departure Time - {{ .DepartureTime }}</span></div>
                                     <div class="cal-task">
                                         <p>
-                                        {{ if .DriverName }}
-                                            <b>{{ .DriverName }}</b> 
-                                        {{ end }}
-                                        {{ if .LicensePlate }}
-                                              -  <b>{{ .LicensePlate }}</b> 
-                                        {{ end }}
                                         {{ if .NumPassengers }}
-                                              -  <b>{{ .NumPassengers }} Passengers</b> 
+                                              <b>{{ .NumPassengers }} Passengers</b> 
                                         {{ end }}
                                         </p>
                                     </div>

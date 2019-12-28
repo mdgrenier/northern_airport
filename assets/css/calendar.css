@@ -1328,8 +1328,8 @@
 
 
 .cal-device {
-  width: 180vh;
-  height: 68vh;
+  width: 215vh;
+  height: 82vh;
   background: white;
 }
 .cal-device > .cal-header {
@@ -1338,13 +1338,13 @@
 }
 
 .cal-app {
-  height: 52vh;
+  height: 65vh;
   width: 100%;
   background-color: lightsteelblue;
 }
 
 .cal-week {
-  height: 10vh;
+  height: 6vh;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -1353,6 +1353,7 @@
 .cal-weekday {
   color: white;
   width: 35vh;
+  height: 5vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1547,7 +1548,7 @@
   z-index: 1;
 }
 .cal-month:first-child {
-  margin-top: 0vh;
+  margin-top: 6vh;
 }
 .cal-month:first-child > .cal-header {
   top: 15.4285714286vh;
@@ -1781,23 +1782,42 @@
   top: -1px;
 }
 
+.cal-date {
+  width: 12.2%;
+  height: 13vh;
+}
+
 .cal-day {
   counter-increment: month;
-  width: 14.2%;
-  height: 7vh;
-  display: block;
+  width: 30.3vh;
+  height: 10vh;
   float: left;
   text-decoration: none;
-  display: flex;
+  display: block;
   flex-direction: column;
-  align-items: center;
+  /*align-items: center;*/
   justify-content: center;
   color: black;
   font-size: 4vh;
-  top: 10vh;
-}
-.cal-day[href="#schedule-1"]:before {
   background: rgba(255, 255, 255, 0.4);
+  border: solid black 1px;
+  margin: 1px;
+}
+
+.trips {
+  display: block;
+  width: 23vh;
+  padding-left: 3vh;
+  float: right;
+}
+
+.trip {
+  font-size: 1.75vh; 
+  display: block;
+}
+
+.cal-day[href="#schedule-1"]:before {
+  background: rgba(255, 255, 255, 0.4); 
 }
 
 .cal-day[href="#schedule-2"]:before {
@@ -1923,12 +1943,13 @@
 .cal-day:before {
   content: counter(month);
   display: block;
-  height: 75%;
-  width: 75%;
-  display: flex;
+  width: 20%;
+  top: 2vh;
   justify-content: center;
   align-items: center;
   border-radius: 50%;
+  text-align: center;
+  float: left;
 }
 
 .cal-item {
