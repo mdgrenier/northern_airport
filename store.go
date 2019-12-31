@@ -1914,6 +1914,11 @@ func (store *dbStore) DriverReservations(driverid int, reportdate time.Time) Dri
 
 	sqlString = "select count(reservationid) " +
 		"from reservations r inner join trips t on r.tripid = t.tripid " +
+		"inner join venues depv on r.departurevenueid = depv.venueid " +
+		"inner join venues desv on r.destinationvenueid = desv.venueid " +
+		"inner join cities depc on r.departurecityid = depc.cityid " +
+		"inner join cities des on r.destinationcityid = des.cityid " +
+		"inner join departuretimes dt on r.departuretimeid = dt.departuretimeid " +
 		"" + whereClause
 	log.Printf("sql string created with where, %s", sqlString)
 
