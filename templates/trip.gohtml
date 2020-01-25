@@ -40,6 +40,7 @@
             </div>
             <div class="trip-wrapper">
                 {{ range . }}
+                    <div class="box trip-row" id="tripid-{{ .DepartureTime }}" style="display: none;">{{ .TripID }}</div>
                     <div class="box trip-row" id="departuredate-{{ .DepartureTime }}">{{ .DepartureDate.Format "2006-01-02" }}</div>
                     <div class="box trip-row" id="departuretime-{{ .DepartureTime }}">{{ .DepartureTime }}</div>
                     <div class="box trip-row" id="numpassengers-{{ .DepartureTime }}">{{ .NumPassengers }}</div>
@@ -103,10 +104,10 @@
 
             var save = document.getElementById("save-{{ .DepartureTime }}");
             save.onclick = function(){
-                //var tripid = {{ .TripID }}
-                var tripid = 0;
+                
+                var tripid = document.getElementById("tripid-{{ .DepartureTime }}").innerHTML;
                 var vehicleid = document.getElementById("vehicle-{{ .DepartureTime }}").value;
-                var driverid = document.getElementById("driver-{{ .DepartureTime }}").value;    
+                var driverid = document.getElementById("driver-{{ .DepartureTime }}").value;
 
                 var xhr = new XMLHttpRequest();
                 xhr.open('PUT', '/trips?tripid='+tripid+'&driverid='+driverid+'&vehicleid='+vehicleid);
@@ -150,8 +151,6 @@
                     document.open(); 
                     document.write(xhr.response); 
                     document.close();
-
-                    console.log("display page");
                 }
             }
 

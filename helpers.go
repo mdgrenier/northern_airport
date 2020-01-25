@@ -223,6 +223,9 @@ func SendCapacityEmail(trip Trips) {
 	body := fmt.Sprintf("Northern Airport Passenger Service Capacity Alert\n\n"+
 		"TripID #%d has reached 75%% capacity.\n\n\n", trip.TripID)
 
+
+	log.Printf("sending capacity email")
+
 	var drivername string
 
 	for _, driver := range trip.DriverList {
@@ -245,7 +248,7 @@ func SendCapacityEmail(trip Trips) {
 
 	msg := "From: " + from + "\n" +
 		"To: mdgrenier@gmail.com\n" +
-		"Subject: Northern Airport Reservation Confirmation\n\n" +
+		"Subject: Northern Airport Reservation Capacity\n\n" +
 		body
 
 	err := smtp.SendMail("smtp.gmail.com:587",

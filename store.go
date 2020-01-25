@@ -172,10 +172,10 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 			"destinationcityid, destinationvenueid, discountcodeid, departureairlineid, drivernotes, "+
 			"internalnotes, departurenumadults, departurenumstudents, departurenumseniors, departurenumchildren, "+
 			"price, status, hash, customdepartureid, customdestinationid, "+
-			"departuredate, triptypeid, tripid, balanceowing, elavontransactionid) VALUES "+
+			"departuredate, triptypeid, tripid, balanceowing, elavontransactionid, flightnumber, flighttime) VALUES "+
 			"(?, ?, ?, ?, ?, ?, ?, ?, ?, "+
 			"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
-			"?, ?, ?, ?, ?)",
+			"?, ?, ?, ?, ?, ?, ?)",
 			reservation.ClientID, reservation.DepartureCityID, reservation.DepartureVenueID, reservation.DepartureTimeID,
 			reservation.DestinationCityID, reservation.DestinationVenueID, reservation.DiscountCodeID, reservation.DepartureAirlineID, reservation.DriverNotes,
 			reservation.InternalNotes, reservation.DepartureNumAdults, reservation.DepartureNumStudents, reservation.DepartureNumSeniors, reservation.DepartureNumChildren,
@@ -801,8 +801,12 @@ func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 
 	numpassengers = reservation.DepartureNumAdults + reservation.DepartureNumChildren + reservation.DepartureNumSeniors + reservation.DepartureNumStudents
 
-	err := store.db.QueryRow("select tripid, numpassengers, capacity, omitted from trips where tripid=?",
-		reservation.TripID).Scan(&tripid, &numtrippassengers, &capacity, &omitted)
+	//err := store.db.QueryRow("select tripid, numpassengers, capacity, omitted from trips where tripid=?",
+	//	reservation.TripID).Scan(&tripid, &numtrippassengers, &capacity, &omitted)
+
+	err := store.db.QueryRow("select tripid, numpassengers, capacity, omitted from trips where " +
+		"departuredate=? and departuretimeid=?",
+		reservation.DepartureDate, reservation.DepartureTimeID).Scan(&tripid, &numtrippassengers, &capacity, &omitted)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -845,8 +849,8 @@ func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 
 				numpassengers += numtrippassengers
 
-				_, err = store.db.Exec("UPDATE trips(numpassengers)"+
-					"VALUES (?) WHERE tripid = ?", numpassengers, tripid)
+				_, err = store.db.Exec("UPDATE trips SET numpassengers "+
+					"= ? WHERE tripid = ?", numpassengers, tripid)
 
 				if err != nil {
 					log.Printf("Error updating trip passengers: %s", err.Error())
@@ -1004,20 +1008,28 @@ func (store *dbStore) GetTrip(tripid int) Trips {
 //UpdateTrip - update driver and vehicle associated with trip
 func (store *dbStore) UpdateTrip(trip *Trips) error {
 
-	row := store.db.QueryRow("SELECT numseats from vehicles where vehicleid = ?",
-		trip.VehicleID)
-
 	var capacity int
 
-	err := row.Scan(&capacity)
+	if trip.VehicleID > 0 {
+		row := store.db.QueryRow("SELECT numseats from vehicles where vehicleid = ?",
+			trip.VehicleID)
 
-	if err != nil {
-		if err == sql.ErrNoRows {
-			log.Print("No capacity matches the vehicle id")
-		} else {
-			log.Printf("Error retrieving capacity from vehicle id: %s", err.Error())
+		err := row.Scan(&capacity)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				log.Print("No capacity matches the vehicle id")
+			} else {
+				log.Printf("Error retrieving capacity from vehicle id: %s", err.Error())
+			}
 		}
+	} else {
+		capacity = 11
 	}
+
+	log.Printf("DriverID: %d, VehicleID: %d, Capacity: %d, TripID: %d",
+		trip.DriverID, trip.VehicleID, capacity, trip.TripID)
+
 	_, updateerr := store.db.Exec("UPDATE trips SET driverid = ?, "+
 		" vehicleid = ?, capacity = ? WHERE tripid = ?", trip.DriverID, trip.VehicleID, capacity, trip.TripID)
 
@@ -1237,7 +1249,7 @@ func (store *dbStore) SearchTrips(tripdate time.Time, reportType int) []Trips {
 		"from (select departuretimeid " +
 		"from trips " + whereClause + " " +
 		"group by departuretimeid) as deptimeids"
-	
+
 	log.Printf("%s", sqlString)
 
 	//need to add where clause to these queries to use today's date
@@ -1262,7 +1274,7 @@ func (store *dbStore) SearchTrips(tripdate time.Time, reportType int) []Trips {
 		tripCount = 50
 	}
 
-	sqlstring := "select departuredate, t.departuretimeid, departuretime, " +
+	sqlstring := "select t.tripid, departuredate, t.departuretimeid, departuretime, " +
 		" sum(numpassengers) as numpassengers, t.driverid, t.vehicleid, capacity, omitted, " +
 		"if(t.driverid > 0, concat(d.firstname, ' ', d.lastname), 'no driver') as drivername, " +
 		"if(t.vehicleid > 0, v.licenseplate, 'no vehicle') as vehicle " +
@@ -1270,7 +1282,7 @@ func (store *dbStore) SearchTrips(tripdate time.Time, reportType int) []Trips {
 		"left join drivers d on d.driverid = t.driverid " +
 		"left join vehicles v on v.vehicleid = t.vehicleid " +
 		whereClause +
-		"group by departuredate, t.departuretimeid, departuretime, " +
+		"group by t.tripid, departuredate, t.departuretimeid, departuretime, " +
 		"t.driverid, t.vehicleid, capacity, omitted, " +
 		"drivername, vehicle " +
 		"order by departuredate desc limit 50"
@@ -1296,7 +1308,8 @@ func (store *dbStore) SearchTrips(tripdate time.Time, reportType int) []Trips {
 	indx = 0
 	for row.Next() {
 		err = row.Scan(
-			&departuredate, &searchTripSlice[indx].DepartureTimeID, &searchTripSlice[indx].DepartureTime,
+			&searchTripSlice[indx].TripID, &departuredate, &searchTripSlice[indx].DepartureTimeID, 
+			&searchTripSlice[indx].DepartureTime,
 			&searchTripSlice[indx].NumPassengers, &searchTripSlice[indx].DriverID,
 			&searchTripSlice[indx].VehicleID, &searchTripSlice[indx].Capacity,
 			&searchTripSlice[indx].Omitted, &searchTripSlice[indx].DriverName,
