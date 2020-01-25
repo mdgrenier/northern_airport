@@ -631,7 +631,8 @@ func UpdateTripHandler(w http.ResponseWriter, r *http.Request) {
 
 		trips[0].RoleID = client.RoleID
 
-		tpl.ExecuteTemplate(w, "trip.gohtml", trips)
+		//tpl.ExecuteTemplate(w, "trip.gohtml", trips)
+		http.Redirect(w, r, "/trips", http.StatusFound)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
