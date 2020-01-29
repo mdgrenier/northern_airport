@@ -13,56 +13,58 @@
         <img class="logo" src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
         {{ template "navbar" }}
 
-        {{ template "adminnavbar" index . 0 }}
+        {{ template "adminnavbar" . }}
     </header>
     <main>
-        <div class="container">
-            <section id="header">
-                <h1>Cities</h1>
-                <div class="city-wrapper">
-                    <div class="box header" id="cityname-header">City Name</div>
-                    <div class="box header" id="northoffset-header">North Offset (mins from NB)</div>
-                    <div class="box header" id="southoffset-header">South Offset (mins from TO)</div>
-                </div>
-            </section>
-            <section id="records">
-                <div class="city-wrapper">
-                    {{ range . }}
-                        <div class="box city-row">
-                            <input type="text" class="form-control" id="cityname-{{ .CityID }}" name="cityname" value="{{ .CityName }}" required>
-                        </div>
-                        <div class="box city-row">
-                            <input type="text" class="form-control" id="northoffset-{{ .CityID }}" name="northoffset" value="{{ .NorthOffset }}" required>
-                        </div>
-                        <div class="box city-row">
-                            <input type="text" class="form-control" id="southoffset-{{ .CityID }}" name="southoffset" value="{{ .SouthOffset }}" required>
-                        </div>
-                        <div class="box city-row">
-                            <button id="update-{{ .CityID }}" type="button" name="update" class="btn btn-primary">Update</button>
-                        </div>
-                        <div class="box city-row">
-                            <button id="remove-{{ .CityID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
-                        </div>
-                    {{ end }}
-                </div>
-            </section>
-            <section id="add-record">
-                <form id="add-city" method="post" action="/cities" onsubmit="submit.disabled = true; return true;">
+        {{ with .Cities }}
+            <div class="container">
+                <section id="header">
+                    <h1>Cities</h1>
                     <div class="city-wrapper">
-                        <div class="box city-row" id="cityname-add">
-                            <input type="text" class="form-control" id="cityname" name="cityname" required>
-                        </div>
-                        <div class="box city-row" id="northoffset-add">
-                            <input type="text" class="form-control" id="northoffset" name="northoffset" required>
-                        </div>
-                        <div class="box city-row" id="southoffset-add">
-                            <input type="text" class="form-control" id="southoffset" name="southoffset" required>
-                        </div>
-                        <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+                        <div class="box header" id="cityname-header">City Name</div>
+                        <div class="box header" id="northoffset-header">North Offset (mins from NB)</div>
+                        <div class="box header" id="southoffset-header">South Offset (mins from TO)</div>
                     </div>
-                </form>
-            </section>
-        </div>
+                </section>
+                <section id="records">
+                    <div class="city-wrapper">
+                        {{ range . }}
+                            <div class="box city-row">
+                                <input type="text" class="form-control" id="cityname-{{ .CityID }}" name="cityname" value="{{ .CityName }}" required>
+                            </div>
+                            <div class="box city-row">
+                                <input type="text" class="form-control" id="northoffset-{{ .CityID }}" name="northoffset" value="{{ .NorthOffset }}" required>
+                            </div>
+                            <div class="box city-row">
+                                <input type="text" class="form-control" id="southoffset-{{ .CityID }}" name="southoffset" value="{{ .SouthOffset }}" required>
+                            </div>
+                            <div class="box city-row">
+                                <button id="update-{{ .CityID }}" type="button" name="update" class="btn btn-primary">Update</button>
+                            </div>
+                            <div class="box city-row">
+                                <button id="remove-{{ .CityID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
+                            </div>
+                        {{ end }}
+                    </div>
+                </section>
+                <section id="add-record">
+                    <form id="add-city" method="post" action="/cities" onsubmit="submit.disabled = true; return true;">
+                        <div class="city-wrapper">
+                            <div class="box city-row" id="cityname-add">
+                                <input type="text" class="form-control" id="cityname" name="cityname" required>
+                            </div>
+                            <div class="box city-row" id="northoffset-add">
+                                <input type="text" class="form-control" id="northoffset" name="northoffset" required>
+                            </div>
+                            <div class="box city-row" id="southoffset-add">
+                                <input type="text" class="form-control" id="southoffset" name="southoffset" required>
+                            </div>
+                            <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        {{ end }}
     </main>
     
     {{ template "footer" }}

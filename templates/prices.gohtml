@@ -13,33 +13,35 @@
         <img class="logo" src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
         {{ template "navbar" }}
 
-        {{ template "adminnavbar" index . 0 }}
+        {{ template "adminnavbar" . }}
 
     </header>
     <main>
-        <div class="container">
-            <h1>Trip Prices</h1>
-            <div class="price-wrapper">
-                <div class="box header" id="departurecity-header">Departure City</div>
-                <div class="box header" id="destinationcity-header">Destination City</div>
-                <div class="box header" id="customertype-header">Customer Type</div>
-                <div class="box header" id="price-header">Price</div>
-                <div class="box header" id="save-header">Save</div>
+        {{ with .Prices }}
+            <div class="container">
+                <h1>Trip Prices</h1>
+                <div class="price-wrapper">
+                    <div class="box header" id="departurecity-header">Departure City</div>
+                    <div class="box header" id="destinationcity-header">Destination City</div>
+                    <div class="box header" id="customertype-header">Customer Type</div>
+                    <div class="box header" id="price-header">Price</div>
+                    <div class="box header" id="save-header">Save</div>
+                </div>
+                <div class="price-wrapper">
+                    {{ range . }}
+                        <div class="box price-row" id="departurecity-{{ .PriceID }}">{{ .DepartureCity }}</div>
+                        <div class="box price-row" id="destinationcity-{{ .PriceID }}">{{ .DestinationCity }}</div>
+                        <div class="box price-row" id="customertype-{{ .PriceID }}">{{ .CustomerType }}</div>
+                        <div class="box price-row" id="price">
+                            <input type="text" class="form-control" id="price-{{ .PriceID }}" name="price-{{ .PriceID }}" value="{{ .Price }}">
+                        </div>
+                        <div class="box price-row" id="save-{{ .PriceID }}">
+                            <button class="btn btn-primary">Save</button>
+                        </div>
+                    {{ end }}
+                </div>
             </div>
-            <div class="price-wrapper">
-                {{ range . }}
-                    <div class="box price-row" id="departurecity-{{ .PriceID }}">{{ .DepartureCity }}</div>
-                    <div class="box price-row" id="destinationcity-{{ .PriceID }}">{{ .DestinationCity }}</div>
-                    <div class="box price-row" id="customertype-{{ .PriceID }}">{{ .CustomerType }}</div>
-                    <div class="box price-row" id="price">
-                        <input type="text" class="form-control" id="price-{{ .PriceID }}" name="price-{{ .PriceID }}" value="{{ .Price }}">
-                    </div>
-                    <div class="box price-row" id="save-{{ .PriceID }}">
-                        <button class="btn btn-primary">Save</button>
-                    </div>
-                {{ end }}
-            </div>
-        </div>
+        {{ end }}
     </main>
     
     {{ template "footer" }}
@@ -49,7 +51,7 @@
 
     <script type="text/javascript" >
         
-        {{ range . }} 
+        {{ range .Prices }} 
 
             var save = document.getElementById("save-{{ .PriceID }}");
             save.onclick = function(){

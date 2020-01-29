@@ -281,11 +281,12 @@ func DriverHandler(w http.ResponseWriter, r *http.Request) {
 
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
-		drivers := store.GetDrivers()
+		driverwrapper := DriverWrapper{}
+		driverwrapper.Drivers = store.GetDrivers()
 
-		drivers[0].RoleID = client.RoleID
+		driverwrapper.RoleID = client.RoleID
 
-		tpl.ExecuteTemplate(w, "driver.gohtml", drivers)
+		tpl.ExecuteTemplate(w, "driver.gohtml", driverwrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
@@ -321,11 +322,12 @@ func AddDriverHandler(w http.ResponseWriter, r *http.Request) {
 			log.Print("Drivers added")
 		}
 
-		drivers := store.GetDrivers()
+		driverwrapper := DriverWrapper{}
+		driverwrapper.Drivers = store.GetDrivers()
 
-		drivers[0].RoleID = client.RoleID
+		driverwrapper.RoleID = client.RoleID
 
-		tpl.ExecuteTemplate(w, "driver.gohtml", drivers)
+		tpl.ExecuteTemplate(w, "driver.gohtml", driverwrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
@@ -362,7 +364,12 @@ func UpdateDriverHandler(w http.ResponseWriter, r *http.Request) {
 
 		store.UpdateDriver(&driver)
 
-		tpl.ExecuteTemplate(w, "driver.gohtml", driver)
+		driverwrapper := DriverWrapper{}
+		driverwrapper.Drivers[0] = driver
+
+		driverwrapper.RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "driver.gohtml", driverwrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
@@ -388,13 +395,16 @@ func DeleteDriverHandler(w http.ResponseWriter, r *http.Request) {
 
 		store.DeleteDriver(driverid)
 
-		driver := store.GetDrivers()
+		driverwrapper := DriverWrapper{}
+		driverwrapper.Drivers = store.GetDrivers()
+
+		driverwrapper.RoleID = client.RoleID
 
 		if err != nil {
 			log.Printf("Error converting driverid: %s", err.Error())
 		}
 
-		tpl.ExecuteTemplate(w, "driver.gohtml", driver)
+		tpl.ExecuteTemplate(w, "driver.gohtml", driverwrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
@@ -416,11 +426,12 @@ func VehicleHandler(w http.ResponseWriter, r *http.Request) {
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
 		//get data need to populate dropdowns in reservation form
-		vehicles := store.GetVehicles()
+		vehiclewrapper := VehicleWrapper{}
+		vehiclewrapper.Vehicles = store.GetVehicles()
 
-		vehicles[0].RoleID = client.RoleID
+		vehiclewrapper.RoleID = client.RoleID
 
-		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehicles)
+		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehiclewrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
@@ -456,11 +467,12 @@ func AddVehicleHandler(w http.ResponseWriter, r *http.Request) {
 			log.Print("Vehicles added")
 		}
 
-		vehicles := store.GetVehicles()
+		vehiclewrapper := VehicleWrapper{}
+		vehiclewrapper.Vehicles = store.GetVehicles()
 
-		vehicles[0].RoleID = client.RoleID
+		vehiclewrapper.RoleID = client.RoleID
 
-		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehicles)
+		tpl.ExecuteTemplate(w, "vehicle.gohtml", vehiclewrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
@@ -570,17 +582,18 @@ func TripHandler(w http.ResponseWriter, r *http.Request) {
 
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
-		searchtrips := store.SearchTrips(tripdate, 0)
+		searchtripwrapper := TripWrapper{}
+		searchtripwrapper.Trips = store.SearchTrips(tripdate, 0)
 
-		if len(searchtrips) > 0 {
-			searchtrips[0].RoleID = client.RoleID
+		if len(searchtripwrapper.Trips) > 0 {
+			searchtripwrapper.RoleID = client.RoleID
 
-			log.Printf("trips: we've got %d trips!", len(searchtrips))
+			log.Printf("trips: we've got %d trips!", len(searchtripwrapper.Trips))
 		} else {
 			log.Printf("trips: no trips returned!")
 		}
 
-		if err := tpl.ExecuteTemplate(w, "trip.gohtml", searchtrips); err != nil {
+		if err := tpl.ExecuteTemplate(w, "trip.gohtml", searchtripwrapper); err != nil {
 			log.Printf("Error executing HTML template: %s", err.Error())
 			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
 		}
@@ -627,9 +640,10 @@ func UpdateTripHandler(w http.ResponseWriter, r *http.Request) {
 
 		store.UpdateTrip(&trip)
 
-		trips := store.GetTrips()
+		tripwrapper := TripWrapper{}
+		tripwrapper.Trips = store.GetTrips()
 
-		trips[0].RoleID = client.RoleID
+		tripwrapper.RoleID = client.RoleID
 
 		//tpl.ExecuteTemplate(w, "trip.gohtml", trips)
 		http.Redirect(w, r, "/trips", http.StatusFound)
@@ -750,18 +764,20 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
-		//get data need to populate dropdowns in reservation form
-		searchreservations := store.SearchReservations(name, phone, email)
+		searchreservationwrapper := SearchReservationWrapper{}
 
-		if len(searchreservations) > 0 {
-			searchreservations[0].RoleID = client.RoleID
+		//get data need to populate dropdowns in reservation form
+		searchreservationwrapper.SearchReservations = store.SearchReservations(name, phone, email)
+
+		if len(searchreservationwrapper.SearchReservations) > 0 {
+			searchreservationwrapper.RoleID = client.RoleID
 
 			log.Printf("search: we've got some reservations!")
 		} else {
 			log.Printf("search: no reservations returned!")
 		}
 
-		if err := tpl.ExecuteTemplate(w, "searchreservations.gohtml", searchreservations); err != nil {
+		if err := tpl.ExecuteTemplate(w, "searchreservations.gohtml", searchreservationwrapper); err != nil {
 			log.Printf("Error executing HTML template: %s", err.Error())
 			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
 		}
@@ -796,15 +812,17 @@ func PostponeHandler(w http.ResponseWriter, r *http.Request) {
 
 		store.PostponeReservation(&searchreservations)
 
-		newsearchreservations := store.SearchReservations("", 0, "")
+		searchreservationwrapper := SearchReservationWrapper{}
 
-		newsearchreservations[0].RoleID = client.RoleID
+		searchreservationwrapper.SearchReservations = store.SearchReservations("", 0, "")
 
-		for i, res := range newsearchreservations {
+		searchreservationwrapper.RoleID = client.RoleID
+
+		for i, res := range searchreservationwrapper.SearchReservations {
 			log.Printf("#%d ReservationID Returned: %d - Postponed: %t", i, res.ReservationID, res.Postponed)
 		}
 
-		if err := tpl.ExecuteTemplate(w, "searchreservations.gohtml", newsearchreservations); err != nil {
+		if err := tpl.ExecuteTemplate(w, "searchreservations.gohtml", searchreservationwrapper); err != nil {
 			log.Printf("Error executing HTML template: %s", err.Error())
 			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -841,17 +859,19 @@ func CancelHandler(w http.ResponseWriter, r *http.Request) {
 
 		store.CancelReservation(&searchreservations)
 
-		newsearchreservations := store.SearchReservations("", 0, "")
+		searchreservationwrapper := SearchReservationWrapper{}
 
-		newsearchreservations[0].RoleID = client.RoleID
+		searchreservationwrapper.SearchReservations = store.SearchReservations("", 0, "")
 
-		for i, res := range newsearchreservations {
+		searchreservationwrapper.RoleID = client.RoleID
+
+		for i, res := range searchreservationwrapper.SearchReservations {
 			log.Printf("#%d ReservationID Returned: %d - Cancelled: %t", i, res.ReservationID, res.Postponed)
 		}
 
 		var buf bytes.Buffer
 		//tpl.ExecuteTemplate(&buf, "searchreservations.gohtml", searchreservations)
-		if err := tpl.ExecuteTemplate(&buf, "searchreservations.gohtml", newsearchreservations); err != nil {
+		if err := tpl.ExecuteTemplate(&buf, "searchreservations.gohtml", searchreservationwrapper); err != nil {
 			log.Printf("Error executing HTML template: %s", err.Error())
 			http.Error(w, "Error executing HTML template: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -878,11 +898,13 @@ func VenueHandler(w http.ResponseWriter, r *http.Request) {
 
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
-		venues := store.GetVenues()
+		venuewrapper := VenueWrapper{}
 
-		venues[0].RoleID = client.RoleID
+		venuewrapper.Venues = store.GetVenues()
 
-		tpl.ExecuteTemplate(w, "venue.gohtml", venues)
+		venuewrapper.RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "venue.gohtml", venuewrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
@@ -920,17 +942,19 @@ func AddVenueHandler(w http.ResponseWriter, r *http.Request) {
 			log.Print("Venues added")
 		}
 
-		venues := store.GetVenues()
+		venuewrapper := VenueWrapper{}
 
-		venues[0].RoleID = client.RoleID
+		venuewrapper.Venues = store.GetVenues()
 
-		tpl.ExecuteTemplate(w, "venue.gohtml", venues)
+		venuewrapper.RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "venue.gohtml", venuewrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
 }
 
-//UpdateVenueHandler - update city in database
+//UpdateVenueHandler - update city in1 database
 func UpdateVenueHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("execute update venue handler")
 
@@ -1031,11 +1055,13 @@ func CityHandler(w http.ResponseWriter, r *http.Request) {
 
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
-		cities := store.GetCities()
+		citywrapper := CityWrapper{}
 
-		cities[0].RoleID = client.RoleID
+		citywrapper.Cities = store.GetCities()
 
-		tpl.ExecuteTemplate(w, "city.gohtml", cities)
+		citywrapper.RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "city.gohtml", citywrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
@@ -1071,11 +1097,13 @@ func AddCityHandler(w http.ResponseWriter, r *http.Request) {
 			log.Print("Cities added")
 		}
 
-		cities := store.GetCities()
+		citywrapper := CityWrapper{}
 
-		cities[0].RoleID = client.RoleID
+		citywrapper.Cities = store.GetCities()
 
-		tpl.ExecuteTemplate(w, "city.gohtml", cities)
+		citywrapper.RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "city.gohtml", citywrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
@@ -1133,11 +1161,13 @@ func PriceHandler(w http.ResponseWriter, r *http.Request) {
 
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 4) {
-		prices := store.GetPrices()
+		pricewrapper := PriceWrapper{}
 
-		prices[0].RoleID = client.RoleID
+		pricewrapper.Prices = store.GetPrices()
 
-		tpl.ExecuteTemplate(w, "prices.gohtml", prices)
+		pricewrapper.RoleID = client.RoleID
+
+		tpl.ExecuteTemplate(w, "prices.gohtml", pricewrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
@@ -1176,15 +1206,17 @@ func UpdatePriceHandler(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("updated ")
 
-		prices := store.GetPrices()
+		pricewrapper := PriceWrapper{}
 
-		prices[0].RoleID = client.RoleID
+		pricewrapper.Prices = store.GetPrices()
+
+		pricewrapper.RoleID = client.RoleID
 
 		if err != nil {
 			log.Printf("Error converting northoffset or southoffset: %s", err.Error())
 		}
 
-		tpl.ExecuteTemplate(w, "prices.gohtml", prices)
+		tpl.ExecuteTemplate(w, "prices.gohtml", pricewrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "city.gohtml", r)
 	}
@@ -1359,10 +1391,11 @@ func AddDepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
 
 		values := r.URL.Query()
 
+		departuretimewrapper := DepartureTimeWrapper{}
 		departuretime := DepartureTimes{}
 		var err error
 
-		departuretime.RoleID = client.RoleID
+		departuretimewrapper.RoleID = client.RoleID
 
 		departuretime.CityID, err = strconv.Atoi(values["cityid"][0])
 		departuretime.DepartureTime, err = strconv.Atoi(values["departuretime"][0])
@@ -1394,7 +1427,9 @@ func AddDepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
 
 		store.AddDepartureTime(&departuretime)
 
-		tpl.ExecuteTemplate(w, "departuretime.gohtml", departuretime)
+		departuretimewrapper.DepartureTimes[0] = departuretime
+
+		tpl.ExecuteTemplate(w, "departuretime.gohtml", departuretimewrapper)
 	} else {
 		tpl.ExecuteTemplate(w, "departuretime.gohtml", r)
 	}
@@ -1570,4 +1605,9 @@ func CalendarReportHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
+}
+
+//ImportHandler - run import script
+func ImportHandler(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/import.php", http.StatusFound)
 }

@@ -13,76 +13,78 @@
         <img class="logo" src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
         {{ template "navbar" }}
 
-        {{ template "adminnavbar" index . 0 }}
+        {{ template "adminnavbar" . }}
     </header>
     <main>
-        <div class="container">
-            <h1>Departure Times</h1>
-            <div class="time-wrapper">
-                <div class="box header" id="cityname-header">City</div>
-                <div class="box header" id="departuretime-header">Departure Time</div>
-                <div class="box header" id="recurring-header">Recurring</div>
-                <div class="box header" id="startdate-header">Start Date</div>
-                <div class="box header" id="enddate-header">End Date</div>
-                <div class="box header" id="save-header">Save Row</div>
-                <div class="box header" id="delete-header">Delete Row</div>
-            </div>
-            <div class="time-wrapper">
-                {{ range . }}
-                    <select class="form-control" id="city-{{ .DepartureTimeID }}" name="departuretimeid">
-                        {{ range .CityList }}
-                            <option value="{{ .CityID }}">{{ .CityName }}</option>
+        {{ with .DepartureTimes }}
+            <div class="container">
+                <h1>Departure Times</h1>
+                <div class="time-wrapper">
+                    <div class="box header" id="cityname-header">City</div>
+                    <div class="box header" id="departuretime-header">Departure Time</div>
+                    <div class="box header" id="recurring-header">Recurring</div>
+                    <div class="box header" id="startdate-header">Start Date</div>
+                    <div class="box header" id="enddate-header">End Date</div>
+                    <div class="box header" id="save-header">Save Row</div>
+                    <div class="box header" id="delete-header">Delete Row</div>
+                </div>
+                <div class="time-wrapper">
+                    {{ range . }}
+                        <select class="form-control" id="city-{{ .DepartureTimeID }}" name="departuretimeid">
+                            {{ range .CityList }}
+                                <option value="{{ .CityID }}">{{ .CityName }}</option>
+                            {{ end }}
+                        </select>
+                        <div class="box time-row">
+                            <input type="text" class="form-control" id="departuretime-{{ .DepartureTimeID }}" name="departuretime-{{ .DepartureTimeID }}" value="{{ .DepartureTime }}">
+                        </div>
+                        <div class="box time-row">
+                            <input type="text" class="form-control" id="recurring-{{ .DepartureTimeID }}" name="recurring-{{ .DepartureTimeID }}" value="{{ .Recurring }}">
+                        </div>
+                        {{ if .StartDate.After .Epoch }}
+                            <input type="date" class="form-control" id="startdate-{{ .DepartureTimeID }}" name="startdate-{{ .DepartureTimeID }}" value='{{ .StartDate.Format "2006-01-02" }}' required>
+                        {{ else }}
+                            <input type="date" class="form-control" id="startdate-{{ .DepartureTimeID }}" name="startdate-{{ .DepartureTimeID }}" value="" required>
                         {{ end }}
-                    </select>
-                    <div class="box time-row">
-                        <input type="text" class="form-control" id="departuretime-{{ .DepartureTimeID }}" name="departuretime-{{ .DepartureTimeID }}" value="{{ .DepartureTime }}">
-                    </div>
-                    <div class="box time-row">
-                        <input type="text" class="form-control" id="recurring-{{ .DepartureTimeID }}" name="recurring-{{ .DepartureTimeID }}" value="{{ .Recurring }}">
-                    </div>
-                    {{ if .StartDate.After .Epoch }}
-                        <input type="date" class="form-control" id="startdate-{{ .DepartureTimeID }}" name="startdate-{{ .DepartureTimeID }}" value='{{ .StartDate.Format "2006-01-02" }}' required>
-                    {{ else }}
-                        <input type="date" class="form-control" id="startdate-{{ .DepartureTimeID }}" name="startdate-{{ .DepartureTimeID }}" value="" required>
-                    {{ end }}
-                    {{ if .EndDate.After .Epoch }}
-                        <input type="date" class="form-control" id="enddate-{{ .DepartureTimeID }}" name="enddate-{{ .DepartureTimeID }}" value='{{ .EndDate.Format "2006-01-02" }}' required>
-                    {{ else }}
-                        <input type="date" class="form-control" id="enddate-{{ .DepartureTimeID }}" name="enddate-{{ .DepartureTimeID }}" value="" required>
-                    {{ end }}
-                    <div class="box time-row" id="save-{{ .DepartureTimeID }}">
-                        <button class="btn btn-primary">Save</button>
-                    </div>
-                    <div class="box time-row" id="delete-{{ .DepartureTimeID }}">
-                        <button class="btn btn-primary">Delete</button>
-                    </div>
-                {{ end }}
-                
-                {{ with index . 0 }}
-                    <select class="form-control" id="city" name="departuretimeid">
-                        {{ range .CityList }}
-                            <option value="{{ .CityID }}">{{ .CityName }}</option>
+                        {{ if .EndDate.After .Epoch }}
+                            <input type="date" class="form-control" id="enddate-{{ .DepartureTimeID }}" name="enddate-{{ .DepartureTimeID }}" value='{{ .EndDate.Format "2006-01-02" }}' required>
+                        {{ else }}
+                            <input type="date" class="form-control" id="enddate-{{ .DepartureTimeID }}" name="enddate-{{ .DepartureTimeID }}" value="" required>
                         {{ end }}
-                    </select>
+                        <div class="box time-row" id="save-{{ .DepartureTimeID }}">
+                            <button class="btn btn-primary">Save</button>
+                        </div>
+                        <div class="box time-row" id="delete-{{ .DepartureTimeID }}">
+                            <button class="btn btn-primary">Delete</button>
+                        </div>
+                    {{ end }}
                     
-                {{ end }}
-                <div class="box time-row">
-                    <input type="text" class="form-control" id="departuretime" name="departuretime">
-                </div>
-                <div class="box time-row">
-                    <input type="text" class="form-control" id="recurring" name="recurring">
-                </div>
-                <div class="box time-row">
-                    <input type="date" class="form-control" id="startdate" name="startdate">
-                </div>
-                <div class="box time-row">
-                    <input type="date" class="form-control" id="enddate" name="enddate">
-                </div>
-                <div class="box time-row" id="add">
-                    <button class="btn btn-primary">Add</button>
+                    {{ with index . 0 }}
+                        <select class="form-control" id="city" name="departuretimeid">
+                            {{ range .CityList }}
+                                <option value="{{ .CityID }}">{{ .CityName }}</option>
+                            {{ end }}
+                        </select>
+                        
+                    {{ end }}
+                    <div class="box time-row">
+                        <input type="text" class="form-control" id="departuretime" name="departuretime">
+                    </div>
+                    <div class="box time-row">
+                        <input type="text" class="form-control" id="recurring" name="recurring">
+                    </div>
+                    <div class="box time-row">
+                        <input type="date" class="form-control" id="startdate" name="startdate">
+                    </div>
+                    <div class="box time-row">
+                        <input type="date" class="form-control" id="enddate" name="enddate">
+                    </div>
+                    <div class="box time-row" id="add">
+                        <button class="btn btn-primary">Add</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        {{ end }}
     </main>
     
     {{ template "footer" }}
@@ -92,7 +94,7 @@
 
     <script type="text/javascript" >
         
-        {{ range . }} 
+        {{ range .DepartureTimes }} 
 
             //set city list to correct one by cityid
             var cityid = {{ .CityID }}

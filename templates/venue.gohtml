@@ -13,63 +13,65 @@
         <img class="logo" src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
         {{ template "navbar" }}
 
-        {{ template "adminnavbar" index . 0 }}
+        {{ template "adminnavbar" . }}
 
     </header>
-        <main>
-        <div class="container">
-            <h1>Venues</h1>
-            <div class="venue-wrapper">
-                <div class="box header" id="cityid-header">City Name</div>
-                <div class="box header" id="name-header">Venue Name</div>
-                <div class="box header" id="extracost-header">Extra Cost</div>
-                <div class="box header" id="active-header">Active</div>
-                <div class="box header" id="extratime-header">Extra Time</div>
-            </div>
-            <div class="venue-wrapper">
-                {{ range . }}
-                    <div class="box venue-row" id="cityname-{{ .VenueID }}">{{ .CityName }}</div>
-                    <div class="box city-row">
-                        <input type="text" class="form-control" id="venuename-{{ .VenueID }}" name="venuename" value="{{ .VenueName }}" required>
-                    </div>
-                    <div class="box city-row">
-                        <input type="text" class="form-control" id="extracost-{{ .VenueID }}" name="extracost" value="{{ .ExtraCost }}" required>
-                    </div>
-                    <div class="box city-row">
-                        <input type="text" class="form-control" id="active-{{ .VenueID }}" name="active" value="{{ .Active }}" required>
-                    </div>
-                    <div class="box city-row">
-                        <input type="text" class="form-control" id="extratime-{{ .VenueID }}" name="extratime" value="{{ .ExtraTime }}" required>
-                    </div>
-                    <div class="box city-row">
-                        <button id="update-{{ .VenueID }}" type="button" name="update" class="btn btn-primary">Update</button>
-                    </div>
-                    <div class="box city-row">
-                        <button id="remove-{{ .VenueID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
-                    </div>
-                {{ end }}
-            </div>
-            <form id="add-venue" method="post" action="/venues" onsubmit="submit.disabled = true; return true;">
+    <main>
+        {{ with .Venues }}
+            <div class="container">
+                <h1>Venues</h1>
                 <div class="venue-wrapper">
-                    <div class="box venue-row" id="cityname-add">
-                        <input type="text" class="form-control" id="cityname" name="cityname" required>
-                    </div>
-                    <div class="box venue-row" id="venuename-add">
-                        <input type="text" class="form-control" id="venuename" name="venuename" required>
-                    </div>
-                    <div class="box venue-row" id="extracost-add">
-                        <input type="text" class="form-control" id="extracost" name="extracost" required>
-                    </div>
-                    <div class="box venue-row" id="active-add">
-                        <input type="text" class="form-control" id="active" name="active" required>
-                    </div>
-                    <div class="box venue-row" id="extratime-add">
-                        <input type="text" class="form-control" id="extratime" name="extratime" required>
-                    </div>
-                    <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
-                </form>
+                    <div class="box header" id="cityid-header">City Name</div>
+                    <div class="box header" id="name-header">Venue Name</div>
+                    <div class="box header" id="extracost-header">Extra Cost</div>
+                    <div class="box header" id="active-header">Active</div>
+                    <div class="box header" id="extratime-header">Extra Time</div>
+                </div>
+                <div class="venue-wrapper">
+                    {{ range . }}
+                        <div class="box venue-row" id="cityname-{{ .VenueID }}">{{ .CityName }}</div>
+                        <div class="box city-row">
+                            <input type="text" class="form-control" id="venuename-{{ .VenueID }}" name="venuename" value="{{ .VenueName }}" required>
+                        </div>
+                        <div class="box city-row">
+                            <input type="text" class="form-control" id="extracost-{{ .VenueID }}" name="extracost" value="{{ .ExtraCost }}" required>
+                        </div>
+                        <div class="box city-row">
+                            <input type="text" class="form-control" id="active-{{ .VenueID }}" name="active" value="{{ .Active }}" required>
+                        </div>
+                        <div class="box city-row">
+                            <input type="text" class="form-control" id="extratime-{{ .VenueID }}" name="extratime" value="{{ .ExtraTime }}" required>
+                        </div>
+                        <div class="box city-row">
+                            <button id="update-{{ .VenueID }}" type="button" name="update" class="btn btn-primary">Update</button>
+                        </div>
+                        <div class="box city-row">
+                            <button id="remove-{{ .VenueID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
+                        </div>
+                    {{ end }}
+                </div>
+                <form id="add-venue" method="post" action="/venues" onsubmit="submit.disabled = true; return true;">
+                    <div class="venue-wrapper">
+                        <div class="box venue-row" id="cityname-add">
+                            <input type="text" class="form-control" id="cityname" name="cityname" required>
+                        </div>
+                        <div class="box venue-row" id="venuename-add">
+                            <input type="text" class="form-control" id="venuename" name="venuename" required>
+                        </div>
+                        <div class="box venue-row" id="extracost-add">
+                            <input type="text" class="form-control" id="extracost" name="extracost" required>
+                        </div>
+                        <div class="box venue-row" id="active-add">
+                            <input type="text" class="form-control" id="active" name="active" required>
+                        </div>
+                        <div class="box venue-row" id="extratime-add">
+                            <input type="text" class="form-control" id="extratime" name="extratime" required>
+                        </div>
+                        <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
             </div>
-        </div>
+        {{ end }}
     </main>
     
     {{ template "footer" }}
@@ -79,7 +81,7 @@
 
     <script type="text/javascript" >
         
-        {{ range . }} 
+        {{ range .Venues }} 
         
             var update = document.getElementById("update-{{ .VenueID }}");
             update.onclick = function(){

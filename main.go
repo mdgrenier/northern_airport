@@ -43,7 +43,12 @@ type Venues struct {
 	ExtraCost int    `json:"extracost" db:"extracost"`
 	Active    int    `json:"active" db:"active"`
 	ExtraTime int    `json:"extratime" db:"extratime"`
-	RoleID    int
+}
+
+// VenueWrapper - for templates
+type VenueWrapper struct {
+	RoleID int
+	Venues []Venues
 }
 
 // Cities - stores cities
@@ -52,7 +57,12 @@ type Cities struct {
 	CityName    string `json:"cityname" db:"cityname"`
 	NorthOffset int    `json:"northoffset" db:"northoffset"`
 	SouthOffset int    `json:"southoffset" db:"southoffset"`
-	RoleID      int
+}
+
+// CityWrapper - for templates
+type CityWrapper struct {
+	RoleID int
+	Cities []Cities
 }
 
 // ResFormData - store values to populate reservations form
@@ -130,7 +140,12 @@ type DepartureTimes struct {
 	StartDate       time.Time `json:"startdate" db:"startdate"`
 	EndDate         time.Time `json:"enddate" db:"enddate"`
 	Epoch           time.Time
-	RoleID          int
+}
+
+// DepartureTimeWrapper - for templates
+type DepartureTimeWrapper struct {
+	RoleID         int
+	DepartureTimes []DepartureTimes
 }
 
 // Trips - store trip data
@@ -150,7 +165,12 @@ type Trips struct {
 	Omitted         int       `json:"omitted" db:"omitted"`
 	RescheduleDate  time.Time `json:"rescheduledate" db:"rescheduledate"`
 	RescheduleTime  time.Time `json:"rescheduletime" db:"rescheduletime"`
-	RoleID          int
+}
+
+// TripWrapper - for templates
+type TripWrapper struct {
+	RoleID int
+	Trips  []Trips
 }
 
 // OmitTrip - store omit trip data
@@ -176,7 +196,12 @@ type SearchReservations struct {
 	DepartureTime    int       `json:"departuretime" db:"departuretime"`
 	Postponed        bool      `json:"postponed" db:"postponed"`
 	Cancelled        bool      `json:"cancelled" db:"cancelled"`
-	RoleID           int
+}
+
+// SearchReservationWrapper - for templates
+type SearchReservationWrapper struct {
+	RoleID             int
+	SearchReservations []SearchReservations
 }
 
 //DriverReport - reservation display structure by driver
@@ -192,29 +217,39 @@ type DriverReport struct {
 	NumPassengers    int    `json:"numpassengers" db:"numpassengers"`
 }
 
-//Drivers - store driver data
+// Drivers - store driver data
 type Drivers struct {
 	DriverID   int    `json:"driverid" db:"driverid"`
 	FirstName  string `json:"firstname" db:"firstname"`
 	LastName   string `json:"lastname" db:"lastname"`
 	DriverName string `json:"drivername" db:"drivername"`
-	RoleID     int
 }
 
-//DriverReportForm - driver and reservation display structure
+// DriverWrapper - for templates
+type DriverWrapper struct {
+	RoleID  int
+	Drivers []Drivers
+}
+
+// DriverReportForm - driver and reservation display structure
 type DriverReportForm struct {
 	Drivers       []Drivers
 	DriverReports []DriverReport
 	RoleID        int
 }
 
-//Vehicles - store vehicle data
+// Vehicles - store vehicle data
 type Vehicles struct {
 	VehicleID    int    `json:"vehicleid" db:"vehicleid"`
 	LicensePlate string `json:"licenseplate" db:"licenseplate"`
 	NumSeats     int    `json:"numseats" db:"numseats"`
 	Make         string `json:"make" db:"make"`
-	RoleID       int
+}
+
+// VehicleWrapper - for templates
+type VehicleWrapper struct {
+	RoleID   int
+	Vehicles []Vehicles
 }
 
 //Airlines - store airline data
@@ -224,7 +259,7 @@ type Airlines struct {
 	Terminal  int    `json:"terminal" db:"terminal"`
 }
 
-//Prices - store price data
+// Prices - store price data
 type Prices struct {
 	PriceID           int     `json:"priceid" db:"priceid"`
 	CustomerTypeID    int     `json:"customertypeid" db:"customertypeid"`
@@ -235,7 +270,12 @@ type Prices struct {
 	DepartureCityID   int     `json:"departurecityid" db:"departurecityid"`
 	DestinationCity   string  `json:"destinationcity" db:"destinationcity"`
 	DestinationCityID int     `json:"destinationcityid" db:"destinationcityid"`
-	RoleID            int
+}
+
+// PriceWrapper - for templates
+type PriceWrapper struct {
+	RoleID int
+	Prices []Prices
 }
 
 //TravelAgencies - store travel agency data
@@ -320,6 +360,7 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/driverreport", DriverReportHandler).Methods("GET")
 	r.HandleFunc("/travelagencyreport", TravelAgencyReportHandler).Methods("GET")
 	r.HandleFunc("/calendarreport", CalendarReportHandler).Methods("GET")
+	r.HandleFunc("/import", ImportHandler).Methods("GET")
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")

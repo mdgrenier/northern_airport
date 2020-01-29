@@ -13,36 +13,38 @@
         <img class="logo" src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
         {{ template "navbar" }}
 
-        {{ template "adminnavbar" index . 0 }}
+        {{ template "adminnavbar" . }}
 
     </header>
     <main>
-        <div class="container">
-            <h1>Reservation Search</h1>
-            <div class="row justify-content-around">
-                <div class="col-xs-4">
-                    <label for="search-name">First OR Last Name</label>
-                    <input type="text" class="form-control" id="search-name" name="search-name">
+        {{ with .SearchReservations }}
+            <div class="container">
+                <h1>Reservation Search</h1>
+                <div class="row justify-content-around">
+                    <div class="col-xs-4">
+                        <label for="search-name">First OR Last Name</label>
+                        <input type="text" class="form-control" id="search-name" name="search-name">
+                    </div>
+                    <div class="col-xs-4">
+                        <label for="search-phone">Phone</label>
+                        <input type="text" class="form-control" id="search-phone" name="search-phone">
+                    </div>
+                    <div class="col-xs-4">
+                        <label for="search-name">Email</label>
+                        <input type="text" class="form-control" id="search-email" name="search-email">
+                    </div>
+                    <div class="col-xs-4">
+                        <button class="btn btn-primary" id="search">Search</button>
+                    </div>
                 </div>
-                <div class="col-xs-4">
-                    <label for="search-phone">Phone</label>
-                    <input type="text" class="form-control" id="search-phone" name="search-phone">
-                </div>
-                <div class="col-xs-4">
-                    <label for="search-name">Email</label>
-                    <input type="text" class="form-control" id="search-email" name="search-email">
-                </div>
-                <div class="col-xs-4">
-                    <button class="btn btn-primary" id="search">Search</button>
-                </div>
+                <hr/>
+                {{ if not . }}
+                    <p>No Results</p>
+                {{ else }}
+                    {{ template "search" . }}
+                {{ end}}
             </div>
-            <hr/>
-            {{ if not . }}
-                <p>No Results</p>
-            {{ else }}
-                {{ template "search" . }}
-            {{ end}}
-        </div>
+        {{ end }}
     </main>
     
     {{ template "footer" }}

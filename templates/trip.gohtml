@@ -13,64 +13,66 @@
         <img class="logo" src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
         {{ template "navbar" }}
 
-        {{ template "adminnavbar" index . 0 }}
+        {{ template "adminnavbar" . }}
 
     </header>
     <main>
-        <div class="container">
-            <h1>Trips</h1>
-            <div class="row justify-content-around">
-                <div class="col-xs-4">
-                    <label for="trip-date">Trip Date</label>
-                    <input type="date" class="form-control" id="search-date" name="search-date">
+        {{ with .Trips }}
+            <div class="container">
+                <h1>Trips</h1>
+                <div class="row justify-content-around">
+                    <div class="col-xs-4">
+                        <label for="trip-date">Trip Date</label>
+                        <input type="date" class="form-control" id="search-date" name="search-date">
+                    </div>
+                    <div class="col-xs-4">
+                        <button class="btn btn-primary" id="search">Search</button>
+                    </div>
                 </div>
-                <div class="col-xs-4">
-                    <button class="btn btn-primary" id="search">Search</button>
+                <div class="trip-wrapper">
+                    <div class="box header" id="departuredate-header">Departure Date</div>
+                    <div class="box header" id="departuretime-header">Departure Time</div>
+                    <div class="box header" id="numpassengers-header">Num Passengers</div>
+                    <div class="box header" id="driver-header">Driver</div>
+                    <div class="box header" id="vehicle-header">Vehicle</div>
+                    <div class="box header" id="capacity-header">Capacity</div>
+                    <div class="box header" id="omitted-header">Omitted</div>
+                    <div class="box header" id="save-header">Save</div>
+                </div>
+                <div class="trip-wrapper">
+                    {{ range . }}
+                        <div class="box trip-row" id="tripid-{{ .DepartureTime }}" style="display: none;">{{ .TripID }}</div>
+                        <div class="box trip-row" id="departuredate-{{ .DepartureTime }}">{{ .DepartureDate.Format "2006-01-02" }}</div>
+                        <div class="box trip-row" id="departuretime-{{ .DepartureTime }}">{{ .DepartureTime }}</div>
+                        <div class="box trip-row" id="numpassengers-{{ .DepartureTime }}">{{ .NumPassengers }}</div>
+                        <select class="form-control" id="driver-{{ .DepartureTime }}" name="driverid">
+                            <option value="0">No Driver</option>
+                            {{ range .DriverList }}
+                                <option value="{{ .DriverID }}">{{ .FirstName }} {{ .LastName }}</option>
+                            {{ end }}
+                        </select>
+                        <select class="form-control" id="vehicle-{{ .DepartureTime }}" name="vehicleid">
+                            <option value="0">No Vehicle</option>
+                            {{ range .VehicleList }}
+                                <option value="{{ .VehicleID }}">{{ .LicensePlate }}</option>
+                            {{ end }}
+                        </select>
+                        <div class="box trip-row" id="capacity-{{ .DepartureTime }}">
+                            {{ .Capacity }}
+                        </div>
+                        <div class="box trip-row" id="omitted-{{ .DepartureTime }}">
+                            {{ .Omitted }}
+                        </div>
+                        <div class="box trip-row" id="save-{{ .DepartureTime }}">
+                            <button class="btn btn-primary">Save</button>
+                        </div>
+                    {{ end }}
+                </div>
+                <div class="trip-button">
+                    <button class="btn btn-primary" id="depaturetimes" onclick="location.href='/times'">Departure Times</button>
                 </div>
             </div>
-            <div class="trip-wrapper">
-                <div class="box header" id="departuredate-header">Departure Date</div>
-                <div class="box header" id="departuretime-header">Departure Time</div>
-                <div class="box header" id="numpassengers-header">Num Passengers</div>
-                <div class="box header" id="driver-header">Driver</div>
-                <div class="box header" id="vehicle-header">Vehicle</div>
-                <div class="box header" id="capacity-header">Capacity</div>
-                <div class="box header" id="omitted-header">Omitted</div>
-                <div class="box header" id="save-header">Save</div>
-            </div>
-            <div class="trip-wrapper">
-                {{ range . }}
-                    <div class="box trip-row" id="tripid-{{ .DepartureTime }}" style="display: none;">{{ .TripID }}</div>
-                    <div class="box trip-row" id="departuredate-{{ .DepartureTime }}">{{ .DepartureDate.Format "2006-01-02" }}</div>
-                    <div class="box trip-row" id="departuretime-{{ .DepartureTime }}">{{ .DepartureTime }}</div>
-                    <div class="box trip-row" id="numpassengers-{{ .DepartureTime }}">{{ .NumPassengers }}</div>
-                    <select class="form-control" id="driver-{{ .DepartureTime }}" name="driverid">
-                        <option value="0">No Driver</option>
-                        {{ range .DriverList }}
-                            <option value="{{ .DriverID }}">{{ .FirstName }} {{ .LastName }}</option>
-                        {{ end }}
-                    </select>
-                    <select class="form-control" id="vehicle-{{ .DepartureTime }}" name="vehicleid">
-                        <option value="0">No Vehicle</option>
-                        {{ range .VehicleList }}
-                            <option value="{{ .VehicleID }}">{{ .LicensePlate }}</option>
-                        {{ end }}
-                    </select>
-                    <div class="box trip-row" id="capacity-{{ .DepartureTime }}">
-                        {{ .Capacity }}
-                    </div>
-                    <div class="box trip-row" id="omitted-{{ .DepartureTime }}">
-                        {{ .Omitted }}
-                    </div>
-                    <div class="box trip-row" id="save-{{ .DepartureTime }}">
-                        <button class="btn btn-primary">Save</button>
-                    </div>
-                {{ end }}
-            </div>
-            <div class="trip-button">
-                <button class="btn btn-primary" id="depaturetimes" onclick="location.href='/times'">Departure Times</button>
-            </div>
-        </div>
+        {{ end }}
     </main>
     
     {{ template "footer" }}

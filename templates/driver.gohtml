@@ -13,44 +13,46 @@
         <img class="logo" src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
         {{ template "navbar" }}
 
-        {{ template "adminnavbar" index . 0 }}
+        {{ template "adminnavbar" . }}
 
     </header>
-        <main>
-        <div class="container">
-            <h1>Drivers</h1>
-            <div class="driver-wrapper">
-                <div class="box header" id="firstname-header">Firstname</div>
-                <div class="box header" id="lastname-header">Lastname</div>
-            </div>
-            <div class="driver-wrapper">
-                {{ range . }}
-                    <div class="box driver-row">
-                        <input type="text" class="form-control" id="firstname-{{ .DriverID }}" name="firstname" value="{{ .FirstName }}" required>
-                    </div>
-                    <div class="box driver-row">
-                        <input type="text" class="form-control" id="lastname-{{ .DriverID }}" name="lastname" value="{{ .LastName }}" required>
-                    </div>
-                    <div class="box driver-row">
-                        <button id="update-{{ .DriverID }}" type="button" name="update" class="btn btn-primary">Update</button>
-                    </div>
-                    <div class="box driver-row">
-                        <button id="remove-{{ .DriverID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
-                    </div>
-                {{ end }}
-            </div>
-            <form id="add-driver" method="post" action="/drivers" onsubmit="submit.disabled = true; return true;">
+    <main>
+        {{ with .Drivers }}
+            <div class="container">
+                <h1>Drivers</h1>
                 <div class="driver-wrapper">
-                    <div class="box driver-row" id="firstname-add">
-                        <input type="text" class="form-control" id="firstname" name="firstname" required>
-                    </div>
-                    <div class="box driver-row" id="lastname-add">
-                        <input type="text" class="form-control" id="lastname" name="lastname" required>
-                    </div>
-                    <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+                    <div class="box header" id="firstname-header">Firstname</div>
+                    <div class="box header" id="lastname-header">Lastname</div>
                 </div>
-            </form>
-        </div>
+                <div class="driver-wrapper">
+                    {{ range . }}
+                        <div class="box driver-row">
+                            <input type="text" class="form-control" id="firstname-{{ .DriverID }}" name="firstname" value="{{ .FirstName }}" required>
+                        </div>
+                        <div class="box driver-row">
+                            <input type="text" class="form-control" id="lastname-{{ .DriverID }}" name="lastname" value="{{ .LastName }}" required>
+                        </div>
+                        <div class="box driver-row">
+                            <button id="update-{{ .DriverID }}" type="button" name="update" class="btn btn-primary">Update</button>
+                        </div>
+                        <div class="box driver-row">
+                            <button id="remove-{{ .DriverID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
+                        </div>
+                    {{ end }}
+                </div>
+                <form id="add-driver" method="post" action="/drivers" onsubmit="submit.disabled = true; return true;">
+                    <div class="driver-wrapper">
+                        <div class="box driver-row" id="firstname-add">
+                            <input type="text" class="form-control" id="firstname" name="firstname" required>
+                        </div>
+                        <div class="box driver-row" id="lastname-add">
+                            <input type="text" class="form-control" id="lastname" name="lastname" required>
+                        </div>
+                        <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        {{ end }}
     </main>
     
     {{ template "footer" }}
@@ -60,7 +62,7 @@
 
     <script type="text/javascript" >
         
-        {{ range . }} 
+        {{ range .Drivers }} 
         
             var update = document.getElementById("update-{{ .DriverID }}");
             update.onclick = function(){

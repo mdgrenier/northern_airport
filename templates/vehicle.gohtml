@@ -13,51 +13,53 @@
         <img class="logo" src="../assets/media/nas-stripes.jpg" alt="northern airport passenger service logo"/>
         {{ template "navbar" }}
 
-        {{ template "adminnavbar" index . 0 }}
+        {{ template "adminnavbar" . }}
 
     </header>
     <main>
-        <div class="container">
-            <h1>Vehicles</h1>
-            <div class="vehicle-wrapper">
-                <div class="box header" id="license-plate">License</div>
-                <div class="box header" id="num-seats">Num Seats</div>
-                <div class="box header" id="make">Make</div>
-            </div>
-            <div class="vehicle-wrapper">
-                {{ range . }}
-                    <div class="box vehicle-row">
-                        <input type="text" class="form-control" id="license-plate-{{ .VehicleID }}" name="license-plate" value="{{ .LicensePlate }}" required>
-                    </div>
-                    <div class="box vehicle-row">
-                        <input type="text" class="form-control" id="num-seats-{{ .VehicleID }}" name="num-seats" value="{{ .NumSeats }}" required>
-                    </div>
-                    <div class="box vehicle-row">
-                        <input type="text" class="form-control" id="make-{{ .VehicleID }}" name="make" value="{{ .Make }}" required>
-                    </div>
-                    <div class="box vehicle-row">
-                        <button id="update-{{ .VehicleID }}" type="button" name="update" class="btn btn-primary">Update</button>
-                    </div>
-                    <div class="box vehicle-row">
-                        <button id="remove-{{ .VehicleID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
-                    </div>
-                {{ end }}
-            </div>
-            <form id="add-vehicle" method="post" action="/vehicles" onsubmit="submit.disabled = true; return true;">
+        {{ with .Vehicles }}
+            <div class="container">
+                <h1>Vehicles</h1>
                 <div class="vehicle-wrapper">
-                    <div class="box vehicle-row" id="license-plate-add">
-                        <input type="text" class="form-control" id="license-plate" name="license-plate" required>
-                    </div>
-                    <div class="box vehicle-row" id="num-seats-add">
-                        <input type="text" class="form-control" id="num-seats" name="num-seats" required>
-                    </div>
-                    <div class="box vehicle-row" id="make-add">
-                        <input type="text" class="form-control" id="make" name="make" required>
-                    </div>
-                    <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+                    <div class="box header" id="license-plate">License</div>
+                    <div class="box header" id="num-seats">Num Seats</div>
+                    <div class="box header" id="make">Make</div>
                 </div>
-            </form>
-        </div>
+                <div class="vehicle-wrapper">
+                    {{ range . }}
+                        <div class="box vehicle-row">
+                            <input type="text" class="form-control" id="license-plate-{{ .VehicleID }}" name="license-plate" value="{{ .LicensePlate }}" required>
+                        </div>
+                        <div class="box vehicle-row">
+                            <input type="text" class="form-control" id="num-seats-{{ .VehicleID }}" name="num-seats" value="{{ .NumSeats }}" required>
+                        </div>
+                        <div class="box vehicle-row">
+                            <input type="text" class="form-control" id="make-{{ .VehicleID }}" name="make" value="{{ .Make }}" required>
+                        </div>
+                        <div class="box vehicle-row">
+                            <button id="update-{{ .VehicleID }}" type="button" name="update" class="btn btn-primary">Update</button>
+                        </div>
+                        <div class="box vehicle-row">
+                            <button id="remove-{{ .VehicleID }}" type="button" name="remove" class="btn btn-primary" disabled>Delete</button>
+                        </div>
+                    {{ end }}
+                </div>
+                <form id="add-vehicle" method="post" action="/vehicles" onsubmit="submit.disabled = true; return true;">
+                    <div class="vehicle-wrapper">
+                        <div class="box vehicle-row" id="license-plate-add">
+                            <input type="text" class="form-control" id="license-plate" name="license-plate" required>
+                        </div>
+                        <div class="box vehicle-row" id="num-seats-add">
+                            <input type="text" class="form-control" id="num-seats" name="num-seats" required>
+                        </div>
+                        <div class="box vehicle-row" id="make-add">
+                            <input type="text" class="form-control" id="make" name="make" required>
+                        </div>
+                        <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        {{ end }}
     </main>
     
     {{ template "footer" }}
@@ -67,7 +69,7 @@
 
     <script type="text/javascript" >
         
-        {{ range . }} 
+        {{ range .Vehicles }} 
         
             var update = document.getElementById("update-{{ .VehicleID }}");
             update.onclick = function(){
