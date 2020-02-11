@@ -112,6 +112,7 @@ type Reservation struct {
 	ReturnDate               time.Time `json:"returndate" db:"returndate"`
 	TripTypeID               int       `json:"triptypeid" db:"triptypeid"`
 	TripID                   int       `json:"tripid" db:"tripid"`
+	ReturnTripID             int       `json:"returntripid" db:"returntripid"`
 	BalanceOwing             float32   `json:"balanceowing" db:"balanceowing"`
 	ElavonTransactionID      int       `json:"elavontranscationid" db:"elavontransactionid"`
 	FlightNumber             int       `json:"flightnumber" db:"flightnumber"`
@@ -313,6 +314,31 @@ type CalendarReport struct {
 	CurrentDate time.Time
 	Days        []CalendarDays
 	RoleID      int
+}
+
+//AGTAReport - store values for AGTA spreadsheet
+type AGTAReport struct {
+	ReservationID      int
+	FlightTime         string
+	AirlineName        string
+	FlightNumber       string
+	FlightCity         string
+	TerminalName       string
+	ConfirmationNumber int
+	PaxName            string
+	NumPax             int
+	DropLocation       string
+	DropCity           string
+	InternalNotes      string
+	DriverNotes        string
+	DepartureTime      int
+	DriverName         string
+	DriverID           int
+	VehicleNum         string
+	IsValid            int
+	DepartureDate      time.Time
+	HotelInfo          string
+	Cancelled          int
 }
 
 var dateLayout string

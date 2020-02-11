@@ -63,6 +63,7 @@ type Store interface {
 	GetTravelAgencyCount() int
 	GetTravelAgencies() []TravelAgencies
 	TravelAgencyReports(month int, year int) []TravelAgencyReport
+	AGTAQueryReport(startdate time.Time, enddate time.Time) []AGTAReport
 }
 
 //The `dbStore` struct will implement the `Store` interface it also takes the sql
@@ -129,7 +130,7 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 			"drivernotes, internalnotes, departurenumadults, departurenumstudents, departurenumseniors, "+
 			"departurenumchildren, returnnumadults, returnnumstudents, returnnumseniors, returnnumchildren, "+
 			"price, status, hash, customdepartureid, customdestinationid, "+
-			"departuredate, returndate, triptypeid, tripid, balanceowing, elavontransactionid, flightnumber, flighttime) VALUES "+
+			"departuredate, returndate, triptypeid, tripid, returntrip, balanceowing, elavontransactionid, flightnumber, flighttime) VALUES "+
 			"(?, ?, ?, ?, ?, ?, ?, ?, ?, "+
 			"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
 			"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
@@ -140,7 +141,7 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 			reservation.DriverNotes, reservation.InternalNotes, reservation.DepartureNumAdults, reservation.DepartureNumStudents, reservation.DepartureNumSeniors,
 			reservation.DepartureNumChildren, reservation.ReturnNumAdults, reservation.ReturnNumStudents, reservation.ReturnNumSeniors, reservation.ReturnNumChildren,
 			reservation.Price, reservation.Status, reservation.Hash, reservation.CustomDepartureID, reservation.CustomDepartureID,
-			reservation.DepartureDate, reservation.ReturnDate, 2, reservation.TripID, reservation.BalanceOwing, reservation.ElavonTransactionID, reservation.FlightNumber, reservation.FlightTime)
+			reservation.DepartureDate, reservation.ReturnDate, 2, reservation.TripID, reservation.ReturnTripID, reservation.BalanceOwing, reservation.ElavonTransactionID, reservation.FlightNumber, reservation.FlightTime)
 
 		if err != nil {
 			log.Printf("Error creating return reservation: %s", err)
@@ -793,20 +794,28 @@ func (store *dbStore) GetClientInfo(client *Client) error {
 //				 generate new trip
 func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 	var tripid int
+	var returntripid int
 	var tripid64 int64
+	var returntripid64 int64
 	var numtrippassengers int
+	var numreturntrippassengers int
 	var numpassengers int
+	var numreturnpassengers int
 	var capacity int
+	var returncapacity int
 	var omitted int
+	var returnomitted int
 
 	numpassengers = reservation.DepartureNumAdults + reservation.DepartureNumChildren + reservation.DepartureNumSeniors + reservation.DepartureNumStudents
+	numreturnpassengers = reservation.ReturnNumAdults + reservation.ReturnNumChildren + reservation.ReturnNumSeniors + reservation.ReturnNumStudents
 
 	//err := store.db.QueryRow("select tripid, numpassengers, capacity, omitted from trips where tripid=?",
 	//	reservation.TripID).Scan(&tripid, &numtrippassengers, &capacity, &omitted)
 
-	err := store.db.QueryRow("select tripid, numpassengers, capacity, omitted from trips where " +
+	err := store.db.QueryRow("select tripid, numpassengers, capacity, omitted from trips where "+
 		"departuredate=? and departuretimeid=?",
-		reservation.DepartureDate, reservation.DepartureTimeID).Scan(&tripid, &numtrippassengers, &capacity, &omitted)
+		reservation.DepartureDate, reservation.DepartureTimeID).Scan(&tripid, &numtrippassengers,
+		&capacity, &omitted)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -865,6 +874,69 @@ func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
 	}
 
 	reservation.TripID = int(tripid)
+
+	if numreturnpassengers > 0 {
+
+		err = store.db.QueryRow("select tripid, numpassengers, capacity, omitted from trips where "+
+			"returndate=? and returndeparturetimeid=?",
+			reservation.ReturnDate, reservation.ReturnDepartureTimeID).Scan(&returntripid,
+			&numreturntrippassengers, &returncapacity, &returnomitted)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				log.Print("No trip, create one")
+
+				//check if trip in omitted table
+				result, inserterr := store.db.Exec("INSERT INTO trips(departuredate, departuretimeid, numpassengers) "+
+					"VALUES (?,?,?)", reservation.ReturnDate, reservation.ReturnDepartureTimeID, numreturnpassengers)
+
+				if inserterr != nil {
+					log.Printf("Error inserting new return trip: %s", inserterr.Error())
+				} else {
+					returntripid64, _ = result.LastInsertId()
+					log.Printf("ReturnTripID: %d", returntripid64)
+					returntripid = int(returntripid64)
+					err = nil
+				}
+			} else {
+				log.Printf("Error retrieving return trip: %s", err.Error())
+			}
+		} else {
+			//add passengers from current reservation to trip passengers
+			vacancies := returncapacity - numreturnpassengers
+
+			if returnomitted == 1 {
+				errorstring := fmt.Sprintf("This return trip is has been cancelled")
+				err = errors.New(errorstring)
+			} else {
+				if vacancies < numreturnpassengers {
+					errorstring := fmt.Sprintf("This return trip is over capacity, only %d vacancies", vacancies)
+					err = errors.New(errorstring)
+				} else {
+					if float32(returncapacity)*(0.75) >= float32(vacancies) {
+
+						trip := store.GetTrip(returntripid)
+
+						SendCapacityEmail(trip)
+					}
+
+					numreturnpassengers += numreturntrippassengers
+
+					_, err = store.db.Exec("UPDATE trips SET numpassengers "+
+						"= ? WHERE tripid = ?", numreturnpassengers, returntripid)
+
+					if err != nil {
+						log.Printf("Error updating trip passengers: %s", err.Error())
+					}
+
+					log.Print("updated passengers num for return trip")
+
+				}
+			}
+
+			//***if over 75% need notification***
+		}
+	}
 
 	return err
 }
@@ -1308,7 +1380,7 @@ func (store *dbStore) SearchTrips(tripdate time.Time, reportType int) []Trips {
 	indx = 0
 	for row.Next() {
 		err = row.Scan(
-			&searchTripSlice[indx].TripID, &departuredate, &searchTripSlice[indx].DepartureTimeID, 
+			&searchTripSlice[indx].TripID, &departuredate, &searchTripSlice[indx].DepartureTimeID,
 			&searchTripSlice[indx].DepartureTime,
 			&searchTripSlice[indx].NumPassengers, &searchTripSlice[indx].DriverID,
 			&searchTripSlice[indx].VehicleID, &searchTripSlice[indx].Capacity,
@@ -2128,7 +2200,6 @@ func (store *dbStore) TravelAgencyReports(month int, year int) []TravelAgencyRep
 			var indx int
 			indx = 0
 			for row.Next() {
-				log.Printf("test")
 				err = row.Scan(
 					&travelAgencyReportSlice[indx].TravelAgencyID, &travelAgencyReportSlice[indx].TravelAgencyName,
 					&travelAgencyReportSlice[indx].ReservationCount, &travelAgencyReportSlice[indx].TotalCost,
@@ -2151,6 +2222,155 @@ func (store *dbStore) TravelAgencyReports(month int, year int) []TravelAgencyRep
 	log.Printf("no date criteria, return empty report")
 
 	return []TravelAgencyReport{}
+}
+
+//AGTAQueryReport - Get Data for AGTA Report
+func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []AGTAReport {
+
+	AGTACount := 0
+
+	sqlString := "select count(reservationid) " +
+		"FROM northernairport.reservations r JOIN northernairport.trips t ON r.tripid = t.tripid " +
+		"JOIN northernairport.clients c ON r.clientid = c.clientid " +
+		"JOIN northernairport.vehicles v ON t.vehicleid = v.vehicleid " +
+		"JOIN northernairport.departuretimes dt ON dt.departuretimeid = r.departuretimeid " +
+		"WHERE departurecityid=2 and (cancelled is null or cancelled = 0)"
+
+	//if startdate.IsZero() {
+	//	sqlString = sqlString + " AND r.returndate >= '" + startdate.Format("2006-01-02") + "' "
+	//}
+
+	//if enddate.IsZero() {
+	//	sqlString = sqlString + " AND r.returndate < '" + enddate.Format("2006-01-02") + "' "
+	//}
+
+	row, err := store.db.Query(sqlString)
+
+	log.Printf("AGTA query count received")
+
+	row.Next()
+	err = row.Scan(
+		&AGTACount,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No AGTA report returned")
+		} else {
+			log.Printf("Error retrieving AGTA report count: %s", err.Error())
+		}
+	}
+
+	log.Printf("AGTA retrieved records")
+
+	log.Printf("AGTA report count: %d", AGTACount)
+	var AGTAReportSlice = make([]AGTAReport, AGTACount)
+
+	if AGTACount > 0 {
+		sqlString = "SELECT r.reservationid, flighttime, (SELECT name FROM airlines WHERE airlineid=departureairlineid) AS AirlineName, " +
+			"flightnumber, '' as FlightCity, (select terminal FROM airlines WHERE airlineid=departureairlineid) AS TerminalName, " +
+			"CONCAT(lastname, ', ', firstname) AS PaxName, r.reservationid AS confirmationnumber, " +
+			"departurenumchildren + departurenumstudents + departurenumadults + departurenumseniors as NumPax, " +
+			"IF (destinationvenueid=100, dropoffaddress, " +
+			"(SELECT name FROM venues WHERE venueid=destinationvenueid)) AS DropLocation, " +
+			"(SELECT name FROM cities WHERE cityid=destinationcityid) AS DropCity, internalnotes, drivernotes, dt.departuretime, " +
+			"(SELECT CONCAT(lastname, ', ' , firstname) FROM drivers WHERE driverid=t.driverid) AS DriverName, t.driverid, " +
+			"(SELECT licenseplate FROM vehicles WHERE vehicleid=t.vehicleid) AS VehicleNum, (cancelled is null or cancelled = 0) AS IsValid, " +
+			"r.departuredate, IF(departurevenueid=99, '', (SELECT name FROM venues WHERE venueid=departurevenueid)) AS HotelInfo, " +
+			"cancelled " +
+			"FROM northernairport.reservations r JOIN northernairport.trips t ON r.tripid = t.tripid " +
+			"JOIN northernairport.clients c ON r.clientid = c.clientid " +
+			"JOIN northernairport.vehicles v ON t.vehicleid = v.vehicleid " +
+			"JOIN northernairport.departuretimes dt ON dt.departuretimeid = r.departuretimeid " +
+			"WHERE departurecityid=2 and (cancelled is null or cancelled = 0)"
+
+		//if startdate.IsZero() {
+		//	sqlString = sqlString + " AND r.returndate >= '" + startdate.Format("2006-01-02") + "' "
+		//}
+
+		//if enddate.IsZero() {
+		//	sqlString = sqlString + " AND r.returndate < '" + enddate.Format("2006-01-02") + "' "
+		//}
+
+		row, err = store.db.Query(sqlString)
+
+		if err != nil {
+			if err == sql.ErrNoRows {
+				log.Print("No AGTA report found")
+			} else {
+				log.Printf("Error retrieving AGTA records: %s", err.Error())
+			}
+			return []AGTAReport{}
+		}
+		defer row.Close()
+
+		log.Printf("AGTA records retrieved")
+
+		var indx int
+		var airlinename sql.NullString
+		var terminalname sql.NullString
+		var internalnotes sql.NullString
+		var drivernotes sql.NullString
+		var drivername sql.NullString
+		var hotelinfo sql.NullString
+		var departuredate mysql.NullTime
+
+		indx = 0
+		for row.Next() {
+			err = row.Scan(
+				&AGTAReportSlice[indx].ReservationID,
+				&AGTAReportSlice[indx].FlightTime,
+				&airlinename, &AGTAReportSlice[indx].FlightNumber,
+				&AGTAReportSlice[indx].FlightCity, &terminalname,
+				&AGTAReportSlice[indx].PaxName, &AGTAReportSlice[indx].ConfirmationNumber,
+				&AGTAReportSlice[indx].NumPax, &AGTAReportSlice[indx].DropLocation,
+				&AGTAReportSlice[indx].DropCity, &internalnotes, &drivernotes,
+				&AGTAReportSlice[indx].DepartureTime, &drivername,
+				&AGTAReportSlice[indx].DriverID, &AGTAReportSlice[indx].VehicleNum,
+				&AGTAReportSlice[indx].IsValid, &departuredate,
+				&hotelinfo, &AGTAReportSlice[indx].Cancelled,
+			)
+
+			if err != nil {
+				log.Printf("Error retrieving AGTA reports: %s", err.Error())
+			}
+
+			if len(airlinename.String) > 0 {
+				AGTAReportSlice[indx].AirlineName = airlinename.String
+			}
+
+			if len(terminalname.String) > 0 {
+				AGTAReportSlice[indx].TerminalName = terminalname.String
+			}
+
+			if len(internalnotes.String) > 0 {
+				AGTAReportSlice[indx].InternalNotes = internalnotes.String
+			}
+
+			if len(drivernotes.String) > 0 {
+				AGTAReportSlice[indx].DriverNotes = drivernotes.String
+			}
+
+			if len(drivername.String) > 0 {
+				AGTAReportSlice[indx].DriverName = drivername.String
+			}
+
+			if len(hotelinfo.String) > 0 {
+				AGTAReportSlice[indx].HotelInfo = hotelinfo.String
+			}
+
+			if departuredate.Valid {
+				AGTAReportSlice[indx].DepartureDate = departuredate.Time
+			} else {
+				AGTAReportSlice[indx].DepartureDate = time.Time{}
+			}
+
+			log.Printf("reservation: %d", AGTAReportSlice[indx].ReservationID)
+
+			indx++
+		}
+	}
+
+	return AGTAReportSlice
 }
 
 // The store variable is a package level variable that will be available for

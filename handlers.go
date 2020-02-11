@@ -1609,5 +1609,13 @@ func CalendarReportHandler(w http.ResponseWriter, r *http.Request) {
 
 //ImportHandler - run import script
 func ImportHandler(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/import.php", http.StatusFound)
+	agtadata := store.AGTAQueryReport(time.Time{}, time.Time{})
+
+	for indx := 0; indx < len(agtadata); indx++ {
+		log.Printf("Reservation ID: %d", agtadata[indx].ReservationID)
+	}
+
+	CreateExcelFile(agtadata)
+
+	http.ServeFile(w, r, "./test.xlsx")
 }
