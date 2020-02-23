@@ -1317,7 +1317,6 @@ func DepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
 
 //UpdateDepartureTimeHandler - update departuretime in database
 func UpdateDepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("execute update departure time handler")
 
 	session, err := sessionStore.Get(r, "northern-airport")
 	if err != nil {
@@ -1375,7 +1374,6 @@ func UpdateDepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
 
 //AddDepartureTimeHandler - update departuretime in database
 func AddDepartureTimeHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("execute add departure time handler")
 
 	session, err := sessionStore.Get(r, "northern-airport")
 	if err != nil {
@@ -1609,13 +1607,64 @@ func CalendarReportHandler(w http.ResponseWriter, r *http.Request) {
 
 //ImportHandler - run import script
 func ImportHandler(w http.ResponseWriter, r *http.Request) {
-	agtadata := store.AGTAQueryReport(time.Time{}, time.Time{})
 
-	for indx := 0; indx < len(agtadata); indx++ {
-		log.Printf("Reservation ID: %d", agtadata[indx].ReservationID)
+	log.Printf("create AGTA script")
+
+	apikey := "jgoiwjerfgi8432u"
+	parameterfailure := 0
+
+	values := r.URL.Query()
+
+	var key string
+	var startdate time.Time
+	var enddate time.Time
+	var err error
+
+	//check if api key received
+	if values["key"] != nil {
+		key = values["key"][0]
+	} else {
+		log.Fatal("No api key found")
+		parameterfailure = 1
 	}
 
-	CreateExcelFile(agtadata)
+	//check if valid start date
+	if values["startdate"] != nil {
+		startdate, err = time.Parse("2006-01-02", values["startdate"][0])
 
-	http.ServeFile(w, r, "./test.xlsx")
+		if err != nil {
+			log.Fatal("Problem parsing startdate")
+		}
+	} else {
+		log.Fatal("Start date not found")
+		parameterfailure = 1
+	}
+
+	//check if valid end date
+	if values["enddate"] != nil {
+		enddate, err = time.Parse("2006-01-02", values["enddate"][0])
+
+		if err != nil {
+			log.Fatal("Problem parsing enddate")
+		}
+	} else {
+		log.Fatal("End date not found")
+		parameterfailure = 1
+	}
+
+	if (key == apikey || startdate.IsZero() || enddate.IsZero()) && parameterfailure == 0 {
+		//agtadata := store.AGTAQueryReport(time.Time{}, time.Time{})
+		agtadata := store.AGTAQueryReport(startdate, enddate)
+
+		for indx := 0; indx < len(agtadata); indx++ {
+			log.Printf("Reservation ID: %d", agtadata[indx].ReservationID)
+		}
+
+		CreateExcelFile(agtadata)
+
+		http.ServeFile(w, r, "./test.xlsx")
+	} else {
+		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
+	}
+
 }

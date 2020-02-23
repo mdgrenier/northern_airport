@@ -2229,6 +2229,8 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 
 	AGTACount := 0
 
+	log.Printf("AGTA get query count")
+
 	sqlString := "select count(reservationid) " +
 		"FROM northernairport.reservations r JOIN northernairport.trips t ON r.tripid = t.tripid " +
 		"JOIN northernairport.clients c ON r.clientid = c.clientid " +
@@ -2236,13 +2238,13 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 		"JOIN northernairport.departuretimes dt ON dt.departuretimeid = r.departuretimeid " +
 		"WHERE departurecityid=2 and (cancelled is null or cancelled = 0)"
 
-	//if startdate.IsZero() {
-	//	sqlString = sqlString + " AND r.returndate >= '" + startdate.Format("2006-01-02") + "' "
-	//}
+	if !startdate.IsZero() {
+		sqlString = sqlString + " AND r.departuredate >= '" + startdate.Format("2006-01-02") + "' "
+	}
 
-	//if enddate.IsZero() {
-	//	sqlString = sqlString + " AND r.returndate < '" + enddate.Format("2006-01-02") + "' "
-	//}
+	if !enddate.IsZero() {
+		sqlString = sqlString + " AND r.departuredate < '" + enddate.Format("2006-01-02") + "' "
+	}
 
 	row, err := store.db.Query(sqlString)
 
@@ -2283,15 +2285,17 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 			"JOIN northernairport.departuretimes dt ON dt.departuretimeid = r.departuretimeid " +
 			"WHERE departurecityid=2 and (cancelled is null or cancelled = 0)"
 
-		//if startdate.IsZero() {
-		//	sqlString = sqlString + " AND r.returndate >= '" + startdate.Format("2006-01-02") + "' "
-		//}
+		if !startdate.IsZero() {
+			sqlString = sqlString + " AND r.departuredate >= '" + startdate.Format("2006-01-02") + "' "
+		}
 
-		//if enddate.IsZero() {
-		//	sqlString = sqlString + " AND r.returndate < '" + enddate.Format("2006-01-02") + "' "
-		//}
+		if !enddate.IsZero() {
+			sqlString = sqlString + " AND r.departuredate < '" + enddate.Format("2006-01-02") + "' "
+		}
 
 		row, err = store.db.Query(sqlString)
+
+		log.Printf("querty: %s", sqlString)
 
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -2306,32 +2310,45 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 		log.Printf("AGTA records retrieved")
 
 		var indx int
+		var flighttime sql.NullString
+		var flightnumber sql.NullString
 		var airlinename sql.NullString
 		var terminalname sql.NullString
 		var internalnotes sql.NullString
+		var droplocation sql.NullString
 		var drivernotes sql.NullString
 		var drivername sql.NullString
 		var hotelinfo sql.NullString
+		var vehiclenum sql.NullString
 		var departuredate mysql.NullTime
 
 		indx = 0
 		for row.Next() {
+			log.Printf("Indx: %d", indx)
 			err = row.Scan(
 				&AGTAReportSlice[indx].ReservationID,
-				&AGTAReportSlice[indx].FlightTime,
-				&airlinename, &AGTAReportSlice[indx].FlightNumber,
+				&flighttime,
+				&airlinename, &flightnumber,
 				&AGTAReportSlice[indx].FlightCity, &terminalname,
 				&AGTAReportSlice[indx].PaxName, &AGTAReportSlice[indx].ConfirmationNumber,
-				&AGTAReportSlice[indx].NumPax, &AGTAReportSlice[indx].DropLocation,
+				&AGTAReportSlice[indx].NumPax, &droplocation,
 				&AGTAReportSlice[indx].DropCity, &internalnotes, &drivernotes,
 				&AGTAReportSlice[indx].DepartureTime, &drivername,
-				&AGTAReportSlice[indx].DriverID, &AGTAReportSlice[indx].VehicleNum,
+				&AGTAReportSlice[indx].DriverID, &vehiclenum,
 				&AGTAReportSlice[indx].IsValid, &departuredate,
 				&hotelinfo, &AGTAReportSlice[indx].Cancelled,
 			)
 
 			if err != nil {
 				log.Printf("Error retrieving AGTA reports: %s", err.Error())
+			}
+
+			if len(flighttime.String) > 0 {
+				AGTAReportSlice[indx].FlightTime = flighttime.String
+			}
+			
+			if len(flightnumber.String) > 0 {
+				AGTAReportSlice[indx].FlightNumber = flightnumber.String
 			}
 
 			if len(airlinename.String) > 0 {
@@ -2346,6 +2363,10 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 				AGTAReportSlice[indx].InternalNotes = internalnotes.String
 			}
 
+			if len(droplocation.String) > 0 {
+				AGTAReportSlice[indx].DropLocation = droplocation.String
+			}
+
 			if len(drivernotes.String) > 0 {
 				AGTAReportSlice[indx].DriverNotes = drivernotes.String
 			}
@@ -2356,6 +2377,10 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 
 			if len(hotelinfo.String) > 0 {
 				AGTAReportSlice[indx].HotelInfo = hotelinfo.String
+			}
+
+			if len(vehiclenum.String) > 0 {
+				AGTAReportSlice[indx].VehicleNum = vehiclenum.String
 			}
 
 			if departuredate.Valid {
