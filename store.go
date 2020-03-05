@@ -2236,15 +2236,11 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 		"JOIN northernairport.clients c ON r.clientid = c.clientid " +
 		"JOIN northernairport.vehicles v ON t.vehicleid = v.vehicleid " +
 		"JOIN northernairport.departuretimes dt ON dt.departuretimeid = r.departuretimeid " +
-		"WHERE departurecityid=2 and (cancelled is null or cancelled = 0)"
-
-	if !startdate.IsZero() {
-		sqlString = sqlString + " AND r.departuredate >= '" + startdate.Format("2006-01-02") + "' "
-	}
-
-	if !enddate.IsZero() {
-		sqlString = sqlString + " AND r.departuredate < '" + enddate.Format("2006-01-02") + "' "
-	}
+		"WHERE (cancelled is null or cancelled = 0) AND (departurecityid=2 AND " +
+		" r.departuredate >= '" + startdate.Format("2006-01-02") + "' AND " +
+		" r.departuredate < '" + enddate.Format("2006-01-02") + "') OR " +
+		" (destinationcityid=2 AND r.returndate >= '" + startdate.Format("2006-01-02") + "' AND " +
+		" r.returndate < '" + enddate.Format("2006-01-02") + "')"
 
 	row, err := store.db.Query(sqlString)
 
@@ -2276,22 +2272,18 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 			"(SELECT name FROM venues WHERE venueid=destinationvenueid)) AS DropLocation, " +
 			"(SELECT name FROM cities WHERE cityid=destinationcityid) AS DropCity, internalnotes, drivernotes, dt.departuretime, " +
 			"(SELECT CONCAT(lastname, ', ' , firstname) FROM drivers WHERE driverid=t.driverid) AS DriverName, t.driverid, " +
-			"(SELECT licenseplate FROM vehicles WHERE vehicleid=t.vehicleid) AS VehicleNum, (cancelled is null or cancelled = 0) AS IsValid, " +
+			"(SELECT numseats FROM vehicles WHERE vehicleid=t.vehicleid) AS VehicleNum, (cancelled is null or cancelled = 0) AS IsValid, " +
 			"r.departuredate, IF(departurevenueid=99, '', (SELECT name FROM venues WHERE venueid=departurevenueid)) AS HotelInfo, " +
 			"cancelled " +
 			"FROM northernairport.reservations r JOIN northernairport.trips t ON r.tripid = t.tripid " +
 			"JOIN northernairport.clients c ON r.clientid = c.clientid " +
 			"JOIN northernairport.vehicles v ON t.vehicleid = v.vehicleid " +
 			"JOIN northernairport.departuretimes dt ON dt.departuretimeid = r.departuretimeid " +
-			"WHERE departurecityid=2 and (cancelled is null or cancelled = 0)"
-
-		if !startdate.IsZero() {
-			sqlString = sqlString + " AND r.departuredate >= '" + startdate.Format("2006-01-02") + "' "
-		}
-
-		if !enddate.IsZero() {
-			sqlString = sqlString + " AND r.departuredate < '" + enddate.Format("2006-01-02") + "' "
-		}
+			"WHERE (cancelled is null or cancelled = 0) AND (departurecityid=2 AND " +
+			" r.departuredate >= '" + startdate.Format("2006-01-02") + "' AND " +
+			" r.departuredate < '" + enddate.Format("2006-01-02") + "') OR " +
+			" (destinationcityid=2 AND r.returndate >= '" + startdate.Format("2006-01-02") + "' AND " +
+			" r.returndate < '" + enddate.Format("2006-01-02") + "')"
 
 		row, err = store.db.Query(sqlString)
 
@@ -2346,7 +2338,7 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 			if len(flighttime.String) > 0 {
 				AGTAReportSlice[indx].FlightTime = flighttime.String
 			}
-			
+
 			if len(flightnumber.String) > 0 {
 				AGTAReportSlice[indx].FlightNumber = flightnumber.String
 			}

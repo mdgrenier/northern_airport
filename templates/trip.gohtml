@@ -82,9 +82,7 @@
 
     <script type="text/javascript" >
 
-        console.log("trips, selected correct driver and vehicle");
-        
-        {{ range . }}
+        {{ range .Trips }}
 
             //set driver list to correct driver by driverid
             var driverid = {{ .DriverID }}
@@ -141,7 +139,7 @@
             var searchdate = document.getElementById("search-date").value;
 
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', '/trips?searchdate='+searchdate);
+            xhr.open('GET', '/trips?searchdate=' + searchdate);
             //xhr.open('GET', '/trips');
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onload = function() {

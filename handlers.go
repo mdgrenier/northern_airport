@@ -1629,8 +1629,8 @@ func ImportHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//check if valid start date
-	if values["startdate"] != nil {
-		startdate, err = time.Parse("2006-01-02", values["startdate"][0])
+	if values["startDate"] != nil {
+		startdate, err = time.Parse("2006-01-02", values["startDate"][0])
 
 		if err != nil {
 			log.Fatal("Problem parsing startdate")
@@ -1641,8 +1641,8 @@ func ImportHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//check if valid end date
-	if values["enddate"] != nil {
-		enddate, err = time.Parse("2006-01-02", values["enddate"][0])
+	if values["endDate"] != nil {
+		enddate, err = time.Parse("2006-01-02", values["endDate"][0])
 
 		if err != nil {
 			log.Fatal("Problem parsing enddate")

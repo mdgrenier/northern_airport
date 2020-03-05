@@ -55,7 +55,7 @@
     <script type="text/javascript" >
 
         window.onload = function () {
-            {{ range . }} 
+            {{ range .SearchReservations }} 
                 var postpone = document.getElementById("postpone-{{ .ReservationID }}"); 
                 postpone.onclick = function(){
                     var reservationid = {{ .ReservationID }}

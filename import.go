@@ -178,7 +178,7 @@ func PopulateData(sheet *xlsx.Sheet, agtareport []AGTAReport) {
 		cell16.Value = agtareport[indx].InternalNotes
 
 		cell17 := row1.AddCell()
-		cell17.Value = strconv.Itoa(agtareport[indx].DepartureTime)
+		cell17.Value = strconv.Itoa(agtareport[indx].DepartureTime)[:2] + ":" + strconv.Itoa(agtareport[indx].DepartureTime)[2:]
 
 		cell18 := row1.AddCell()
 		cell18.Value = agtareport[indx].DriverName
@@ -187,7 +187,7 @@ func PopulateData(sheet *xlsx.Sheet, agtareport []AGTAReport) {
 		cell19.Value = strconv.Itoa(agtareport[indx].DriverID)
 
 		cell20 := row1.AddCell()
-		cell20.Value = strconv.Itoa(agtareport[indx].DepartureTime) + " seats"
+		cell20.Value = agtareport[indx].VehicleNum + " seats"
 
 		cell21 := row1.AddCell()
 		cell21.Value = ""
