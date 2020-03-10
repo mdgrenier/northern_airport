@@ -17,8 +17,6 @@ func CreateExcelFile(agtareport []AGTAReport) {
 	var sheet *xlsx.Sheet
 	var err error
 
-	log.Printf("Creating log file")
-
 	file = xlsx.NewFile()
 	sheet, err = file.AddSheet("Simple")
 	if err != nil {
@@ -28,8 +26,6 @@ func CreateExcelFile(agtareport []AGTAReport) {
 	log.Printf("File created")
 
 	CreateHeaderRow(sheet)
-
-	log.Printf("Header Created")
 
 	PopulateData(sheet, agtareport)
 
@@ -128,9 +124,6 @@ func CreateHeaderRow(sheet *xlsx.Sheet) {
 func PopulateData(sheet *xlsx.Sheet, agtareport []AGTAReport) {
 
 	for indx := 0; indx < len(agtareport); indx++ {
-
-		log.Printf("Record %d Added", indx)
-
 		row1 := sheet.AddRow()
 		cell1 := row1.AddCell()
 		cell1.Value = strconv.Itoa(agtareport[indx].ReservationID)

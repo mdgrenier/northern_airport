@@ -2313,8 +2313,6 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 
 		row, err = store.db.Query(sqlString)
 
-		log.Printf("querty: %s", sqlString)
-
 		if err != nil {
 			if err == sql.ErrNoRows {
 				log.Print("No AGTA report found")
@@ -2324,8 +2322,6 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 			return []AGTAReport{}
 		}
 		defer row.Close()
-
-		log.Printf("AGTA records retrieved")
 
 		var indx int
 		var flighttime sql.NullString
@@ -2342,7 +2338,6 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 
 		indx = 0
 		for row.Next() {
-			log.Printf("Indx: %d", indx)
 			err = row.Scan(
 				&AGTAReportSlice[indx].ReservationID,
 				&flighttime, &airlinename, &flightnumber, &terminalname,
@@ -2404,8 +2399,6 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 			} else {
 				AGTAReportSlice[indx].DepartureDate = time.Time{}
 			}
-
-			log.Printf("reservation: %d", AGTAReportSlice[indx].ReservationID)
 
 			indx++
 		}
