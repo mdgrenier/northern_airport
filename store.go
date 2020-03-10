@@ -2233,9 +2233,11 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 
 	sqlString := "select count(reservationid) " +
 		"FROM northernairport.reservations r JOIN northernairport.trips t ON r.tripid = t.tripid " +
+		"LEFT JOIN northernairport.trips rt ON r.returntripid = rt.tripid " +
 		"JOIN northernairport.clients c ON r.clientid = c.clientid " +
 		"JOIN northernairport.vehicles v ON t.vehicleid = v.vehicleid " +
 		"JOIN northernairport.departuretimes dt ON dt.departuretimeid = r.departuretimeid " +
+		"LEFT JOIN northernairport.departuretimes rdt ON dt.departuretimeid = r.returndeparturetimeid " +
 		"WHERE (cancelled is null or cancelled = 0) AND (departurecityid=2 AND " +
 		" r.departuredate >= '" + startdate.Format("2006-01-02") + "' AND " +
 		" r.departuredate < '" + enddate.Format("2006-01-02") + "') OR " +
@@ -2264,26 +2266,50 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 	var AGTAReportSlice = make([]AGTAReport, AGTACount)
 
 	if AGTACount > 0 {
-		sqlString = "SELECT r.reservationid, flighttime, (SELECT name FROM airlines WHERE airlineid=departureairlineid) AS AirlineName, " +
-			"flightnumber, '' as FlightCity, (select terminal FROM airlines WHERE airlineid=departureairlineid) AS TerminalName, " +
-			"CONCAT(lastname, ', ', firstname) AS PaxName, r.reservationid AS confirmationnumber, " +
-			"departurenumchildren + departurenumstudents + departurenumadults + departurenumseniors as NumPax, " +
-			"IF (destinationvenueid=100, dropoffaddress, " +
-			"(SELECT name FROM venues WHERE venueid=destinationvenueid)) AS DropLocation, " +
-			"(SELECT name FROM cities WHERE cityid=destinationcityid) AS DropCity, internalnotes, drivernotes, dt.departuretime, " +
-			"(SELECT CONCAT(lastname, ', ' , firstname) FROM drivers WHERE driverid=t.driverid) AS DriverName, t.driverid, " +
-			"(SELECT numseats FROM vehicles WHERE vehicleid=t.vehicleid) AS VehicleNum, (cancelled is null or cancelled = 0) AS IsValid, " +
-			"r.departuredate, IF(departurevenueid=99, '', (SELECT name FROM venues WHERE venueid=departurevenueid)) AS HotelInfo, " +
-			"cancelled " +
-			"FROM northernairport.reservations r JOIN northernairport.trips t ON r.tripid = t.tripid " +
-			"JOIN northernairport.clients c ON r.clientid = c.clientid " +
-			"JOIN northernairport.vehicles v ON t.vehicleid = v.vehicleid " +
-			"JOIN northernairport.departuretimes dt ON dt.departuretimeid = r.departuretimeid " +
-			"WHERE (cancelled is null or cancelled = 0) AND (departurecityid=2 AND " +
-			" r.departuredate >= '" + startdate.Format("2006-01-02") + "' AND " +
-			" r.departuredate < '" + enddate.Format("2006-01-02") + "') OR " +
-			" (destinationcityid=2 AND r.returndate >= '" + startdate.Format("2006-01-02") + "' AND " +
-			" r.returndate < '" + enddate.Format("2006-01-02") + "')"
+		sqlString =
+			"SELECT r.reservationid, flighttime, " +
+				"IF(departurecityid=2, " +
+				"(SELECT name FROM airlines WHERE airlineid=departureairlineid), " +
+				"(SELECT name FROM airlines WHERE airlineid=returnairlineid)) AS AirlineName, " +
+				"flightnumber, " +
+				"IF(departurecityid=2, " +
+				"(select terminal FROM airlines WHERE airlineid=departureairlineid), " +
+				"(select terminal FROM airlines WHERE airlineid=returnairlineid)) AS TerminalName, " +
+				"CONCAT(lastname, ', ', firstname) AS PaxName, r.reservationid AS confirmationnumber, " +
+				"departurenumchildren + departurenumstudents + departurenumadults + departurenumseniors as NumPax, " +
+				"IF(departurecityid=2, " +
+				"IF(destinationvenueid=100, dropoffaddress, " +
+				"(SELECT name FROM venues WHERE venueid=destinationvenueid)), " +
+				"IF(returndestinationvenueid=100, returndropoffaddress, " +
+				"(SELECT name FROM venues WHERE venueid=returndestinationvenueid))) AS DropLocation, " +
+				"IF(departurecityid=2, " +
+				"(SELECT name FROM cities WHERE cityid=destinationcityid), " +
+				"(SELECT name FROM cities WHERE cityid=returndestinationcityid)) AS DropCity, " +
+				"internalnotes, drivernotes, " +
+				"IF(departurecityid=2, dt.departuretime, rdt.departuretime) as departuretime, " +
+				"IF(departurecityid=2, " +
+				"((SELECT CONCAT(lastname, ', ' , firstname) FROM drivers WHERE driverid=t.driverid)), " +
+				"((SELECT CONCAT(lastname, ', ' , firstname) FROM drivers WHERE driverid=rt.driverid))) AS DriverName, " +
+				"IF(departurecityid=2, t.driverid, rt.driverid) As driverid, " +
+				"IF(departurecityid=2, " +
+				"((SELECT numseats FROM vehicles WHERE vehicleid=t.vehicleid)), " +
+				"((SELECT numseats FROM vehicles WHERE vehicleid=rt.vehicleid))) AS VehicleNum, " +
+				"(cancelled is null or cancelled = 0) AS IsValid, r.departuredate, " +
+				"IF(departurecityid=2, " +
+				"IF(departurevenueid=99, '', (SELECT name FROM venues WHERE venueid=departurevenueid)), " +
+				"IF(returndeparturevenueid=99, '', (SELECT name FROM venues WHERE venueid=returndeparturevenueid))) AS HotelInfo, " +
+				"cancelled " +
+				"FROM northernairport.reservations r JOIN northernairport.trips t ON r.tripid = t.tripid " +
+				"LEFT JOIN northernairport.trips rt ON r.returntripid = rt.tripid " +
+				"JOIN northernairport.clients c ON r.clientid = c.clientid " +
+				"JOIN northernairport.vehicles v ON t.vehicleid = v.vehicleid " +
+				"JOIN northernairport.departuretimes dt ON dt.departuretimeid = r.departuretimeid " +
+				"LEFT JOIN northernairport.departuretimes rdt ON rdt.departuretimeid = r.returndeparturetimeid " +
+				"WHERE (cancelled is null or cancelled = 0) AND (departurecityid=2 AND " +
+				" r.departuredate >= '" + startdate.Format("2006-01-02") + "' AND " +
+				" r.departuredate < '" + enddate.Format("2006-01-02") + "') OR " +
+				" (destinationcityid=2 AND r.returndate >= '" + startdate.Format("2006-01-02") + "' AND " +
+				" r.returndate < '" + enddate.Format("2006-01-02") + "')"
 
 		row, err = store.db.Query(sqlString)
 
@@ -2319,9 +2345,7 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 			log.Printf("Indx: %d", indx)
 			err = row.Scan(
 				&AGTAReportSlice[indx].ReservationID,
-				&flighttime,
-				&airlinename, &flightnumber,
-				&AGTAReportSlice[indx].FlightCity, &terminalname,
+				&flighttime, &airlinename, &flightnumber, &terminalname,
 				&AGTAReportSlice[indx].PaxName, &AGTAReportSlice[indx].ConfirmationNumber,
 				&AGTAReportSlice[indx].NumPax, &droplocation,
 				&AGTAReportSlice[indx].DropCity, &internalnotes, &drivernotes,

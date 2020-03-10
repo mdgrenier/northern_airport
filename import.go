@@ -29,6 +29,8 @@ func CreateExcelFile(agtareport []AGTAReport) {
 
 	CreateHeaderRow(sheet)
 
+	log.Printf("Header Created")
+
 	PopulateData(sheet, agtareport)
 
 	err = file.Save("test.xlsx")
@@ -126,6 +128,9 @@ func CreateHeaderRow(sheet *xlsx.Sheet) {
 func PopulateData(sheet *xlsx.Sheet, agtareport []AGTAReport) {
 
 	for indx := 0; indx < len(agtareport); indx++ {
+
+		log.Printf("Record %d Added", indx)
+
 		row1 := sheet.AddRow()
 		cell1 := row1.AddCell()
 		cell1.Value = strconv.Itoa(agtareport[indx].ReservationID)
@@ -178,7 +183,9 @@ func PopulateData(sheet *xlsx.Sheet, agtareport []AGTAReport) {
 		cell16.Value = agtareport[indx].InternalNotes
 
 		cell17 := row1.AddCell()
-		cell17.Value = strconv.Itoa(agtareport[indx].DepartureTime)[:2] + ":" + strconv.Itoa(agtareport[indx].DepartureTime)[2:]
+		if agtareport[indx].DepartureTime > 0 {
+			cell17.Value = strconv.Itoa(agtareport[indx].DepartureTime)[:2] + ":" + strconv.Itoa(agtareport[indx].DepartureTime)[2:]
+		}
 
 		cell18 := row1.AddCell()
 		cell18.Value = agtareport[indx].DriverName
