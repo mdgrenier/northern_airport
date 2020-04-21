@@ -387,6 +387,7 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/travelagencyreport", TravelAgencyReportHandler).Methods("GET")
 	r.HandleFunc("/calendarreport", CalendarReportHandler).Methods("GET")
 	r.HandleFunc("/import", ImportHandler).Methods("GET")
+	r.HandleFunc("/elavon", ElavonHandler).Methods("GET")
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
@@ -406,6 +407,9 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/postpone", PostponeHandler).Methods("PUT")
 	r.HandleFunc("/cancel", CancelHandler).Methods("PUT")
 	r.HandleFunc("/omittrip", OmitTripHandler).Methods("PUT")
+	r.HandleFunc("/approved", ApprovedHandler).Methods("PUT")
+	r.HandleFunc("/declined", DeclinedHandler).Methods("PUT")
+	r.HandleFunc("/error", ErrorHandler).Methods("PUT")
 	//delete method only
 	r.HandleFunc("/cities", DeleteCityHandler).Methods("DELETE")
 	r.HandleFunc("/venues", DeleteVenueHandler).Methods("DELETE")

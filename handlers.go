@@ -3,8 +3,10 @@ package main
 import (
 	"bytes"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -1662,9 +1664,91 @@ func ImportHandler(w http.ResponseWriter, r *http.Request) {
 
 		CreateExcelFile(agtadata)
 
-		http.ServeFile(w, r, "./test.xlsx")
+		http.ServeFile(w, r, "./import.xlsx")
 	} else {
 		tpl.ExecuteTemplate(w, "accessdenied.gohtml", r)
 	}
+
+}
+
+//ElavonHandler - sent to Elavon for payment
+func ElavonHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Provide Converge Credentials
+	//Converge 6-Digit Account ID *Not the 10-Digit Elavon Merchant ID*
+	//const MERCHANTID = 631103
+	const MERCHANTID = "011427"
+	//Converge User ID *MUST FLAG AS HOSTED API USER IN CONVERGE UI*
+	const USERID = "webpage"
+	//Converge PIN (64 CHAR A/N)
+	//const PIN = "80KYG17V8IBW89MTJYJZIQ3C31DCCG9BJRYP9IYZ4D83ZGQEHCUQDVZB2YBSIG7S"
+	const PIN = "WVYWOH"
+	const CVVINDICATOR = '1' //means "present"
+	//demo url
+	const PAYSUCCESSURL = "/paysuccess.php"
+	const PAYFAILURL = "/payerror.php"
+	const CARDTYPE = "CREDITCARD"
+
+	// URL to Converge demo session token server
+	const tokenurl = "https://api.demo.convergepay.com/hosted-payments/transaction_token"
+	// URL to Converge production session token server
+	//const tokenurl := "https://api.convergepay.com/hosted-payments/transaction_token"
+
+	// URL to the demo Hosted Payments Page
+	hppurl := "https://api.demo.convergepay.com/hosted-payments"
+	// URL to the production Hosted Payments Page
+	//hppurl := "https://api.convergepay.com/hosted-payments"
+
+	//err := r.ParseForm()
+
+	//Follow the above pattern to add additional fields to be sent in curl request below
+	requestBody, err := json.Marshal(map[string]string{
+		"ssl_merchant_id":      MERCHANTID,
+		"ssl_user_id":          USERID,
+		"ssl_pin":              PIN,
+		"ssl_transaction_type": "CCSALE",
+		"ssl_amount":           "1.00",
+	})
+
+	if err != nil {
+		log.Printf("Error marshaling json %s", err)
+	}
+
+	log.Printf("Request Body: %s", string(requestBody))
+
+	resp, err := http.Post(tokenurl, "application/json", bytes.NewBuffer(requestBody))
+
+	if err != nil {
+		log.Printf("Error creating post request to %s: %s", tokenurl, err)
+	}
+
+	defer resp.Body.Close()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		log.Printf("Error reading post response: %s", err)
+	}
+
+	log.Printf("Response Body: %s", string(respBody))
+
+	hppurl = hppurl + "?ssl_txn_auth_token=" + string(respBody)
+
+	http.Redirect(w, r, hppurl, http.StatusFound)
+
+}
+
+//ApprovedHander - approved confirmation from Elavon
+func ApprovedHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+//DeclinedHander - decline confirmation from Elavon
+func DeclinedHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+//ErrorHander - error confirmation from Elavon
+func ErrorHandler(w http.ResponseWriter, r *http.Request) {
 
 }
