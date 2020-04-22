@@ -200,7 +200,7 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 	departuredate := reservation.DepartureDate.Format("2006-01-02")
 	departuretime := strconv.Itoa(store.GetDepartureTime(reservation.DepartureTimeID))
 	destinationcity := store.GetCityName(reservation.DestinationCityID)
-	destinationvenue := store.GetCityName(reservation.DestinationVenueID)
+	destinationvenue := store.GetVenueName(reservation.DestinationVenueID)
 	numadults := strconv.Itoa(reservation.DepartureNumAdults)
 	numseniors := strconv.Itoa(reservation.DepartureNumSeniors)
 	numstudents := strconv.Itoa(reservation.DepartureNumStudents)

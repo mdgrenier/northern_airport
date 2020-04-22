@@ -407,9 +407,9 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/postpone", PostponeHandler).Methods("PUT")
 	r.HandleFunc("/cancel", CancelHandler).Methods("PUT")
 	r.HandleFunc("/omittrip", OmitTripHandler).Methods("PUT")
-	r.HandleFunc("/approved", ApprovedHandler).Methods("PUT")
-	r.HandleFunc("/declined", DeclinedHandler).Methods("PUT")
-	r.HandleFunc("/error", ErrorHandler).Methods("PUT")
+	//r.HandleFunc("/approved", ApprovedHandler).Methods("PUT")
+	//r.HandleFunc("/declined", DeclinedHandler).Methods("PUT")
+	//r.HandleFunc("/error", ErrorHandler).Methods("PUT")
 	//delete method only
 	r.HandleFunc("/cities", DeleteCityHandler).Methods("DELETE")
 	r.HandleFunc("/venues", DeleteVenueHandler).Methods("DELETE")

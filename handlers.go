@@ -221,14 +221,14 @@ func ReservationHandler(w http.ResponseWriter, r *http.Request) {
 
 //CreateReservationHandler - store reservation in database
 func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
-	session, err := sessionStore.Get(r, "northern-airport")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	//session, err := sessionStore.Get(r, "northern-airport")
+	//if err != nil {
+	//	http.Error(w, err.Error(), http.StatusInternalServerError)
+	//	return
+	//}
 
 	//get client data from session cookie
-	client := GetClient(session)
+	//client := GetClient(session)
 
 	reservation := Reservation{}
 
@@ -240,7 +240,7 @@ func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Form information retrieved")
 
 	//check if trip exists, if not create one
-	err = store.GetOrAddTrip(&reservation)
+	err := store.GetOrAddTrip(&reservation)
 
 	if err != nil {
 		log.Printf("Error creating reservation: %s", err.Error())
@@ -257,8 +257,11 @@ func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 			log.Print("reservation created")
 		}
 
+		elavonURL := "/elavon?price=" + fmt.Sprintf("%f", reservation.Price)
+
 		//http.Redirect(w, r, "/reservationcreated", http.StatusFound)
-		tpl.ExecuteTemplate(w, "created.gohtml", client)
+		//tpl.ExecuteTemplate(w, "created.gohtml", client)
+		http.Redirect(w, r, elavonURL, http.StatusFound)
 	}
 
 }
@@ -1700,6 +1703,7 @@ func ElavonHandler(w http.ResponseWriter, r *http.Request) {
 	//hppurl := "https://api.convergepay.com/hosted-payments"
 
 	//err := r.ParseForm()
+	values := r.URL.Query()
 
 	//Follow the above pattern to add additional fields to be sent in curl request below
 	requestBody, err := json.Marshal(map[string]string{
@@ -1707,7 +1711,7 @@ func ElavonHandler(w http.ResponseWriter, r *http.Request) {
 		"ssl_user_id":          USERID,
 		"ssl_pin":              PIN,
 		"ssl_transaction_type": "CCSALE",
-		"ssl_amount":           "1.00",
+		"ssl_amount":           values["price"][0],
 	})
 
 	if err != nil {
@@ -1738,6 +1742,7 @@ func ElavonHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+/*
 //ApprovedHander - approved confirmation from Elavon
 func ApprovedHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -1752,3 +1757,4 @@ func DeclinedHandler(w http.ResponseWriter, r *http.Request) {
 func ErrorHandler(w http.ResponseWriter, r *http.Request) {
 
 }
+*/
