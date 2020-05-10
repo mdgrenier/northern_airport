@@ -257,7 +257,8 @@ func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 			log.Print("reservation created")
 		}
 
-		elavonURL := "/elavon?price=" + fmt.Sprintf("%f", reservation.Price)
+		elavonURL := "/elavon?price=" + fmt.Sprintf("%f", reservation.Price) +
+			"&reservationid=" + strconv.Itoa(reservation.ReservationID)
 
 		//http.Redirect(w, r, "/reservationcreated", http.StatusFound)
 		//tpl.ExecuteTemplate(w, "created.gohtml", client)
@@ -1702,16 +1703,17 @@ func ElavonHandler(w http.ResponseWriter, r *http.Request) {
 	// URL to the production Hosted Payments Page
 	//hppurl := "https://api.convergepay.com/hosted-payments"
 
-	//err := r.ParseForm()
 	values := r.URL.Query()
 
 	//Follow the above pattern to add additional fields to be sent in curl request below
 	requestBody, err := json.Marshal(map[string]string{
-		"ssl_merchant_id":      MERCHANTID,
-		"ssl_user_id":          USERID,
-		"ssl_pin":              PIN,
-		"ssl_transaction_type": "CCSALE",
-		"ssl_amount":           values["price"][0],
+		"ssl_merchant_id":          MERCHANTID,
+		"ssl_user_id":              USERID,
+		"ssl_pin":                  PIN,
+		"ssl_transaction_type":     "CCSALE",
+		"ssl_transaction_currency": "CAD",
+		"ssl_amount":               values["price"][0],
+		"reservationid":            values["reservationid"][0],
 	})
 
 	if err != nil {
@@ -1742,19 +1744,78 @@ func ElavonHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-/*
-//ApprovedHander - approved confirmation from Elavon
+//ApprovedHandler - approved confirmation from Elavon
 func ApprovedHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("transaction approved")
 
+	values := r.URL.Query()
+
+	reservationid, err := strconv.Atoi(values["reservationid"][0])
+	elavontransactionid, err := strconv.Atoi(values["ssl_merchant_txn_id"][0])
+
+	if err != nil {
+		log.Printf("error converting reservationid: %s", err)
+	} else {
+		log.Printf("reservation status updated to error")
+	}
+
+	status := "approved"
+
+	err = store.UpdateStatus(reservationid, elavontransactionid, status)
+
+	if err != nil {
+		log.Printf("error updating reservation: %s", err)
+	} else {
+		log.Printf("reseravtion status updated to approved")
+	}
 }
 
-//DeclinedHander - decline confirmation from Elavon
+//DeclinedHandler - decline confirmation from Elavon
 func DeclinedHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("transaction declined")
 
+	values := r.URL.Query()
+
+	reservationid, err := strconv.Atoi(values["reservationid"][0])
+	elavontransactionid, err := strconv.Atoi(values["ssl_merchant_txn_id"][0])
+	if err != nil {
+		log.Printf("error converting reservationid: %s", err)
+	} else {
+		log.Printf("reservation status updated to error")
+	}
+
+	status := "declined"
+
+	err = store.UpdateStatus(reservationid, elavontransactionid, status)
+
+	if err != nil {
+		log.Printf("error updating reservation: %s", err)
+	} else {
+		log.Printf("reseravtion status updated to decline")
+	}
 }
 
-//ErrorHander - error confirmation from Elavon
+//ErrorHandler - error confirmation from Elavon
 func ErrorHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("transaction error")
 
+	values := r.URL.Query()
+
+	reservationid, err := strconv.Atoi(values["reservationid"][0])
+	elavontransactionid, err := strconv.Atoi(values["ssl_merchant_txn_id"][0])
+	if err != nil {
+		log.Printf("error converting reservationid: %s", err)
+	} else {
+		log.Printf("reservation status updated to error")
+	}
+
+	status := "error"
+
+	err = store.UpdateStatus(reservationid, elavontransactionid, status)
+
+	if err != nil {
+		log.Printf("error updating reservation: %s", err)
+	} else {
+		log.Printf("reservation status updated to error")
+	}
 }
-*/

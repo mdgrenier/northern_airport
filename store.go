@@ -64,6 +64,7 @@ type Store interface {
 	GetTravelAgencies() []TravelAgencies
 	TravelAgencyReports(month int, year int) []TravelAgencyReport
 	AGTAQueryReport(startdate time.Time, enddate time.Time) []AGTAReport
+	UpdateStatus(reservationid int, elavontransactionid int, status string) error
 }
 
 //The `dbStore` struct will implement the `Store` interface it also takes the sql
@@ -2405,6 +2406,26 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 	}
 
 	return AGTAReportSlice
+}
+
+//UpdateStatus - Update Reservation Status
+func (store *dbStore) UpdateStatus(reservationid int, elavontransactionid int, status string) error {
+	log.Printf("update reservation status: %s in database", status)
+
+	if status != "paid" && status != "declined" && status != "error" {
+		log.Printf("Invalid status received: %s", status)
+	}
+
+	_, updateerr := store.db.Exec("UPDATE reservations SET status = ?, SET elavontransactionid = ?"+
+		"WHERE reservationid = ?", status, elavontransactionid, reservationid)
+
+	if updateerr != nil {
+		log.Printf("Error updating price: %s", updateerr.Error())
+	} else {
+		log.Printf("Update Status: %s", status)
+	}
+
+	return updateerr
 }
 
 // The store variable is a package level variable that will be available for
