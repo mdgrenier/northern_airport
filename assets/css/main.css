@@ -1,3 +1,7 @@
+main {
+    overflow: auto;
+}
+
 #return-info {
     display: none;
 }
@@ -26,6 +30,7 @@
 
 .logo {
     padding-top: 50px;
+    max-width: 100%;
 }
 
 .navbar-inverse {
@@ -147,3 +152,4 @@
 .nav>li>a {
     padding: 10px 10px;
 }
+

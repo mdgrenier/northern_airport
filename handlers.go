@@ -29,6 +29,12 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//store form data in client data structure
+	if len(r.Form.Get("accounttype")) > 0 {
+		client.RoleID, err = strconv.Atoi(r.Form.Get("accounttype"))
+	} else {
+		client.RoleID = 2
+	}
+
 	client.Username = r.Form.Get("username")
 	client.Password = r.Form.Get("password")
 	client.Firstname = r.Form.Get("firstname")
@@ -261,7 +267,7 @@ func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 			"&reservationid=" + strconv.Itoa(reservation.ReservationID)
 
 		//http.Redirect(w, r, "/reservationcreated", http.StatusFound)
-		//tpl.ExecuteTemplate(w, "created.gohtml", client)
+		//tpl.ExecuteTemplate(w, "elavon.gohtml", reservation)
 		http.Redirect(w, r, elavonURL, http.StatusFound)
 	}
 
@@ -288,7 +294,7 @@ func DriverHandler(w http.ResponseWriter, r *http.Request) {
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4) {
 		driverwrapper := DriverWrapper{}
-		driverwrapper.Drivers = store.GetDrivers()
+		driverwrapper.Drivers = store.GetDrivers(0)
 
 		driverwrapper.RoleID = client.RoleID
 
@@ -329,7 +335,7 @@ func AddDriverHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		driverwrapper := DriverWrapper{}
-		driverwrapper.Drivers = store.GetDrivers()
+		driverwrapper.Drivers = store.GetDrivers(0)
 
 		driverwrapper.RoleID = client.RoleID
 
@@ -402,7 +408,7 @@ func DeleteDriverHandler(w http.ResponseWriter, r *http.Request) {
 		store.DeleteDriver(driverid)
 
 		driverwrapper := DriverWrapper{}
-		driverwrapper.Drivers = store.GetDrivers()
+		driverwrapper.Drivers = store.GetDrivers(0)
 
 		driverwrapper.RoleID = client.RoleID
 
@@ -1455,15 +1461,27 @@ func DriverReportHandler(w http.ResponseWriter, r *http.Request) {
 	var driverid int
 	var date time.Time
 
-	if values["driverid"] != nil {
-		driverid, err = strconv.Atoi(values["driverid"][0])
+	//get client data from session cookie
+	client := GetClient(session)
 
-		if err != nil {
-			log.Printf("Error getting driverid: %s", err.Error())
-		}
-	} else {
-		driverid = 0
+	//get driverid from via clientid
+	driverid, err = store.GetDriverIDFromClient(client.ClientID)
+
+	if err != nil {
+		log.Printf("Error Getting DriverID from Client: %s", err)
 	}
+
+	/*
+		if values["driverid"] != nil {
+			driverid, err = strconv.Atoi(values["driverid"][0])
+
+			if err != nil {
+				log.Printf("Error getting driverid: %s", err.Error())
+			}
+		} else {
+			driverid = 0
+		}
+	*/
 
 	if values["departuredate"] != nil {
 		date, err = time.Parse("2006-01-02", values["departuredate"][0])
@@ -1472,17 +1490,19 @@ func DriverReportHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Error getting date: %s", err.Error())
 		}
 	} else {
-		date = time.Time{}
-	}
+		date, err = time.Parse("2006-01-02", time.Now().String())
 
-	//get client data from session cookie
-	client := GetClient(session)
+		if err != nil {
+			log.Printf("Error getting date: %s", err.Error())
+		}
+	}
 
 	//if authenticated get all client info
 	if client.Authenticated && (client.RoleID == 3 || client.RoleID == 4 || client.RoleID == 5) {
 		//get data need to populate dropdowns in reservation form
-		log.Printf("get driver reservations")
+		log.Printf("get driver reservations: driverid - %d and date - %s", driverid, date)
 		driverreservations := store.DriverReservations(driverid, date)
+		driverreservations.Drivers = store.GetDrivers(driverid)
 		log.Printf("reservations retrieved")
 
 		if len(driverreservations.DriverReports) > 0 {
@@ -1681,12 +1701,16 @@ func ElavonHandler(w http.ResponseWriter, r *http.Request) {
 	// Provide Converge Credentials
 	//Converge 6-Digit Account ID *Not the 10-Digit Elavon Merchant ID*
 	//const MERCHANTID = 631103
-	const MERCHANTID = "011427"
+	const MERCHANTID = "010069"
 	//Converge User ID *MUST FLAG AS HOSTED API USER IN CONVERGE UI*
+	//const USERID = "webpage"
 	const USERID = "webpage"
 	//Converge PIN (64 CHAR A/N)
 	//const PIN = "80KYG17V8IBW89MTJYJZIQ3C31DCCG9BJRYP9IYZ4D83ZGQEHCUQDVZB2YBSIG7S"
-	const PIN = "WVYWOH"
+	//const PIN = "WVYWOH"
+	//const PIN = "WQJDZW"
+	const PIN = "SL0V2X0EE5AY1X82A485VNIHPZ73LP39DXVGHIXAHUNA1FIH4O48XGTIK8ZON4OS"
+
 	const CVVINDICATOR = '1' //means "present"
 	//demo url
 	const PAYSUCCESSURL = "/paysuccess.php"
@@ -1705,6 +1729,15 @@ func ElavonHandler(w http.ResponseWriter, r *http.Request) {
 
 	values := r.URL.Query()
 
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	//get client data from session cookie
+	client := GetClient(session)
+
 	//Follow the above pattern to add additional fields to be sent in curl request below
 	requestBody, err := json.Marshal(map[string]string{
 		"ssl_merchant_id":          MERCHANTID,
@@ -1714,6 +1747,15 @@ func ElavonHandler(w http.ResponseWriter, r *http.Request) {
 		"ssl_transaction_currency": "CAD",
 		"ssl_amount":               values["price"][0],
 		"reservationid":            values["reservationid"][0],
+		"ssl_first_name":           client.Firstname,
+		"ssl_last_name":            client.Lastname,
+		"ssl_avs_address":          client.StreetAddress,
+		"ssl_city":                 client.City,
+		"ssl_state":                client.Province,
+		"ssl_avs_zip":              client.PostalCode,
+		"ssl_country":              client.Country,
+		"ssl_phone":                client.Phone,
+		"ssl_email":                client.Email,
 	})
 
 	if err != nil {

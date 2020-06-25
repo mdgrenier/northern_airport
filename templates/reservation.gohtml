@@ -31,7 +31,7 @@
                         {{end}}
 
                         <div class="row justify-content-around">
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="firstname">Firstname*</label>
                                 {{ if .Authenticated }}
                                     <input type="text" class="form-control" id="firstname" name="firstname" value={{.Firstname}} required autofocus>
@@ -40,7 +40,7 @@
                                 {{end}}
                             </div>
                         
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="lastname">Lastname*</label>
                                 {{ if .Authenticated }}
                                     <input type="lastname" class="form-control" id="lastname" name="lastname" value={{.Lastname}} required>
@@ -51,7 +51,7 @@
                         </div>
 
                         <div class="row justify-content-around">
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="email">Email*</label>
                                 {{ if .Authenticated }}
                                     <input type="email" class="form-control" id="email" name="email" value={{.Email}} required>
@@ -59,7 +59,7 @@
                                     <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
                                 {{end}}
                             </div>
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="phone">Phone Number*</label>
                                 {{ if .Authenticated }}
                                     <input type="tel" class="form-control" id="phone" name="phone" value={{.Phone}} required>
@@ -70,7 +70,7 @@
                         </div>
 
                         <div class="row justify-content-around">
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="streetaddress">Street Address</label>
                                 {{ if .Authenticated }}
                                     <input type="text" class="form-control" id="streetaddress" name="streetaddress" value={{.StreetAddress}} required>
@@ -78,7 +78,7 @@
                                     <input type="text" class="form-control" id="streetaddress" name="streetaddress" value="XXXXXXXXXXXX" required>
                                 {{end}}
                             </div>
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="city">City</label>
                                 {{ if .Authenticated }}
                                     <input type="city" class="form-control" id="city" name="city" value={{.City}} required>
@@ -89,7 +89,7 @@
                         </div>
 
                         <div class="row justify-content-around">
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="provstate">Province/State</label>
                                 {{ if .Authenticated }}
                                     <input type="text" class="form-control" id="provstate" name="provstate" value={{.Province}} required>
@@ -97,7 +97,7 @@
                                     <input type="text" class="form-control" id="provstate" name="provstate" value="Ontario" required>
                                 {{end}}
                             </div>
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="postalzip">Postal/Zip Code</label>
                                 {{ if .Authenticated }}
                                     <input type="postalzip" class="form-control" id="postalzip" name="postalzip" value={{.PostalCode}} pattern="([A-Za-z][0-9][A-Za-z] [0-9][A-Za-z][0-9]|[A-Za-z][0-9][A-Za-z][0-9][A-Za-z][0-9]|(\d{5}([\-]\d{4})?))" required>
@@ -111,7 +111,7 @@
                         </div>
 
                         <div class="row justify-content-around">
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="country">Country</label>
                                 {{ if .Authenticated }}
                                     <input type="text" class="form-control" id="country" name="country" value={{.Country}} required>
@@ -124,11 +124,11 @@
                         <h3>Travel Agents Use Only</h3>
                         <div class="travel-agent-info">
                             <div class="row justify-content-around">    
-                                <div class="col-xs-4">
+                                <div class="col-xs-6">
                                     <label for="iata">Travel Agent IATA#</label>
                                     <input type="text" class="form-control" id="iata" name="iata" placeholder="IATA #">
                                 </div>
-                                <div class="col-xs-4">
+                                <div class="col-xs-6">
                                     <label for="agentname">Agent Name</label>
                                     <input type="text" class="form-control" id="agentname" name="agentname" placeholder="Agent Name">
                                 </div>
@@ -142,7 +142,7 @@
                         <h3>Trip Information</h3>
                     </header>
                     <div class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="triptype">Trip Type</label>
                             <select class="form-control" id="triptype" name="triptype">
                                 <option value="1">One Way</option>
@@ -152,7 +152,7 @@
                     </div>
 
                     <div class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="departurecity">Departure City</label>
                             <select class="form-control" id="departurecity" name="departurecity" placeholder="Departure City">
                                 <option value="0">Select a City</option>
@@ -161,7 +161,7 @@
                                 {{ end }}
                             </select>
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="departurevenue">Departure Venue</label>
                             <select class="form-control" id="departurevenue" name="departurevenue" placeholder="Departure Venue">
                                 <option value="0">First Select a City</option>
@@ -171,7 +171,7 @@
 
                     <div id="show-departure-airline">
                         <div class="row justify-content-around">    
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="departureairline">Departure Airline</label>
                                 <select class="form-control" id="departureairline" name="departureairline">
                                     <option value="0">Select an Airline</option>
@@ -184,14 +184,14 @@
                     </div>
 
                     <div id="pickupaddress-div" class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="pickupaddress">Pickup Address</label>
                             <input type="text" class="form-control" id="pickupaddress" name="pickupaddress" placeholder="Pickup Address">
                         </div>
                     </div>
 
                     <div class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="destinationcity">Destination City</label>
                             <select class="form-control" id="destinationcity" name="destinationcity" placeholder="Destination City">
                                 <option value="0">Select a City</option>
@@ -200,7 +200,7 @@
                                 {{ end }}
                             </select>
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="destinationvenue">Destination Venue</label>
                             <select class="form-control" id="destinationvenue" name="destinationvenue" placeholder="Destination Venue">
                                 <option value="0">First Select a City</option>
@@ -210,7 +210,7 @@
 
                     <div id="show-destination-airline">
                         <div class="row justify-content-around">    
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="destinationairline">Destination Airline</label>
                                 <select class="form-control" id="destinationairline" name="destinationairline">
                                     <option value="0">Select an Airline</option>
@@ -223,18 +223,18 @@
                     </div>
 
                     <div id="dropoffaddress-div" class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="dropoffaddress">Dropoff Address</label>
                             <input type="text" class="form-control" id="dropoffaddress" name="dropoffaddress" placeholder="Dropoff Address">
                         </div>
                     </div>
 
                     <div class="row justify-content-around">
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="departuredate">Departure Date</label>
                             <input type="date" class="form-control" id="departuredate" name="departuredate" required>
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="departuretime">Departure Time</label>
                             <select class="form-control" id="departuretime" name="departuretime" placeholder="Departure Time">
                                 <option value="0">First Select Cities and Venues</option>
@@ -268,7 +268,7 @@
                         <h3>Return Trip Information</h3>  
                     </header>
                     <div class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="returndeparturecity">Return Departure City</label>
                             <select class="form-control" id="returndeparturecity" name="returndeparturecity" placeholder="Departure City">
                                 {{ range .Cities }}
@@ -276,7 +276,7 @@
                                 {{ end }}
                             </select>
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="returndeparturevenue">Return Departure Venue</label>
                             <select class="form-control" id="returndeparturevenue" name="returndeparturevenue" placeholder="Departure Venue">
                                 <option value="0">First Select a City</option>
@@ -287,7 +287,7 @@
 
                     <div id="show-return-departure-airline">
                         <div class="row justify-content-around">    
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="returndepartureairline">Return Airline</label>
                                 <select class="form-control" id="returndepatureairline" name="returndepartureairline">
                                     <option value="0">Select an Airline</option>
@@ -300,14 +300,14 @@
                     </div>
 
                     <div id="return-pickupaddress-div" class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="return-pickupaddress">Return Pickup Address</label>
                             <input type="text" class="form-control" id="return-pickupaddress" name="return-pickupaddress" placeholder="Return Pickup Address">
                         </div>
                     </div>
 
                     <div class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="returndestinationcity">Return Destination City</label>
                             <select class="form-control" id="returndestinationcity" name="returndestinationcity" placeholder="Destination City">
                                 <option value="0">Select a City</option>
@@ -316,7 +316,7 @@
                                 {{ end }}
                             </select>
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="returndestinationvenue">Return Destination Venue</label>
                             <select class="form-control" id="returndestinationvenue" name="returndestinationvenue" placeholder="Destination Venue">
                                 <option value="0">First Select a City</option>
@@ -326,7 +326,7 @@
 
                     <div id="show-return-destination-airline">
                         <div class="row justify-content-around">    
-                            <div class="col-xs-4">
+                            <div class="col-xs-6">
                                 <label for="returndestinationairline">Return Airline</label>
                                 <select class="form-control" id="returndestinationairline" name="returndestinationairline">
                                     <option value="0">Select an Airline</option>
@@ -339,18 +339,18 @@
                     </div>
 
                     <div id="return-dropoffaddress-div" class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="return-dropoffaddress">Return Dropoff Address</label>
                             <input type="text" class="form-control" id="return-dropoffaddress" name="return-dropoffaddress" placeholder="Return Dropoff Address">
                         </div>
                     </div>
 
                     <div class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="returndeparturedate">Return Departure Date</label>
                             <input type="date" class="form-control" id="returndeparturedate" name="returndeparturedate">
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="returndeparturetime">Return Departure Time</label>
                             <select class="form-control" id="returndeparturetime" name="returndeparturetime" placeholder="Departure Time">
                                 <option value="0">First Select Cities and Venues</option>
@@ -384,11 +384,11 @@
                         <h3>Flight Info</h3>
                     </header>
                     <div class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="flightnumber">Flight Number</label>
                             <input type="text" class="form-control" id="flightnumber" name="flightnumber" value="0">
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="flighttime">Flight Time</label>
                             <input type="text" class="form-control" id="flighttime" name="flighttime" value="0">
                         </div>
@@ -400,11 +400,11 @@
                         <h3>Notes</h3>
                     </header>
                     <div class="row justify-content-around">    
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="internalnotes">Internal Notes</label>
                             <textarea class="form-control" id="internalnotes" name="internalnotes" cols="40" rows="5"></textarea>
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="drivernotes">Driver Notes</label>
                             <textarea class="form-control" id="drivernotes" name="drivernotes" cols="40" rows="5"></textarea>
                         </div>
@@ -416,11 +416,11 @@
                         <h3>Price</h3>
                     </header>
                     <div class="row justify-content-around"> 
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="promocode">Promotional Code</label>
                             <input type="text" class="form-control" id="promocode" name="promocode">
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-6">
                             <label for="tripprice">Price</label>
                             <input type="text" class="form-control" id="tripprice" name="tripprice">
                         </div>

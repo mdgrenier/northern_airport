@@ -29,7 +29,7 @@ func CreateExcelFile(agtareport []AGTAReport) {
 
 	PopulateData(sheet, agtareport)
 
-	err = file.Save("test.xlsx")
+	err = file.Save("import.xlsx")
 
 	if err != nil {
 		fmt.Printf(err.Error())

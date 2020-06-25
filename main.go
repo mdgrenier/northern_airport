@@ -228,8 +228,9 @@ type Drivers struct {
 
 // DriverWrapper - for templates
 type DriverWrapper struct {
-	RoleID  int
-	Drivers []Drivers
+	RoleID   int
+	DriverID int
+	Drivers  []Drivers
 }
 
 // DriverReportForm - driver and reservation display structure
@@ -422,7 +423,8 @@ func newRouter() *mux.Router {
 func main() {
 	r := newRouter()
 
-	connString := "root:test@tcp(db:3306)/northernairport"
+	connString := "root:ah83is82js95pq@tcp(db:3306)/northernairport"
+	//connString := "root:@tcp(db:3306)/northernairport"
 	db, err := sql.Open("mysql", connString)
 
 	if err != nil {
@@ -450,7 +452,7 @@ func InitSession() {
 
 	//must update, currently setting maxage to 2 minutes and http only (will need secure when live)
 	sessionStore.Options = &sessions.Options{
-		MaxAge:   60 * 2,
+		MaxAge:   60 * 60,
 		HttpOnly: true,
 	}
 

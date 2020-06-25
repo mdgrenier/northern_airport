@@ -25,7 +25,7 @@
 
 
 {{ define "adminnavbar" }}
-    {{ if or (eq .RoleID 3) (eq .RoleID 4) (eq .RoleID 5) }}
+    {{ if or (eq .RoleID 1) (eq .RoleID 4) (eq .RoleID 5) }}
         <nav class="navbar navbar-inverse" role="navigation">
             <div class="container">
                 <div class="navbar-header">
@@ -71,17 +71,22 @@
                                 <a href="/search">Search</a>
                             </li>
                             <li>
-                                <a href="/drivers">Add/Change/Remove Driver</a>
+                                <a href="/drivers">Driver Admin</a>
                             </li>
                             <li>
-                                <a href="/vehicles">Add/Change/Remove Vehicle</a>
+                                <a href="/vehicles">Vehicle Admin</a>
                             </li>
                             <li>
-                                <a href="/venues">Add/Change/Remove Venue</a>
+                                <a href="/venues">Venue Admin</a>
                             </li>
                             <li>
-                                <a href="/cities">Add/Change/Remove Cities</a>
+                                <a href="/cities">City Admin</a>
                             </li>
+                            {{ if (eq .RoleID 4) }}
+                                <li>
+                                    <a href="/signup">Create Account</a>
+                                </li>
+                            {{ end }}
                         {{ end }}
                     </ul>
                 </div>

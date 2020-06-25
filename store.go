@@ -19,6 +19,7 @@ type Store interface {
 	SignInUser(client *Client) error
 	CreateReservation(reservation *Reservation) error
 	GetClientInfo(client *Client) error
+	GetDriverIDFromClient(clientid int) (int, error)
 	GetVenues() []Venues
 	GetVenueName(int) string
 	GetVenueCount() int
@@ -46,7 +47,7 @@ type Store interface {
 	SearchTrips(tripdate time.Time, reportType int) []Trips
 	PostponeReservation(searchreservation *SearchReservations) error
 	CancelReservation(searchreservation *SearchReservations) error
-	GetDrivers() []Drivers
+	GetDrivers(driverid int) []Drivers
 	AddDriver(driver Drivers) error
 	UpdateDriver(driver *Drivers) error
 	DeleteDriver(driver int) error
@@ -90,8 +91,8 @@ func (store *dbStore) CreateUser(client *Client) error {
 
 	//create account details record linked to client record
 	result, err = store.db.Exec("INSERT INTO accountdetails(clientid, password, roleid, username) "+
-		"VALUES (?, ?, 2, ?)",
-		id, client.Password, client.Username)
+		"VALUES (?, ?, ?, ?)",
+		id, client.Password, client.RoleID, client.Username)
 
 	return err
 }
@@ -228,8 +229,8 @@ func (store *dbStore) SignInUser(client *Client) error {
 	//create a client object
 	storedClient := &Client{}
 
-	err := store.db.QueryRow("select password, roleid from accountdetails where username=?",
-		client.Username).Scan(&storedClient.Password, &client.RoleID)
+	err := store.db.QueryRow("select password, roleid, clientid from accountdetails where username=?",
+		client.Username).Scan(&storedClient.Password, &client.RoleID, &client.ClientID)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -791,6 +792,46 @@ func (store *dbStore) GetClientInfo(client *Client) error {
 	return err
 }
 
+//GetDriverIDFromClient - given the clientid return driverid
+func (store *dbStore) GetDriverIDFromClient(clientid int) (int, error) {
+
+	var row *sql.Rows
+	var err error
+
+	if clientid > 0 {
+		row, err = store.db.Query(
+			//get accountdetailid from via clientid
+			"SELECT d.driverid FROM accountdetails a inner join drivers d on "+
+				"a.accountdetailid = d.accountdetailid WHERE clientid = ?", clientid)
+	} else {
+		return 0, nil
+	}
+
+	// We return in case of an error, and defer the closing of the row structure
+	if err != nil {
+		log.Printf("Error retrieving client: %s", err.Error())
+		return 0, err
+	}
+	defer row.Close()
+
+	var driverid int
+
+	//store client into into local variables
+	row.Next()
+	err = row.Scan(
+		&driverid,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No driver found")
+		} else {
+			log.Printf("Error retrieving driver: %s", err.Error())
+		}
+	}
+
+	return driverid, err
+}
+
 //GetOrAddTrip - store appropriate tripid in reservation, if no trip
 //				 generate new trip
 func (store *dbStore) GetOrAddTrip(reservation *Reservation) error {
@@ -1012,7 +1053,7 @@ func (store *dbStore) GetTrips() []Trips {
 
 			//populate drivers
 			tripSlice[indx].DriverList = make([]Drivers, store.GetDriverCount())
-			tripSlice[indx].DriverList = store.GetDrivers()
+			tripSlice[indx].DriverList = store.GetDrivers(0)
 
 			//populate vehicle
 			tripSlice[indx].VehicleList = make([]Vehicles, store.GetVehicleCount())
@@ -1300,7 +1341,7 @@ func (store *dbStore) SearchTrips(tripdate time.Time, reportType int) []Trips {
 
 	//populate drivers
 	driverlist := make([]Drivers, store.GetDriverCount())
-	driverlist = store.GetDrivers()
+	driverlist = store.GetDrivers(0)
 	//populate vehicle
 	vehiclelist := make([]Vehicles, store.GetVehicleCount())
 	vehiclelist = store.GetVehicles()
@@ -1584,19 +1625,40 @@ func (store *dbStore) GetDriverCount() int {
 }
 
 //GetDrivers - return all drivers
-func (store *dbStore) GetDrivers() []Drivers {
+func (store *dbStore) GetDrivers(driverid int) []Drivers {
 
-	row, err := store.db.Query("select driverid, firstname, lastname,  " +
-		"concat(firstname, ' ', lastname) as drivername from drivers")
+	var row *sql.Rows
+	var err error
+	var length int
 
-	if err != nil {
-		log.Printf("Error retrieving drivers: %s", err.Error())
-		return nil
+	if driverid == 0 {
+		row, err = store.db.Query("select driverid, firstname, lastname,  " +
+			"concat(firstname, ' ', lastname) as drivername from drivers")
+
+		if err != nil {
+			log.Printf("Error retrieving drivers: %s", err.Error())
+			return nil
+		}
+		defer row.Close()
+
+		//create slice to store all departure times
+		length = store.GetDriverCount()
+	} else {
+		row, err = store.db.Query("select driverid, firstname, lastname,  "+
+			"concat(firstname, ' ', lastname) as drivername from drivers where driverid = ?",
+			driverid)
+
+		if err != nil {
+			log.Printf("Error retrieving drivers: %s", err.Error())
+			return nil
+		}
+		defer row.Close()
+
+		//create slice to store all departure times
+		length = 1
 	}
-	defer row.Close()
 
-	//create slice to store all departure times
-	var driverSlice = make([]Drivers, store.GetDriverCount())
+	driverSlice := make([]Drivers, length)
 
 	var indx int
 	indx = 0
@@ -1986,7 +2048,7 @@ func (store *dbStore) DriverReservations(driverid int, reportdate time.Time) Dri
 	var whereClause string
 	var sqlString string
 
-	drivers := store.GetDrivers()
+	drivers := store.GetDrivers(0)
 
 	whereClause = " where r.postponed = 0 and r.cancelled = 0 and t.driverid = " + strconv.Itoa(driverid)
 

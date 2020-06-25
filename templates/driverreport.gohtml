@@ -22,20 +22,26 @@
             {{ with . }}
                 <div class="driver-report-criteria-wrapper">
                     <div class="row justify-content-around">
-                        <div class="col-xs-4">
+                        <div class="col-xs-5">
                             <label for="name">Driver Name</label>
                             <select class="form-control" id="drivername" name="drivername">
-                                <option value="0">Select a Driver</option>
-                                {{ range .Drivers }}
-                                    <option value="{{ .DriverID }}">{{ .DriverName }}</option>
+                                {{ if (eq .RoleID 5) }}
+                                    {{ with index .Drivers 0 }}
+                                        <option value="{{ .DriverID }}">{{ .DriverName }}</option>
+                                    {{ end }}
+                                {{ else }}
+                                    <option value="0">Select a Driver</option>
+                                    {{ range .Drivers }}
+                                        <option value="{{ .DriverID }}">{{ .DriverName }}</option>
+                                    {{ end }}
                                 {{ end }}
                             </select>
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-5">
                             <label for="departuredate">Departure Date</label>
                             <input type="date" class="form-control" id="departuredate" name="departuredate" required>
                         </div>
-                        <div class="col-xs-4">
+                        <div class="col-xs-5">
                                 <button class="btn btn-primary" id="update">Update</button>
                         </div>
                     </div>
