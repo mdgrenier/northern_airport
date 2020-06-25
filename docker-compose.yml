@@ -16,7 +16,7 @@ services:
   db:
     image: mysql:latest
     environment: 
-      MYSQL_ROOT_PASSWORD: test
+      MYSQL_ROOT_PASSWORD: ah83is82js95pq
       MYSQL_DATABASE: northernairport
     ports:
       - "3306:3306"
