@@ -21,8 +21,8 @@
             <div class="container">
                 <h1>Drivers</h1>
                 <div class="driver-wrapper">
-                    <div class="box header" id="firstname-header">Firstname</div>
-                    <div class="box header" id="lastname-header">Lastname</div>
+                    <div class="box header" id="firstname-header">First Name</div>
+                    <div class="box header" id="lastname-header">Last Name</div>
                 </div>
                 <div class="driver-wrapper">
                     {{ range . }}
@@ -42,12 +42,12 @@
                 </div>
                 <form id="add-driver" method="post" action="/drivers" onsubmit="submit.disabled = true; return true;">
                     <div class="driver-wrapper">
-                        <div class="box driver-row" id="firstname-add">
-                            <input type="text" class="form-control" id="firstname" name="firstname" required>
-                        </div>
-                        <div class="box driver-row" id="lastname-add">
-                            <input type="text" class="form-control" id="lastname" name="lastname" required>
-                        </div>
+                                <div class="box driver-row" id="firstname-add">
+                                    <input type="text" class="form-control" id="firstname" name="firstname" required>
+                                </div>
+                                <div class="box driver-row" id="lastname-add">
+                                    <input type="text" class="form-control" id="lastname" name="lastname" required>
+                                </div>
                         <button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>

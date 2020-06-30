@@ -244,19 +244,19 @@
                     
                     <p>Number of Passengers</p>  
                     <div class="row justify-content-around">
-                        <div class="col-xs-2">
+                        <div class="col-xs-3">
                             <label for="departurenumadults">Adults</label>
                             <input type="text" class="form-control" id="departurenumadults" name="departurenumadults" value="0">
                         </div>
-                        <div class="col-xs-2">
+                        <div class="col-xs-3">
                             <label for="departurenumseniors">Seniors (65+)</label>
                             <input type="text" class="form-control" id="departurenumseniors" name="departurenumseniors" value="0">
                         </div>
-                        <div class="col-xs-2">
+                        <div class="col-xs-3">
                             <label for="departurenumstudents">Students</label>
                             <input type="text" class="form-control" id="departurenumstudents" name="departurenumstudents" value="0">
                         </div>
-                        <div class="col-xs-2">
+                        <div class="col-xs-3">
                             <label for="departurenumchildren">Children (under 12)</label>
                             <input type="text" class="form-control" id="departurenumchildren" name="departurenumchildren" value="0">
                         </div>
@@ -360,19 +360,19 @@
 
                     <p>Number of Return Passengers</p>  
                     <div class="row justify-content-around">
-                        <div class="col-xs-2">
+                        <div class="col-xs-3">
                             <label for="returnnumadults">Adults</label>
                             <input type="text" class="form-control" id="returnnumadults" name="returnnumadults" value="0">
                         </div>
-                        <div class="col-xs-2">
+                        <div class="col-xs-3">
                             <label for="returnnumseniors">Seniors (65+)</label>
                             <input type="text" class="form-control" id="returnnumseniors" name="returnnumseniors" value="0">
                         </div>
-                        <div class="col-xs-2">
+                        <div class="col-xs-3">
                             <label for="returnnumstudents">Students</label>
                             <input type="text" class="form-control" id="returnnumstudents" name="returnnumstudents" value="0">
                         </div>
-                        <div class="col-xs-2">
+                        <div class="col-xs-3">
                             <label for="returnnumchildren">Children (under 12)</label>
                             <input type="text" class="form-control" id="returnnumchildren" name="numchildren" value="0">
                         </div>
@@ -426,9 +426,17 @@
                         </div>
                     </div>
                 </section>
-                <button id="calc-price" type="button" name="calc-price" class="btn btn-primary">Calculate Price</button>
-                <!--<button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>-->
-                <button id="submit-res" type="button" class="btn btn-primary" onclick="return Validate()">Submit Reservation</button>
+                <section>
+                    <div class="row justify-content-around"> 
+                        <div class="col-xs-6">
+                            <button id="calc-price" type="button" name="calc-price" class="btn btn-primary">Calculate Price</button>
+                            <!--<button id="submit" type="submit" name="submit" class="btn btn-primary">Submit</button>-->
+                        </div>
+                        <div class="col-xs-6">
+                            <button id="submit-res" type="button" class="btn btn-primary" onclick="return Validate()">Submit Reservation</button>
+                        </div>
+                    </div>
+                </section>
             </form>
         </div>
     </main>

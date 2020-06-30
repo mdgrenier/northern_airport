@@ -1,5 +1,6 @@
 main {
     overflow: auto;
+    min-width: 700px;
 }
 
 #return-info {
@@ -60,7 +61,7 @@ main {
 
 .trip-wrapper {
     display: grid;
-    grid-template-columns: 10% 10% 11% 12% 14% 6% 7% 7%;
+    grid-template-columns: 9% 9% 9% 20% 20% 10% 9% 8%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;
@@ -84,7 +85,7 @@ main {
 
 .driver-wrapper {
     display: grid;
-    grid-template-columns: 12% 12% 8% 8%;
+    grid-template-columns: 25% 25% 13% 13%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;
@@ -92,7 +93,7 @@ main {
 
 .vehicle-wrapper {
     display: grid;
-    grid-template-columns: 12% 12% 12% 8% 8%;
+    grid-template-columns: 22% 15% 22% 13% 13%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;
@@ -100,7 +101,7 @@ main {
 
 .venue-wrapper {
     display: grid;
-    grid-template-columns: 12% 30% 8% 8% 8% 8% 8%;
+    grid-template-columns: 20% 30% 10% 10% 10% 13% 13%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;
@@ -108,7 +109,7 @@ main {
 
 .city-wrapper {
     display: grid;
-    grid-template-columns: 12% 20% 20% 8% 8%;
+    grid-template-columns: 20% 25% 25% 13% 13%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;
@@ -116,7 +117,7 @@ main {
 
 .price-wrapper {
     display: grid;
-    grid-template-columns: 25% 25% 15% 10% 10%;
+    grid-template-columns: 25% 25% 15% 13% 13%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;
@@ -124,7 +125,7 @@ main {
 
 .driver-report-wrapper {
     display: grid;
-    grid-template-columns: 10% 12% 20% 12% 20% 7% 7%;
+    grid-template-columns: 10% 12% 20% 12% 20% 10% 10%;
     grid-gap: 2px;
     background-color: #fff;
     color: #444;
@@ -138,11 +139,14 @@ main {
     color: #444;
 }
 
+
+
 .box {
     /*background-color: #444;*/
     color: #000;
     border-radius: 3px;
     padding: 5px;
+    overflow: overlay;
 }
 
 .header {

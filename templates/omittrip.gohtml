@@ -22,11 +22,11 @@
             <div class="omittrip-wrapper">
                 <div class="row justify-content-around">
                     <div class="col-xs-5">
-                        <label for="departuredate">Departure Date</label>
+                        <label for="departuredate">Dep Date</label>
                         <input type="date" class="form-control" id="departuredate" name="departuredate" required>
                     </div>
                     <div class="col-xs-5">
-                        <label for="departuretime">Departure Time</label>
+                        <label for="departuretime">Dep Time</label>
                         <select class="form-control" id="departuretime" name="departuretime">
                             {{ range .DepartureTimes }}
                                 <option value="{{ .DepartureTimeID }}">{{ .DepartureTime }}</option>
