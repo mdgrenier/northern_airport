@@ -6,9 +6,10 @@ services:
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=db
+      - PMA_PORT=3306
     restart: always
     ports:
-      - 80:80
+      - 8081:8081
     volumes:
       - /sessions
     depends_on:
@@ -23,11 +24,15 @@ services:
     volumes:
       - ./data:/docker-entrypoint-initdb.d
     restart: always
-  web:
-    depends_on:
-      - db
-    build: .
+  app:
+    container_name: NorthernAirport
+    build:
+      dockerfile: Dockerfile
+      context: .
     ports:
       - "8080:8080"
+      - "443:443"
     restart: always
-    
+    volumes:
+      - /data/letsencrypt:/etc/letsencrypt
+      - /data/letsencrypt-www:/tmp/lestencrypt

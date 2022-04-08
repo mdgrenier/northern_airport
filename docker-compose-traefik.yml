@@ -1,0 +1,56 @@
+version: "3.4"
+
+services:
+  traefik:
+    image: traefik:2.1
+    container_name: Treafik
+    restart: always
+    ports:
+      #- '80:80'
+      - '443:443'
+      - '3306:3306'
+    volumes:
+    - ./traefik:/etc/traefik
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: PhpMyAdmin
+    restart: always
+    hostname: database
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+      - PMA_PORT=3306
+    volumes:
+      - /sessions
+    depends_on:
+      - db
+  db:
+    image: mysql:latest
+    container_name: MySQL
+    environment: 
+      MYSQL_ROOT_PASSWORD: ah83is82js95pq
+      MYSQL_DATABASE: northernairport
+#    ports:
+#      - "3306:3306"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.db.rule=HostSNI(`*`)"
+      - "traefik.tcp.services.db.loadbalancer.server.port=3306"
+      - "traefik.tcp.routers.db.entrypoints=mysql"
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
+    restart: always
+  app:
+    container_name: NorthernAirport
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - "8080:8080"
+    restart: always
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.my-app.rule=Host(`northernair.xyz`,`www.northernair.xyz`)'
+      - 'traefik.http.routers.my-app.tls=true'
+      - 'traefik.http.routers.my-app.tls.certresolver=lets-encrypt'

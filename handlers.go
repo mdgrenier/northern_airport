@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -59,7 +60,8 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	client.Password = string(hashedPassword)
 
-	err = store.CreateUser(client)
+	_, err = store.CreateUser(client)
+
 	if err != nil {
 		log.Fatal("Error Creating User: ", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -227,26 +229,43 @@ func ReservationHandler(w http.ResponseWriter, r *http.Request) {
 
 //CreateReservationHandler - store reservation in database
 func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
-	//session, err := sessionStore.Get(r, "northern-airport")
-	//if err != nil {
-	//	http.Error(w, err.Error(), http.StatusInternalServerError)
-	//	return
-	//}
+	session, err := sessionStore.Get(r, "northern-airport")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	client := Client{}
 
 	//get client data from session cookie
-	//client := GetClient(session)
+	client = GetClient(session)
 
 	reservation := Reservation{}
+
+	log.Printf("ClientID: %d", client.ClientID)
 
 	log.Printf("Retrieve form data")
 
 	//get reservation data from form
 	reservation = GetReservationFormValues(r, true)
 
+	if client.ClientID == 0 {
+		////details not being stored here/////
+		client = reservation.ClientDetails
+		log.Printf("Get Client from Reservation, Name: %s %s", client.Firstname, client.Lastname)
+		clientid, _ := store.CreateUser(&client)
+		client.ClientID = clientid
+		log.Printf("Get Client, ClientID: %d", client.ClientID)
+		reservation.ClientDetails.ClientID = clientid
+	} else {
+		reservation.ClientDetails = client
+		log.Printf("Get Client from Session, Name: %s %s", client.Firstname, client.Lastname)
+	}
+
 	log.Printf("Form information retrieved")
 
 	//check if trip exists, if not create one
-	err := store.GetOrAddTrip(&reservation)
+	err = store.GetOrAddTrip(&reservation)
 
 	if err != nil {
 		log.Printf("Error creating reservation: %s", err.Error())
@@ -263,12 +282,24 @@ func CreateReservationHandler(w http.ResponseWriter, r *http.Request) {
 			log.Print("reservation created")
 		}
 
+		if err != nil {
+			log.Fatal("Error retrieving client details: ", err)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
 		elavonURL := "/elavon?price=" + fmt.Sprintf("%f", reservation.Price) +
 			"&reservationid=" + strconv.Itoa(reservation.ReservationID)
 
 		//http.Redirect(w, r, "/reservationcreated", http.StatusFound)
 		//tpl.ExecuteTemplate(w, "elavon.gohtml", reservation)
 		http.Redirect(w, r, elavonURL, http.StatusFound)
+
+		//_, err = http.Post("http://165.22.237.104:8080/elavon", "application/json", bytes.NewBuffer(requestBody))
+
+		//if err != nil {
+		//	log.Fatal("Error with post request: ", err)
+		//	w.WriteHeader(http.StatusInternalServerError)
+		//}
 	}
 
 }
@@ -1701,15 +1732,14 @@ func ElavonHandler(w http.ResponseWriter, r *http.Request) {
 	// Provide Converge Credentials
 	//Converge 6-Digit Account ID *Not the 10-Digit Elavon Merchant ID*
 	//const MERCHANTID = 631103
-	const MERCHANTID = "010069"
+	const MERCHANTID = "0022805"
 	//Converge User ID *MUST FLAG AS HOSTED API USER IN CONVERGE UI*
 	//const USERID = "webpage"
-	const USERID = "webpage"
+	const USERID = "apiuser"
 	//Converge PIN (64 CHAR A/N)
 	//const PIN = "80KYG17V8IBW89MTJYJZIQ3C31DCCG9BJRYP9IYZ4D83ZGQEHCUQDVZB2YBSIG7S"
 	//const PIN = "WVYWOH"
-	//const PIN = "WQJDZW"
-	const PIN = "SL0V2X0EE5AY1X82A485VNIHPZ73LP39DXVGHIXAHUNA1FIH4O48XGTIK8ZON4OS"
+	const PIN = "DZKLNA2M7ZAAE8X6W4AD6T3IY4X1LFR41IG0B2ZBZDAYC6DO3JECM4IC4IM8QTR9"
 
 	const CVVINDICATOR = '1' //means "present"
 	//demo url
@@ -1729,33 +1759,28 @@ func ElavonHandler(w http.ResponseWriter, r *http.Request) {
 
 	values := r.URL.Query()
 
-	session, err := sessionStore.Get(r, "northern-airport")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	reservationid, _ := strconv.Atoi(values["reservationid"][0])
 
-	//get client data from session cookie
-	client := GetClient(session)
+	client := store.GetClientFromReservation(reservationid)
 
-	//Follow the above pattern to add additional fields to be sent in curl request below
+	log.Printf("Client Name: %s %s", client.Firstname, client.Lastname)
+
 	requestBody, err := json.Marshal(map[string]string{
-		"ssl_merchant_id":          MERCHANTID,
-		"ssl_user_id":              USERID,
-		"ssl_pin":                  PIN,
-		"ssl_transaction_type":     "CCSALE",
-		"ssl_transaction_currency": "CAD",
-		"ssl_amount":               values["price"][0],
-		"reservationid":            values["reservationid"][0],
-		"ssl_first_name":           client.Firstname,
-		"ssl_last_name":            client.Lastname,
-		"ssl_avs_address":          client.StreetAddress,
-		"ssl_city":                 client.City,
-		"ssl_state":                client.Province,
-		"ssl_avs_zip":              client.PostalCode,
-		"ssl_country":              client.Country,
-		"ssl_phone":                client.Phone,
-		"ssl_email":                client.Email,
+		"ssl_merchant_id":      MERCHANTID,
+		"ssl_user_id":          USERID,
+		"ssl_pin":              PIN,
+		"ssl_transaction_type": "CCSALE",
+		"ssl_amount":           values["price"][0],
+		"ssl_invoice_number":   values["reservationid"][0],
+		"ssl_first_name":       client.Firstname,
+		"ssl_last_name":        client.Lastname,
+		"ssl_phone":            client.Phone,
+		"ssl_email":            client.Email,
+		"ssl_streetaddress":    client.StreetAddress,
+		"ssl_city":             client.City,
+		"ssl_province":         client.Province,
+		"ssl_postalcode":       client.PostalCode,
+		"ssl_country":          client.Country,
 	})
 
 	if err != nil {
@@ -1780,84 +1805,63 @@ func ElavonHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Response Body: %s", string(respBody))
 
-	hppurl = hppurl + "?ssl_txn_auth_token=" + string(respBody)
+	params := url.Values{}
+	params.Add("ssl_txn_auth_token", string(respBody))
+
+	hppurl = hppurl + "?" + params.Encode()
 
 	http.Redirect(w, r, hppurl, http.StatusFound)
 
 }
 
-//ApprovedHandler - approved confirmation from Elavon
-func ApprovedHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("transaction approved")
+//TransactionStatusHandler - redirect after transaction complete
+func TransactionStatusHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("transaction complete")
 
-	values := r.URL.Query()
-
-	reservationid, err := strconv.Atoi(values["reservationid"][0])
-	elavontransactionid, err := strconv.Atoi(values["ssl_merchant_txn_id"][0])
-
-	if err != nil {
-		log.Printf("error converting reservationid: %s", err)
-	} else {
-		log.Printf("reservation status updated to error")
+	if err := r.ParseForm(); err != nil {
+		log.Printf("ParseForm() err: %v", err)
+		return
 	}
 
-	status := "approved"
+	log.Printf("Post from website! r.PostFrom = %v\n", r.PostForm)
 
-	err = store.UpdateStatus(reservationid, elavontransactionid, status)
+	ssl_result_message := r.FormValue("ssl_result_message")
+	ssl_amount, _ := strconv.ParseFloat(r.FormValue("ssl_amount"), 32)
+	ssl_txn_id := r.FormValue("ssl_txn_id")
 
-	if err != nil {
-		log.Printf("error updating reservation: %s", err)
-	} else {
-		log.Printf("reseravtion status updated to approved")
-	}
-}
-
-//DeclinedHandler - decline confirmation from Elavon
-func DeclinedHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("transaction declined")
-
-	values := r.URL.Query()
-
-	reservationid, err := strconv.Atoi(values["reservationid"][0])
-	elavontransactionid, err := strconv.Atoi(values["ssl_merchant_txn_id"][0])
-	if err != nil {
-		log.Printf("error converting reservationid: %s", err)
-	} else {
-		log.Printf("reservation status updated to error")
+	if ssl_result_message == "approval" {
+		ssl_result_message = "approved"
 	}
 
-	status := "declined"
+	//need to get NorthernAirport transaction id to update correct reservation
+	reservationid, _ := strconv.Atoi(r.FormValue("ssl_invoice_number"))
 
-	err = store.UpdateStatus(reservationid, elavontransactionid, status)
+	log.Printf("ReservationID: %d", reservationid)
 
-	if err != nil {
-		log.Printf("error updating reservation: %s", err)
+	//need to get NorthernAirport transaction amount to ensure the correct amount was paid
+	amount := store.GetReservationAmount(reservationid)
+	log.Printf("Transaction Amount: %f, Reservation Amount: %f", ssl_amount, amount)
+
+	if float32(ssl_amount) == amount {
+
+		err := store.UpdateStatus(reservationid, ssl_txn_id, ssl_result_message)
+
+		if err != nil {
+			log.Printf("error updating reservation: %s", err)
+		} else {
+			log.Printf("reseravtion status updated to approved")
+		}
 	} else {
-		log.Printf("reseravtion status updated to decline")
+		//need to do something if amount from Elavon doesn't match Northern Airport amount
+		//this should never happen
 	}
 }
 
-//ErrorHandler - error confirmation from Elavon
-func ErrorHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("transaction error")
+//MigrateHandler - migrate old reservations into new database
+func MigrateHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("start migration")
 
-	values := r.URL.Query()
+	store.MigrateDB()
 
-	reservationid, err := strconv.Atoi(values["reservationid"][0])
-	elavontransactionid, err := strconv.Atoi(values["ssl_merchant_txn_id"][0])
-	if err != nil {
-		log.Printf("error converting reservationid: %s", err)
-	} else {
-		log.Printf("reservation status updated to error")
-	}
-
-	status := "error"
-
-	err = store.UpdateStatus(reservationid, elavontransactionid, status)
-
-	if err != nil {
-		log.Printf("error updating reservation: %s", err)
-	} else {
-		log.Printf("reservation status updated to error")
-	}
+	log.Printf("migration complete")
 }

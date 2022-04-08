@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"html/template"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/sessions"
@@ -12,6 +13,8 @@ import (
 	"github.com/gorilla/securecookie"
 
 	"github.com/gorilla/mux"
+
+	"github.com/gorilla/context"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -78,6 +81,7 @@ type ResFormData struct {
 
 // Reservation - store reservation information
 type Reservation struct {
+	ClientDetails            Client    `json:"clientdetails" db:"client"`
 	ReservationID            int       `json:"reservationid" db:"reservationid"`
 	ClientID                 int       `json:"clientid" db:"clientid"`
 	DepartureCityID          int       `json:"departurecityid" db:"departurecityid"`
@@ -389,6 +393,7 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/calendarreport", CalendarReportHandler).Methods("GET")
 	r.HandleFunc("/import", ImportHandler).Methods("GET")
 	r.HandleFunc("/elavon", ElavonHandler).Methods("GET")
+	r.HandleFunc("/migrate", MigrateHandler).Methods("GET")
 	//post method only
 	r.HandleFunc("/signin", SigninHandler).Methods("POST")
 	r.HandleFunc("/register", RegisterHandler).Methods("POST")
@@ -397,6 +402,8 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/drivers", AddDriverHandler).Methods("POST")
 	r.HandleFunc("/cities", AddCityHandler).Methods("POST")
 	r.HandleFunc("/times", AddDepartureTimeHandler).Methods("POST")
+	//r.HandleFunc("/elavon", ElavonHandler).Methods("POST")
+	r.HandleFunc("/transactionstatus", TransactionStatusHandler).Methods("POST")
 	//put method only
 	r.HandleFunc("/trips", UpdateTripHandler).Methods("PUT")
 	r.HandleFunc("/cities", UpdateCityHandler).Methods("PUT")
@@ -408,9 +415,6 @@ func newRouter() *mux.Router {
 	r.HandleFunc("/postpone", PostponeHandler).Methods("PUT")
 	r.HandleFunc("/cancel", CancelHandler).Methods("PUT")
 	r.HandleFunc("/omittrip", OmitTripHandler).Methods("PUT")
-	r.HandleFunc("/approved", ApprovedHandler).Methods("PUT")
-	r.HandleFunc("/declined", DeclinedHandler).Methods("PUT")
-	r.HandleFunc("/error", ErrorHandler).Methods("PUT")
 	//delete method only
 	r.HandleFunc("/cities", DeleteCityHandler).Methods("DELETE")
 	r.HandleFunc("/venues", DeleteVenueHandler).Methods("DELETE")
@@ -422,6 +426,8 @@ func newRouter() *mux.Router {
 
 func main() {
 	r := newRouter()
+	http.Handle("/", r)
+	r.Use(SetCSPHeaders)
 
 	connString := "root:ah83is82js95pq@tcp(db:3306)/northernairport"
 	//connString := "root:@tcp(db:3306)/northernairport"
@@ -435,7 +441,28 @@ func main() {
 
 	InitSession()
 
-	http.ListenAndServe(":8080", r)
+	//http.ListenAndServe(":80", r)
+	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
+}
+
+func SetCSPHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//  w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		//w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self'; object-src 'self';style-src 'self' img-src 'self'; media-src 'self'; frame-ancestors 'self'; frame-src 'self'; connect-src 'self'")
+
+		header := w.Header()
+		csp := []string{"default-src 'self' ",
+			"style-src 'self' https://cdnjs.cloudflare.com",
+			"font-src 'self' https://cdnjs.cloudflare.com",
+			//"script-src 'self' https://cdnjs.cloudflare.com 'sha256-Pj4adVzOLitxyl2o99sCaYR4mXGXeF6whHx5TnSPjZo=' 'unsafe-hashes'",
+			"script-src 'self' https://cdnjs.cloudflare.com https://cdn.mxpnl.com https://api.demo.convergepay.com https://cdn.appdynamics.com 'unsafe-inline'",
+			"frame-src 'none'"}
+
+		//header.Set("Content-Type", "text/html; charset=UTF-8")
+		header.Set("Content-Security-Policy", strings.Join(csp, "; "))
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 // InitSession initializes a user session

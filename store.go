@@ -15,7 +15,7 @@ import (
 
 //Store offers an interface for various db function to the rest of the application
 type Store interface {
-	CreateUser(client *Client) error
+	CreateUser(client *Client) (int, error)
 	SignInUser(client *Client) error
 	CreateReservation(reservation *Reservation) error
 	GetClientInfo(client *Client) error
@@ -63,9 +63,13 @@ type Store interface {
 	DriverReservations(driverid int, departuredate time.Time) DriverReportForm
 	GetTravelAgencyCount() int
 	GetTravelAgencies() []TravelAgencies
+	GetClientFromReservation(reservationid int) Client
 	TravelAgencyReports(month int, year int) []TravelAgencyReport
 	AGTAQueryReport(startdate time.Time, enddate time.Time) []AGTAReport
-	UpdateStatus(reservationid int, elavontransactionid int, status string) error
+	//UpdateStatus(reservationid int, elavontransactionid int, status string) error
+	UpdateStatus(reservationid int, elavontransactionid string, status string) error
+	GetReservationAmount(reservationid int) float32
+	MigrateDB()
 }
 
 //The `dbStore` struct will implement the `Store` interface it also takes the sql
@@ -75,7 +79,7 @@ type dbStore struct {
 }
 
 //CreateUser - store new client in database
-func (store *dbStore) CreateUser(client *Client) error {
+func (store *dbStore) CreateUser(client *Client) (int, error) {
 
 	result, err := store.db.Exec("INSERT INTO clients(firstname, lastname, phone, email, "+
 		"streetaddress, city, province, postalcode, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -83,7 +87,7 @@ func (store *dbStore) CreateUser(client *Client) error {
 		client.City, client.Province, client.PostalCode, client.Country)
 
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	//get id from client insertion transaction
@@ -94,7 +98,7 @@ func (store *dbStore) CreateUser(client *Client) error {
 		"VALUES (?, ?, ?, ?)",
 		id, client.Password, client.RoleID, client.Username)
 
-	return err
+	return int(id), err
 }
 
 //CreateReservation - store new reservation in database
@@ -116,6 +120,7 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 	log.Print("Inserting reservation into DB")
 
 	log.Printf("TripID: %d", reservation.TripID)
+	log.Printf("ClientID: %d", reservation.ClientDetails.ClientID)
 
 	var insertError error
 	var id int64
@@ -137,7 +142,7 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 			"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
 			"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "+
 			"?, ?, ?, ?, ?, ?)",
-			reservation.ClientID, reservation.DepartureCityID, reservation.DepartureVenueID, reservation.DepartureTimeID,
+			reservation.ClientDetails.ClientID, reservation.DepartureCityID, reservation.DepartureVenueID, reservation.DepartureTimeID,
 			reservation.DestinationCityID, reservation.DestinationVenueID, reservation.ReturnDepartureCityID, reservation.ReturnDepartureVenueID, reservation.ReturnDepartureTimeID,
 			reservation.ReturnDestinationCityID, reservation.ReturnDestinationVenueID, reservation.DiscountCodeID, reservation.DepartureAirlineID, reservation.ReturnAirlineID,
 			reservation.DriverNotes, reservation.InternalNotes, reservation.DepartureNumAdults, reservation.DepartureNumStudents, reservation.DepartureNumSeniors,
@@ -213,12 +218,14 @@ func (store *dbStore) CreateReservation(reservation *Reservation) error {
 	departuredetails = FormatTripDetails(departurecity, departurevenue, departuredate, departuretime,
 		destinationcity, destinationvenue, numadults, numseniors, numstudents, numchildren)
 
-	var client Client
-	client.ClientID = reservation.ClientID
+	//var client Client
+	//client.ClientID = reservation.ClientID
+	//client.ClientID = reservation.ClientDetails.ClientID
 
-	store.GetClientInfo(&client)
+	//store.GetClientInfo(&client)
 
-	SendConfirmationEmail(client.Email, departuredetails, returndetails, reservation.ReservationID, reservation.Price)
+	//SendConfirmationEmail(client.Email, departuredetails, returndetails, reservation.ReservationID, reservation.Price)
+	SendConfirmationEmail(reservation.ClientDetails.Email, departuredetails, returndetails, reservation.ReservationID, reservation.Price)
 
 	return insertError
 }
@@ -770,7 +777,7 @@ func (store *dbStore) GetClientInfo(client *Client) error {
 
 	// We return in case of an error, and defer the closing of the row structure
 	if err != nil {
-		log.Printf("Error retrieving client: %s", err.Error())
+		log.Printf("Error retrieving client 1: %s", err.Error())
 		return err
 	}
 	defer row.Close()
@@ -785,7 +792,7 @@ func (store *dbStore) GetClientInfo(client *Client) error {
 		if err == sql.ErrNoRows {
 			log.Print("No client found")
 		} else {
-			log.Printf("Error retrieving client: %s", err.Error())
+			log.Printf("Error retrieving client 2: %s", err.Error())
 		}
 	}
 
@@ -2287,6 +2294,32 @@ func (store *dbStore) TravelAgencyReports(month int, year int) []TravelAgencyRep
 	return []TravelAgencyReport{}
 }
 
+//GetClientFromReservation - return client info used to create reservation
+func (store *dbStore) GetClientFromReservation(reservationid int) Client {
+
+	row := store.db.QueryRow("select firstname, lastname, phone, email, streetaddress, city, "+
+		"province, postalcode, country from clients c inner join reservations r "+
+		"on c.clientid = r.clientid where r.reservationid = ?", reservationid)
+
+	client := Client{}
+
+	err := row.Scan(
+		&client.Firstname, &client.Lastname, &client.Phone,
+		&client.Email, &client.StreetAddress, &client.City,
+		&client.Province, &client.PostalCode, &client.Country,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No client found")
+		} else {
+			log.Printf("Error retrieving client: %s", err.Error())
+		}
+	}
+
+	return client
+}
+
 //AGTAQueryReport - Get Data for AGTA Report
 func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []AGTAReport {
 
@@ -2471,14 +2504,16 @@ func (store *dbStore) AGTAQueryReport(startdate time.Time, enddate time.Time) []
 }
 
 //UpdateStatus - Update Reservation Status
-func (store *dbStore) UpdateStatus(reservationid int, elavontransactionid int, status string) error {
+func (store *dbStore) UpdateStatus(reservationid int, elavontransactionid string, status string) error {
 	log.Printf("update reservation status: %s in database", status)
 
-	if status != "paid" && status != "declined" && status != "error" {
+	if status != "approval" && status != "declined" && status != "error" {
 		log.Printf("Invalid status received: %s", status)
+	} else if status == "approval" {
+		status = "approved"
 	}
 
-	_, updateerr := store.db.Exec("UPDATE reservations SET status = ?, SET elavontransactionid = ?"+
+	_, updateerr := store.db.Exec("UPDATE reservations SET status = ?, elavontransactionid = ? "+
 		"WHERE reservationid = ?", status, elavontransactionid, reservationid)
 
 	if updateerr != nil {
@@ -2488,6 +2523,182 @@ func (store *dbStore) UpdateStatus(reservationid int, elavontransactionid int, s
 	}
 
 	return updateerr
+}
+
+//GetReservationAmount - Get Reservation Amount
+func (store *dbStore) GetReservationAmount(reservationid int) float32 {
+	row := store.db.QueryRow("select price from reservations "+
+		"where reservationid = ?", reservationid)
+
+	price := 0.0
+
+	err := row.Scan(
+		&price,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Print("No reservation found")
+		} else {
+			log.Printf("Error retrieving reservation: %s", err.Error())
+		}
+	}
+
+	return float32(price)
+}
+
+func (store *dbStore) MigrateDB() {
+	log.Printf("migate database")
+
+	log.Printf("delete existing records")
+
+	const layoutISO = "2006-01-02"
+
+	//delete clients, update auto increment
+	{
+		_, updateerr := store.db.Exec("DELETE FROM clients WHERE ClientID > 7")
+
+		if updateerr != nil {
+			log.Printf("Error deleting clients: %s", updateerr.Error())
+		} else {
+			log.Printf("Clients deleted")
+		}
+
+		log.Printf("update auto increment to 8")
+
+		_, updateerr = store.db.Exec("ALTER TABLE clients AUTO_INCREMENT = 8")
+
+		if updateerr != nil {
+			log.Printf("Error updating clients auto increment: %s", updateerr.Error())
+		} else {
+			log.Printf("Clients auto increment updated")
+		}
+	}
+
+	//delete reservations, update auto increment
+	{
+		_, updateerr := store.db.Exec("DELETE FROM reservations WHERE ReservationID > 2")
+
+		if updateerr != nil {
+			log.Printf("Error deleting reservations: %s", updateerr.Error())
+		} else {
+			log.Printf("Reservations deleted")
+		}
+
+		log.Printf("update auto increment to 3")
+
+		_, updateerr = store.db.Exec("ALTER TABLE reservations AUTO_INCREMENT = 3")
+
+		if updateerr != nil {
+			log.Printf("Error updating reservations auto increment: %s", updateerr.Error())
+		} else {
+			log.Printf("Reservations auto increment updated")
+		}
+	}
+
+	//add trips for each day starting 01/01/2016
+	{
+		log.Printf("Creating Trips")
+
+		datecounter, err := time.Parse("2006-01-02", "2020-01-01")
+
+		if err != nil {
+			log.Printf("Error creating start date: %s", err.Error())
+		}
+
+		today, err := time.Parse("2006-01-02", time.Now().Format(layoutISO))
+
+		if err != nil {
+			log.Printf("Error creating current date: %s", err.Error())
+		}
+
+		for datecounter.Before(today) {
+
+			_, triperr := store.db.Exec("INSERT INTO trips (departuredate, departuretimeid, "+
+				"numpassengers, driverid, vehicleid, capacity, omitted) "+
+				"VALUES	(?, 1, 0, 0, 0, 11, 0), "+
+				" (?, 2, 0, 0, 0, 11, 0), "+
+				" (?, 3, 0, 0, 0, 11, 0), "+
+				" (?, 4, 0, 0, 0, 11, 0), "+
+				" (?, 5, 0, 0, 0, 11, 0), "+
+				" (?, 6, 0, 0, 0, 11, 0), "+
+				" (?, 7, 0, 0, 0, 11, 0), "+
+				" (?, 8, 0, 0, 0, 11, 0) ",
+				datecounter.Format(layoutISO), datecounter.Format(layoutISO), datecounter.Format(layoutISO),
+				datecounter.Format(layoutISO), datecounter.Format(layoutISO), datecounter.Format(layoutISO),
+				datecounter.Format(layoutISO), datecounter.Format(layoutISO))
+
+			if triperr != nil {
+				log.Printf("Error inserting trip for day: %s Error: %s", datecounter.Format(layoutISO), triperr.Error())
+				//log.Printf(sqlstmt)
+			}
+
+			datecounter = datecounter.Add(24 * time.Hour)
+		}
+
+		log.Printf("Trips Created")
+	}
+
+	//migrate clients and reservations
+	{
+		log.Printf("Migrating Clients")
+
+		datecounter, err := time.Parse("2006-01-02", "2020-01-01")
+
+		if err != nil {
+			log.Printf("Error creating start date: %s", err.Error())
+		}
+
+		today, err := time.Parse("2006-01-02", time.Now().Format(layoutISO))
+
+		if err != nil {
+			log.Printf("Error creating current date: %s", err.Error())
+		}
+
+		for datecounter.Before(today) {
+
+			plusonemonth := datecounter.AddDate(0, 1, 0)
+
+			result, clienterr := store.db.Exec("INSERT INTO clients (firstname, lastname, phone, "+
+				"email, streetaddress, city, province, postalcode, country) "+
+				"SELECT firstname, lastname, CASE WHEN REGEXP_REPLACE(phone, '[^0-9]','') = '' THEN 0 "+
+				"ELSE LEFT(REGEXP_REPLACE(phone, '[^0-9]',''),10) END AS phone, "+
+				"email, billingaddress, city, province, postal, country "+
+				"FROM reservations_old "+
+				"WHERE departuredate >= ? AND "+
+				"departuredate <= ? ", datecounter.Format(layoutISO), plusonemonth.Format(layoutISO))
+
+			if clienterr != nil {
+				log.Printf("Error migrating legacy client: %s Error: %s", datecounter.Format(layoutISO), clienterr.Error())
+			}
+
+			id, _ := result.LastInsertId()
+
+			_, reservationerr := store.db.Exec("INSERT INTO reservations (clientid, travelagencyid, departurecityid, "+
+				"departurevenueid, departuretimeid, destinationcityid, destinationvenueid, returndeparturecityid, "+
+				"returndeparturevenueid, returndeparturetimeid, returndestinationcityid, returndestinationvenueid, "+
+				"discountcodeid, departureairlineid, returnairlineid, drivernotes, internalnotes, departurenumadults, "+
+				"departurenumstudents, departurenumseniors, departurenumchildren, returnnumadults, returnnumstudents, "+
+				"returnnumseniors, returnnumchildren, price, customdepartureid, customdestinationid, departuredate, "+
+				"returndate, triptypeid, balanceowing, elavontransactionid, postponed, cancelled, tripid) "+
+				"SELECT "+strconv.Itoa(int(id))+", 1, departurecity, departurevenue, 1, "+
+				"destinationcity, destinationvenue, destinationcity, IF(returndeparturevenue LIKE '', null, returndeparturevenue), REGEXP_REPLACE(returntime, '[^0-9]',null), "+
+				"IF(returndestinationcity LIKE '', null, returndestinationcity), IF(returndestinationvenue LIKE '', null, returndestinationvenue), 1, IF(airline LIKE '', null, airline), "+
+				"IF(returnairline LIKE '', null, returnairline),	drivernotes, tanotes, departureadults, departurestudents, departureseniors, departurechildren, "+
+				"IF(returnadults LIKE '', null, returnadults), IF(returnstudents LIKE '', null, returnstudents), IF(returnseniors LIKE '', null, returnseniors), "+
+				"IF(returnchildren LIKE '', null, returnchildren), cost, 0, 0, departuredate, IF(returndate LIKE '', null, returndate), IF(triptype LIKE 'oneway', 1, 2), balanceowing, elavontransactionid, "+
+				"0, 0, 1 FROM reservations_old r "+
+				"WHERE departuredate >= ? "+
+				"AND departuredate <= ?", datecounter.Format(layoutISO), plusonemonth.Format(layoutISO))
+
+			if reservationerr != nil {
+				log.Printf("Error migrating legacy reservation: %s Error: %s", datecounter.Format(layoutISO), reservationerr.Error())
+			}
+
+			datecounter = plusonemonth
+		}
+
+	}
 }
 
 // The store variable is a package level variable that will be available for

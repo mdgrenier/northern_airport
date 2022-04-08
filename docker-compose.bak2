@@ -1,0 +1,48 @@
+version: "3.4"
+
+services:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+      - PMA_PORT=3306
+    restart: always
+    ports:
+      - 8081:8081
+    volumes:
+      - /sessions
+    depends_on:
+      - db
+  db:
+    image: mysql:latest
+    environment: 
+      MYSQL_ROOT_PASSWORD: ah83is82js95pq
+      MYSQL_DATABASE: northernairport
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
+    restart: always
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: dev
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - ./opt/app/api
+      - ./public:/var/www/html
+      - ./conf.d:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/nginx/ssl
+      - ./certbot/data:/var/www/certbot
+  certbot:
+        image: certbot/certbot:latest
+        command: certonly --webroot -w /var/www/certbot --email matt@mgrenier.ca --agree-tos --no-eff-email --dry-run -d northernair.xyz -d www.northernair.xyz
+        volumes:
+            - ./certbot/conf:/etc/letsencrypt
+            - ./certbot/logs:/var/log/letsencrypt
+            - ./certbot/data:/var/www/certbot

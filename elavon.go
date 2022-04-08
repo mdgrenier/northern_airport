@@ -13,11 +13,14 @@ func Elavon(w http.ResponseWriter, r *http.Request) {
 
 	// Provide Converge Credentials
 	//Converge 6-Digit Account ID *Not the 10-Digit Elavon Merchant ID*
-	const MERCHANTID = 631103
+	//const MERCHANTID = 631103
+	const MERCHANTID = "0022805"
 	//Converge User ID *MUST FLAG AS HOSTED API USER IN CONVERGE UI*
-	const USERID = "webpage"
+	//const USERID = "webpage"
+	const USERID = "apiuser"
 	//Converge PIN (64 CHAR A/N)
-	const PIN = "80KYG17V8IBW89MTJYJZIQ3C31DCCG9BJRYP9IYZ4D83ZGQEHCUQDVZB2YBSIG7S"
+	//const PIN = "80KYG17V8IBW89MTJYJZIQ3C31DCCG9BJRYP9IYZ4D83ZGQEHCUQDVZB2YBSIG7S"
+	const PIN = "DZKLNA2M7ZAAE8X6W4AD6T3IY4X1LFR41IG0B2ZBZDAYC6DO3JECM4IC4IM8QTR9"
 	const CVVINDICATOR = '1' //means "present"
 	//demo url
 	const ELAVONURL = "https://demo.myvirtualmerchant.com/VirtualMerchantDemo/process.do"
@@ -27,7 +30,7 @@ func Elavon(w http.ResponseWriter, r *http.Request) {
 	const CARDTYPE = "CREDITCARD"
 
 	type elavonPayload struct {
-		sslmerchantid      int     //`json:"ssl_merchant_id"`
+		sslmerchantid      string     //`json:"ssl_merchant_id"`
 		ssluserid          string  //`json:"ssl_user_id"`
 		sslpin             string  //`json:"ssl_pin"`
 		ssltransactiontype string  //`json:"ssl_transaction_type"`

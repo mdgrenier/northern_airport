@@ -49,7 +49,22 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 	*
 	**********************************************************************/
 
+	client := Client{}
+
 	reservation.ClientID, err = strconv.Atoi(r.FormValue("clientid"))
+
+	client.Firstname = r.FormValue("firstname")
+	client.Lastname = r.FormValue("lastname")
+	client.Email = r.FormValue("email")
+	client.Phone = r.FormValue("phone")
+	client.StreetAddress = r.FormValue("streetaddress")
+	client.City = r.FormValue("city")
+
+	reservation.ClientDetails = client
+
+	log.Printf("Firstname: %s", reservation.ClientDetails.Firstname)
+	log.Printf("Lastname: %s", reservation.ClientDetails.Lastname)
+	log.Printf("Email: %s", reservation.ClientDetails.Email)
 
 	//store trip info in resformdata
 	if gettripdata {
@@ -222,7 +237,6 @@ func SendCapacityEmail(trip Trips) {
 
 	body := fmt.Sprintf("Northern Airport Passenger Service Capacity Alert\n\n"+
 		"TripID #%d has reached 75%% capacity.\n\n\n", trip.TripID)
-
 
 	log.Printf("sending capacity email")
 
