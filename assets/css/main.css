@@ -1,6 +1,10 @@
 main {
     overflow: auto;
-    min-width: 700px;
+    /*min-width: 700px;*/
+}
+
+body {
+    margin: 15px;
 }
 
 #return-info {
