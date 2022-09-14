@@ -181,8 +181,8 @@ func GetReservationFormValues(r *http.Request, gettripdata bool) Reservation {
 //SendConfirmationEmail - given the recipient and email body, send a email
 func SendConfirmationEmail(to string, departuredetails string, returndetails string, reservationid int, price float32) {
 
-	from := "mdgrenier@gmail.com"
-	pass := "Dh76nm6m*"
+	from := "testemail@gmail.com"
+	pass := "mytestpassword"
 	//to := "matt@mgrenier.ca"
 	body := fmt.Sprintf("Northern Airport Passenger Service Confirmation\n\n"+
 		"Your Confirmation ID is #%d\n\nDeparture information:\n%s\n\n", reservationid, departuredetails)
